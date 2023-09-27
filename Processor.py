@@ -22,9 +22,11 @@ class Processor:
         crop = Crop
         nn = NnScale
         biln = BilinearScale
+        merge = Merge
         self.class_map = {"crop": crop,
                           "nn_scale": nn,
-                          "bilinear_scale": biln}
+                          "bilinear_scale": biln,
+                          "merge": merge}
 
         # what in-labels should be already done for applying our filter with this out-label
         self.label_dependencies = {}
@@ -35,18 +37,28 @@ class Processor:
         self.inp_image = ""
     
     def process(self, label):
-        if label != "-i":
-            if (label not in self.label_dependencies):
-                raise Exception("Label doesn't exist: " + label)
-            prev_label = self.label_dependencies[label]
-            image = self.process(prev_label)
-        else:
-            image = cv2.imread(self.inp_image)
+        for prev_label in self.label_dependencies[label]:
+            if prev_label != "-i":
+                if (prev_label not in self.label_dependencies):
+                    raise Exception("Label doesn't exist: " + prev_label)
+
+                image = []
+                image.append(self.process(prev_label))
+                print(label, len(image))
+                if len(image) == 2:
+                    return self.label_in_map[prev_label].apply(image[0], image[1])
+                elif len(image) == 1:
+                    return self.label_in_map[prev_label].apply(image[0])
+            else:
+                return cv2.imread(self.inp_image)
         
-        if label != self.fin:
-            return self.label_in_map[label].apply(image)
-        else:
-            return image
+        # if label != self.fin:
+        #     print(label, len(image))
+        #     if len(image) == 2:
+        #         return self.label_in_map[label].apply(image[0], image[1])
+        #     elif len(image) == 1:
+        #         return self.label_in_map[label].apply(image[0])
+        
 
 
 class Parser:
@@ -71,21 +83,29 @@ class Parser:
                 case 'crop':
                     if len(command[1]) != 5:
                         raise Exception("Wrong number of parameters for crop")
-                    res_obj.label_dependencies[command[2]] = command[0]
-                    res_obj.label_in_map[command[0]] = res_obj.class_map["crop"](command[1][1],
+                    res_obj.label_dependencies[command[2]] = [command[0]]
+                    res_obj.label_in_map[command[2]] = res_obj.class_map["crop"](command[1][1],
                                                                                  command[1][2],
                                                                                  command[1][3],
                                                                                  command[1][4])
                 case 'nn_scale':
                     if len(command[1]) != 2:
                         raise Exception("Wrong number of parameters for nn_scale")
-                    res_obj.label_dependencies[command[2]] = command[0]
-                    res_obj.label_in_map[command[0]] = res_obj.class_map["nn_scale"](command[1][1])
+                    res_obj.label_dependencies[command[2]] = [command[0]]
+                    res_obj.label_in_map[command[2]] = res_obj.class_map["nn_scale"](command[1][1])
                 case 'bilinear_scale':
                     if len(command[1]) != 2:
                         raise Exception("Wrong number of parameters for nn_scale")
-                    res_obj.label_dependencies[command[2]] = command[0]
-                    res_obj.label_in_map[command[0]] = res_obj.class_map["bilinear_scale"](command[1][1])
+                    res_obj.label_dependencies[command[2]] = [command[0]]
+                    res_obj.label_in_map[command[2]] = res_obj.class_map["bilinear_scale"](command[1][1])
+                case 'merge':
+                    if len(command[1]) != 1:
+                        raise Exception("Wrong number of parameters for merge")
+                    res_obj.label_dependencies[command[2]] = []
+                    for c in command[0].split(':'):
+                        res_obj.label_dependencies[command[2]].append(c)
+                    res_obj.label_in_map[command[2]] = res_obj.class_map["merge"]()
+
                 case _:
                     raise Exception("Wrong filter name: " + command[1][0])
         
@@ -119,6 +139,12 @@ class Crop():
             
         cropped_image = img[self.y1:self.y2, self.x1:self.x2]
         return cropped_image
+
+
+class Merge():
+
+    def apply(self, img1, img2):
+        return img2
 
 
 class NnScale():
