@@ -8,7 +8,7 @@ import argparse
 
 class Filter:
 
-    def __init__(self,img):
+    def __init__(self, img):
         self.input_image = cv2.imread(img) # open image
         self.input_height, self.input_width, _ = self.input_image.shape # initialize sizes
 
