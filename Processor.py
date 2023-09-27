@@ -36,6 +36,8 @@ class Processor:
     
     def process(self, label):
         if label != "-i":
+            if (label not in self.label_dependencies):
+                raise Exception("Label doesn't exist: " + label)
             prev_label = self.label_dependencies[label]
             image = self.process(prev_label)
         else:
@@ -67,17 +69,25 @@ class Parser:
             command[1] = command[1].split(':')
             match command[1][0]:
                 case 'crop':
+                    if len(command[1]) != 5:
+                        raise Exception("Wrong number of parameters for crop")
                     res_obj.label_dependencies[command[2]] = command[0]
                     res_obj.label_in_map[command[0]] = res_obj.class_map["crop"](command[1][1],
                                                                                  command[1][2],
                                                                                  command[1][3],
                                                                                  command[1][4])
                 case 'nn_scale':
+                    if len(command[1]) != 2:
+                        raise Exception("Wrong number of parameters for nn_scale")
                     res_obj.label_dependencies[command[2]] = command[0]
                     res_obj.label_in_map[command[0]] = res_obj.class_map["nn_scale"](command[1][1])
                 case 'bilinear_scale':
+                    if len(command[1]) != 2:
+                        raise Exception("Wrong number of parameters for nn_scale")
                     res_obj.label_dependencies[command[2]] = command[0]
                     res_obj.label_in_map[command[0]] = res_obj.class_map["bilinear_scale"](command[1][1])
+                case _:
+                    raise Exception("Wrong filter name: " + command[1][0])
         
         print("\nDependencies:")
         for key in res_obj.label_dependencies:
@@ -102,11 +112,10 @@ class Crop():
     
     def apply(self, img):
         input_height, input_width, _ = img.shape
-        # add check for correct x, y, x, y
         if (self.x1 > input_width or self.y1 > input_height or self.x2 > input_width or self.y2 > input_height or
             (self.x1 >= self.x2) or (self.y1 >= self.y2) or self.x1 < 0 or self.x2 < 0 or self.y1 < 0 or self.y2 < 0 or
             type(self.x1) != int or type(self.x2) != int or type(self.y1) != int or type(self.y2) != int):
-            raise Exception("Wrong crop parameters")
+            raise Exception("Wrong crop parameters: " + self.x1 + ' ' + self.y1 + ' ' + self.x2 + ' ' + self.y2)
             
         cropped_image = img[self.y1:self.y2, self.x1:self.x2]
         return cropped_image
@@ -121,7 +130,6 @@ class NnScale():
         input_height, input_width, _ = img.shape
         new_width = int(input_width * self.scale_factor)
         new_height = int(input_height * self.scale_factor)
-
         upscaled_image = np.zeros((new_height, new_width, 3), dtype=np.uint8)
 
         for y in range(new_height):
