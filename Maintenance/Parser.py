@@ -1,22 +1,21 @@
 import os
 import errno
-
 import re
-
 from Maintenance.Processor import Processor
+from typing import List
 
 
 class Parser:
 
     def __init__(self, inp_file: str, inp_actions: str):
-        self.inp_image = inp_file
-        self.inp_actions = inp_actions
+        self.inp_image: str = inp_file
+        self.inp_actions: str = inp_actions
 
     def parse(self) -> Processor:
-        res_obj = Processor()
+        res_obj: Processor = Processor()
         res_obj.inp_image = self.inp_image
 
-        inp_parameters = self.inp_actions.split('][')
+        inp_parameters: List[str] = self.inp_actions.split('][')
         inp_parameters[0] = inp_parameters[0][1:]  # delete first '['
         inp_parameters[-1] = inp_parameters[-1][:-1]  # delete last ']'
         for i in range(len(inp_parameters)):
