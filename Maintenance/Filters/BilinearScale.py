@@ -1,12 +1,13 @@
 import numpy as np
+from typing import List
 
 
 class BilinearScale:
 
-    def __init__(self, scale_factor):
-        self.scale_factor = float(scale_factor)
+    def __init__(self, scale_factor: float):
+        self.scale_factor: float = float(scale_factor)
 
-    def apply(self, img):
+    def apply(self, img: np.ndarray) -> List[np.ndarray]:
         input_height, input_width, _ = img.shape
         new_width = int(input_width * self.scale_factor)
         new_height = int(input_height * self.scale_factor)
