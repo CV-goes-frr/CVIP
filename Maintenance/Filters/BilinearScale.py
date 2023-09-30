@@ -1,15 +1,11 @@
-import sys
-import os
-import errno
-
 import numpy as np
 
 
-class BilinearScale():
+class BilinearScale:
 
     def __init__(self, scale_factor):
         self.scale_factor = float(scale_factor)
-    
+
     def apply(self, img):
         input_height, input_width, _ = img.shape
         new_width = int(input_width * self.scale_factor)
@@ -38,7 +34,8 @@ class BilinearScale():
                 bottom_left = img[y2, x1]
                 bottom_right = img[y2, x2]
 
-                weight = (1 - alpha) * (1 - beta) * top_left + alpha * (1 - beta) * top_right + (1 - alpha) * beta * bottom_left + alpha * beta * bottom_right
+                weight = (1 - alpha) * (1 - beta) * top_left + alpha * (1 - beta) * top_right + (
+                        1 - alpha) * beta * bottom_left + alpha * beta * bottom_right
 
                 upscaled_image[y, x] = weight.astype(np.uint8)
 

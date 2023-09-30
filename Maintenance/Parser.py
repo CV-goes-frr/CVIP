@@ -1,8 +1,6 @@
-import sys
 import os
 import errno
 
-import numpy as np
 import re
 
 from Maintenance.Processor import Processor
@@ -55,15 +53,15 @@ class Parser:
 
                 case _:
                     raise Exception("Wrong filter name: " + command[1][0])
-        
+
         print("\nDependencies:")
         for key in res_obj.label_dependencies:
             print(key, res_obj.label_dependencies[key])
-        
+
         print("\nLabels map to filters:")
         for key in res_obj.label_in_map:
             print(key, res_obj.label_in_map[key])
-            
+
         res_obj.fin = inp_parameters[-1][-1]
 
         if not os.path.exists(res_obj.inp_image):

@@ -1,11 +1,7 @@
-import sys
-import os
-import errno
-
 import numpy as np
 
 
-class NnScale():
+class NnScale:
 
     def __init__(self, scale_factor):
         self.scale_factor = float(scale_factor)

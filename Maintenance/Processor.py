@@ -25,15 +25,15 @@ class Processor:
         self.label_in_map = {}
 
         self.inp_image = ""
-    
+
     def process(self, label: str) -> list:
         # get all results from previous filters
         image = []
         if label != '-i':
             for prev_label in self.label_dependencies[label]:
-                if (prev_label not in self.label_dependencies and prev_label != '-i'):
+                if prev_label not in self.label_dependencies and prev_label != '-i':
                     raise Exception("Label doesn't exist: " + prev_label)
-                
+
                 prev_result = self.process(prev_label)
                 for img in prev_result:
                     image.append(img)
@@ -47,10 +47,10 @@ class Processor:
             result = self.label_in_map[label].apply(image[0], image[1])
         elif len(image) == 1:
             result = self.label_in_map[label].apply(image[0])
-        
+
         print(len(result), "from", label)
         to_return = []
         for img in result:
             to_return.append(img)
-        
+
         return to_return
