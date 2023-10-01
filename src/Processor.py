@@ -2,6 +2,7 @@ import cv2
 from typing import List, Dict
 
 from .Filters.BilinearScale import BilinearScale
+from .Filters.BicubicScale import BicubicScale
 from .Filters.Crop import Crop
 from .Filters.NnScale import NnScale
 from .Filters.Merge import Merge
@@ -15,6 +16,7 @@ class Processor:
         self.class_map: Dict[str, type] = {"crop": Crop,
                                            "nn_scale": NnScale,
                                            "bilinear_scale": BilinearScale,
+                                           "bicubic_scale": BicubicScale,
                                            "merge": Merge,
                                            "duplicate": Duplicate}
 

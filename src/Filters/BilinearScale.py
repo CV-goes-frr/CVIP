@@ -15,7 +15,7 @@ class BilinearScale(Filter):
             print("USING CACHE...")
             return self.cache
 
-        print("BILINEAR UPSCALE IN PROCESS...")
+        print("BILINEAR SCALE IN PROCESS...")
         input_height, input_width, _ = img.shape
         new_width = int(input_width * self.scale_factor)
         new_height = int(input_height * self.scale_factor)

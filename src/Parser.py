@@ -3,7 +3,7 @@ import errno
 import re
 from typing import List
 
-from Maintenance.Processor import Processor
+from src.Processor import Processor
 
 
 class Parser:
@@ -40,9 +40,14 @@ class Parser:
                     res_obj.label_in_map[command[2]] = res_obj.class_map["nn_scale"](command[1][1])
                 case 'bilinear_scale':
                     if len(command[1]) != 2:
-                        raise Exception("Wrong number of parameters for nn_scale")
+                        raise Exception("Wrong number of parameters for bilinear_scale")
                     res_obj.label_dependencies[command[2]] = [command[0]]
                     res_obj.label_in_map[command[2]] = res_obj.class_map["bilinear_scale"](command[1][1])
+                case 'bicubic_scale':
+                    if len(command[1]) != 2:
+                        raise Exception("Wrong number of parameters for bicubic_scale")
+                    res_obj.label_dependencies[command[2]] = [command[0]]
+                    res_obj.label_in_map[command[2]] = res_obj.class_map["bicubic_scale"](command[1][1])
                 case 'merge':
                     if len(command[1]) != 1:
                         raise Exception("Wrong number of parameters for merge")
