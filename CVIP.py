@@ -2,8 +2,8 @@ import cv2
 import argparse
 import numpy as np
 from typing import List
-from Maintenance.Parser import Parser
-from Maintenance.Processor import Processor
+from src.Parser import Parser
+from src.Processor import Processor
 
 
 def main():
