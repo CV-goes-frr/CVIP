@@ -1,10 +1,11 @@
 import cv2
+from typing import List, Dict
+
 from .Filters.BilinearScale import BilinearScale
 from .Filters.Crop import Crop
 from .Filters.NnScale import NnScale
 from .Filters.Merge import Merge
 from .Filters.Duplicate import Duplicate
-from typing import List, Dict
 
 
 class Processor:
@@ -40,14 +41,14 @@ class Processor:
             return [cv2.imread(self.inp_image)]
 
         # now let our filter process all we've got from previous
-        print(len(image), "to", label)
+        # print(len(image), "to", label)
         result: List = []
         if len(image) == 2:
             result = self.label_in_map[label].apply(image[0], image[1])
         elif len(image) == 1:
             result = self.label_in_map[label].apply(image[0])
 
-        print(len(result), "from", label)
+        print(len(result), "result(s) from", label, "\n")
         to_return: List = []
         for img in result:
             to_return.append(img)

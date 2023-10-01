@@ -1,13 +1,21 @@
 import numpy as np
 from typing import List
 
+from .Filter import Filter
 
-class BilinearScale:
+
+class BilinearScale(Filter):
 
     def __init__(self, scale_factor: float):
+        super().__init__()
         self.scale_factor: float = float(scale_factor)
 
     def apply(self, img: np.ndarray) -> List[np.ndarray]:
+        if self.cache:
+            print("USING CACHE...")
+            return self.cache
+
+        print("BILINEAR UPSCALE IN PROCESS...")
         input_height, input_width, _ = img.shape
         new_width = int(input_width * self.scale_factor)
         new_height = int(input_height * self.scale_factor)
@@ -39,5 +47,8 @@ class BilinearScale:
                         1 - alpha) * beta * bottom_left + alpha * beta * bottom_right
 
                 upscaled_image[y, x] = weight.astype(np.uint8)
+
+        if self.calls_counter > 1:
+            self.cache = [upscaled_image]
 
         return [upscaled_image]
