@@ -1,8 +1,9 @@
 import os
 import errno
 import re
-from Maintenance.Processor import Processor
 from typing import List
+
+from Maintenance.Processor import Processor
 
 
 class Parser:
@@ -53,17 +54,23 @@ class Parser:
                 case _:
                     raise Exception("Wrong filter name: " + command[1][0])
 
+            # increase calls counter
+            for c in command[0].split(':'):
+                if c in res_obj.label_in_map:
+                    res_obj.label_in_map[c].calls_counter += 1
+
         print("\nDependencies:")
         for key in res_obj.label_dependencies:
             print(key, res_obj.label_dependencies[key])
 
         print("\nLabels map to filters:")
         for key in res_obj.label_in_map:
-            print(key, res_obj.label_in_map[key])
+            print(key, res_obj.label_in_map[key], "calls:", res_obj.label_in_map[key].calls_counter)
 
         res_obj.fin = inp_parameters[-1][-1]
 
         if not os.path.exists(res_obj.inp_image):
             raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), res_obj.inp_image)
 
+        print()
         return res_obj
