@@ -1,7 +1,8 @@
 import cv2
 from typing import List, Dict
+import time
 
-from .Filters.BilinearScale import BilinearScale
+from .Filters.BilinearScaleParallel import BilinearScale
 from .Filters.BicubicScale import BicubicScale
 from .Filters.Crop import Crop
 from .Filters.NnScale import NnScale
@@ -45,10 +46,13 @@ class Processor:
         # now let our filter process all we've got from previous
         # print(len(image), "to", label)
         result: List = []
+        start = time.time()
         if len(image) == 2:
             result = self.label_in_map[label].apply(image[0], image[1])
         elif len(image) == 1:
             result = self.label_in_map[label].apply(image[0])
+        end = time.time()
+        print("Time elapsed:", end - start)
 
         print(len(result), "result(s) from", label, "\n")
         to_return: List = []
