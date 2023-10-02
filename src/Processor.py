@@ -3,8 +3,8 @@ import time
 
 from typing import List, Dict
 
-from .Filters.BilinearScaleParallel import BilinearScale
-from .Filters.BicubicScaleParallel import BicubicScale
+from .Filters.BilinearScale import BilinearScale
+from .Filters.BicubicScale import BicubicScale
 from .Filters.Crop import Crop
 from .Filters.NnScale import NnScale
 from .Filters.Merge import Merge
