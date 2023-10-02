@@ -8,12 +8,13 @@ from src.Processor import Processor
 
 class Parser:
 
-    def __init__(self, inp_file: str, inp_actions: str):
+    def __init__(self, inp_file: str, inp_actions: str, processes_limit: str):
         self.inp_image: str = inp_file
         self.inp_actions: str = inp_actions
+        self.processes_limit: int = int(processes_limit)
 
     def parse(self) -> Processor:
-        res_obj: Processor = Processor()
+        res_obj: Processor = Processor(self.processes_limit)
         res_obj.inp_image = self.inp_image
 
         inp_parameters: List[str] = self.inp_actions.split('][')

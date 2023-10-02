@@ -20,7 +20,7 @@ class Crop(Filter):
 
     # @npArrToTuple
     #@lru_cache()
-    def apply(self, img: np.ndarray) -> List[np.ndarray]:
+    def apply(self, img: np.ndarray, processes_limit: int) -> List[np.ndarray]:
         if self.cache:
             print("USING CACHE...")
             return self.cache

@@ -12,8 +12,9 @@ from .Filters.Duplicate import Duplicate
 
 class Processor:
 
-    def __init__(self):
+    def __init__(self, processes_limit):
         self.fin: str = ""
+        self.processes_limit: int = processes_limit
         self.class_map: Dict[str, type] = {"crop": Crop,
                                            "nn_scale": NnScale,
                                            "bilinear_scale": BilinearScale,
@@ -48,9 +49,9 @@ class Processor:
         result: List = []
         start = time.time()
         if len(image) == 2:
-            result = self.label_in_map[label].apply(image[0], image[1])
+            result = self.label_in_map[label].apply(image[0], image[1], self.processes_limit)
         elif len(image) == 1:
-            result = self.label_in_map[label].apply(image[0])
+            result = self.label_in_map[label].apply(image[0], self.processes_limit)
         end = time.time()
         print("Time elapsed:", end - start)
 

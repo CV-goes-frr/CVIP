@@ -10,7 +10,6 @@ class BilinearScale(Filter):
     def __init__(self, scale_factor: float):
         super().__init__()
         self.scale_factor: float = float(scale_factor)
-        self.pool = Pool(processes=8)  # Create a Pool of 8 processes
 
     # Define process_pixel as a separate function outside the class
     @staticmethod
@@ -40,10 +39,12 @@ class BilinearScale(Filter):
 
         return weight.astype(np.uint8)
 
-    def apply(self, img: np.ndarray) -> List[np.ndarray]:
+    def apply(self, img: np.ndarray, processes_limit: int) -> List[np.ndarray]:
         if self.cache:
             print("USING CACHE...")
             return self.cache
+
+        pool = Pool(processes=processes_limit)  # Create a Pool of 8 processes
 
         print("BILINEAR SCALE IN PROCESS...")
         input_height, input_width, _ = img.shape
@@ -53,14 +54,14 @@ class BilinearScale(Filter):
         upscaled_image = np.zeros((new_height, new_width, 3), dtype=np.uint8)
 
         # Split the image into 8 equal parts
-        part_height = new_height // 8
+        part_height = new_height // processes_limit
         coordinates = [(x, y) for x in range(new_width) for y in range(new_height)]
         parts = [coordinates[i:i+part_height] for i in range(0, len(coordinates), part_height)]
 
         # Use the Pool.map method to parallelize the pixel processing for each part
-        processed_pixels = self.pool.starmap(self.process_pixel,
-                                             [(x, y, self.scale_factor, input_width, input_height, img)
-                                              for part in parts for (x, y) in part])
+        processed_pixels = pool.starmap(self.process_pixel,
+                                        [(x, y, self.scale_factor, input_width, input_height, img)
+                                         for part in parts for (x, y) in part])
 
         # Convert the processed pixels back to an image
         for (x, y), pixel_value in zip(coordinates, processed_pixels):
