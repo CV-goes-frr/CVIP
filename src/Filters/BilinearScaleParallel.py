@@ -1,4 +1,5 @@
 import numpy as np
+
 from typing import List
 from multiprocessing import Pool
 
@@ -13,7 +14,8 @@ class BilinearScale(Filter):
 
     # Define process_pixel as a separate function outside the class
     @staticmethod
-    def process_pixel(x, y, scale_factor, input_width, input_height, img):
+    def process_pixel(x: int, y: int, scale_factor: float,
+                      input_width: int, input_height: int, img: np.ndarray) -> np.ndarray:
         # This function calculates the pixel value for a given (x, y) coordinate
         original_x = int(x / scale_factor)
         original_y = int(y / scale_factor)
