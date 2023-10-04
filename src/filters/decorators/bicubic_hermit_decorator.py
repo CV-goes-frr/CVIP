@@ -4,6 +4,13 @@ import numpy as np
 
 
 def bicubic_hermit_cache(function):
+    """
+    Overriding wrapper function to make input data hashable and
+    cached_wrapper function to call the original function with hashable input data.
+
+    :param function: - original function
+    :return: - wrapper function
+    """
     @lru_cache(maxsize=128)
     def cached_wrapper(hashable_array1: tuple, hashable_array2: tuple,
                        hashable_array3: tuple, hashable_array4: tuple, t: int):

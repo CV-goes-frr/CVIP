@@ -16,10 +16,22 @@ class BicubicScale(Filter):
         self.scale_factor: float = float(scale_factor)
 
     @staticmethod
-    def process_pixel(w: int, h: int, scale_factor: float,
+    def process_pixel(x: int, y: int, scale_factor: float,
                       input_width: int, input_height: int, img: np.ndarray) -> np.ndarray:
-        original_x = int(w / scale_factor)
-        original_y = int(h / scale_factor)
+        """
+        Method to parallel computations (it's static because we need to call it in other processes).
+        Method gets 16 nearest pixels to make computations with bicubic hermit to set color of the pixel at (x,y).
+
+        :param x: x position of pixel that's going to be processed
+        :param y: y position of pixel that's going to be processed
+        :param scale_factor: float value that we use to scale image
+        :param input_width: width of the input image
+        :param input_height: height of the input image
+        :param img: np.ndarray of image pixels (2D)
+        :return: (R, G, B) np.ndarray that is our processed pixel
+        """
+        original_x = int(x / scale_factor)
+        original_y = int(y / scale_factor)
 
         dx = original_x - math.floor(original_x)
         dy = original_y - math.floor(original_y)
@@ -102,6 +114,6 @@ def bicubic_hermit(a: np.ndarray, b: np.ndarray, c: np.ndarray, d: np.ndarray, t
     return a_n * pow3(t) + b_n * t * t + c_n * t + d_n
 
 
-# @lru_cache(maxsize=128)
+@lru_cache(maxsize=128)
 def pow3(t: int):
     return t * t * t
