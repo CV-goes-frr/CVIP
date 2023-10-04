@@ -16,6 +16,8 @@ class Processor:
 
     def __init__(self, processes_limit: int):
         self.fin: str = ""
+        if processes_limit > 8:
+            processes_limit = 8
         self.processes_limit: int = processes_limit
         self.pool: Pool = Pool(processes=processes_limit)
         self.class_map: Dict[str, type] = {"crop": Crop,
