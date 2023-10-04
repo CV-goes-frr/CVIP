@@ -1,8 +1,8 @@
-import numpy as np
-import math
-
-from typing import List
 from multiprocessing import Pool
+import math
+from typing import List
+
+import numpy as np
 
 from .Filter import Filter
 
@@ -22,35 +22,35 @@ class BicubicScale(Filter):
         dx = original_x - math.floor(original_x)
         dy = original_y - math.floor(original_y)
 
-        x1 = min(max(math.floor(original_x) - 1, 0), input_width - 1)
-        x2 = min(max(math.floor(original_x), 0), input_width - 1)
-        x3 = min(max(math.floor(original_x) + 1, 0), input_width - 1)
-        x4 = min(max(math.floor(original_x) + 2, 0), input_width - 1)
+        x_1 = min(max(math.floor(original_x) - 1, 0), input_width - 1)
+        x_2 = min(max(math.floor(original_x), 0), input_width - 1)
+        x_3 = min(max(math.floor(original_x) + 1, 0), input_width - 1)
+        x_4 = min(max(math.floor(original_x) + 2, 0), input_width - 1)
 
-        y1 = min(max(math.floor(original_y) - 1, 0), input_height - 1)
-        y2 = min(max(math.floor(original_y), 0), input_height - 1)
-        y3 = min(max(math.floor(original_y) + 1, 0), input_height - 1)
-        y4 = min(max(math.floor(original_y) + 2, 0), input_height - 1)
+        y_1 = min(max(math.floor(original_y) - 1, 0), input_height - 1)
+        y_2 = min(max(math.floor(original_y), 0), input_height - 1)
+        y_3 = min(max(math.floor(original_y) + 1, 0), input_height - 1)
+        y_4 = min(max(math.floor(original_y) + 2, 0), input_height - 1)
 
-        pix11 = img[y1, x1]
-        pix21 = img[y1, x2]
-        pix31 = img[y1, x3]
-        pix41 = img[y1, x4]
+        pix11 = img[y_1, x_1]
+        pix21 = img[y_1, x_2]
+        pix31 = img[y_1, x_3]
+        pix41 = img[y_1, x_4]
 
-        pix12 = img[y2, x1]
-        pix22 = img[y2, x2]
-        pix32 = img[y2, x3]
-        pix42 = img[y2, x4]
+        pix12 = img[y_2, x_1]
+        pix22 = img[y_2, x_2]
+        pix32 = img[y_2, x_3]
+        pix42 = img[y_2, x_4]
 
-        pix13 = img[y3, x1]
-        pix23 = img[y3, x2]
-        pix33 = img[y3, x3]
-        pix43 = img[y3, x4]
+        pix13 = img[y_3, x_1]
+        pix23 = img[y_3, x_2]
+        pix33 = img[y_3, x_3]
+        pix43 = img[y_3, x_4]
 
-        pix14 = img[y4, x1]
-        pix24 = img[y4, x2]
-        pix34 = img[y4, x3]
-        pix44 = img[y4, x4]
+        pix14 = img[y_4, x_1]
+        pix24 = img[y_4, x_2]
+        pix34 = img[y_4, x_3]
+        pix44 = img[y_4, x_4]
 
         arr1 = bicubic_hermit(pix11, pix21, pix31, pix41, dy)
         arr2 = bicubic_hermit(pix12, pix22, pix32, pix42, dy)
@@ -61,12 +61,10 @@ class BicubicScale(Filter):
 
         return val.astype(np.uint8)
 
-    def apply(self, img: np.ndarray, processes_limit: int) -> List[np.ndarray]:
+    def apply(self, img: np.ndarray, processes_limit: int, pool: Pool) -> List[np.ndarray]:
         if self.cache:
             print("USING CACHE...")
             return self.cache
-
-        pool = Pool(processes=processes_limit)
 
         print("BICUBIC SCALE IN PROCESS...")
         input_height, input_width, _ = img.shape

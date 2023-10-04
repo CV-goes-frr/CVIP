@@ -1,5 +1,7 @@
-import numpy as np
+from multiprocessing import Pool
 from typing import List
+
+import numpy as np
 # from functools import lru_cache
 
 from .Filter import Filter
@@ -20,7 +22,7 @@ class Crop(Filter):
 
     # @npArrToTuple
     #@lru_cache()
-    def apply(self, img: np.ndarray, processes_limit: int) -> List[np.ndarray]:
+    def apply(self, img: np.ndarray, processes_limit: int, pool: Pool) -> List[np.ndarray]:
         if self.cache:
             print("USING CACHE...")
             return self.cache

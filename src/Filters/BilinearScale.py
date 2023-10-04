@@ -1,7 +1,7 @@
-import numpy as np
-
 from typing import List
 from multiprocessing import Pool
+
+import numpy as np
 
 from .Filter import Filter
 
@@ -20,33 +20,31 @@ class BilinearScale(Filter):
         original_x = int(x / scale_factor)
         original_y = int(y / scale_factor)
 
-        x1, y1 = int(original_x), int(original_y)
-        x2, y2 = x1 + 1, y1 + 1
+        x_1, y_1 = int(original_x), int(original_y)
+        x_2, y_2 = x_1 + 1, y_1 + 1
 
-        x1 = min(max(x1, 0), input_width - 1)
-        x2 = min(max(x2, 0), input_width - 1)
-        y1 = min(max(y1, 0), input_height - 1)
-        y2 = min(max(y2, 0), input_height - 1)
+        x_1 = min(max(x_1, 0), input_width - 1)
+        x_2 = min(max(x_2, 0), input_width - 1)
+        y_1 = min(max(y_1, 0), input_height - 1)
+        y_2 = min(max(y_2, 0), input_height - 1)
 
-        alpha = original_x - x1
-        beta = original_y - y1
+        alpha = original_x - x_1
+        beta = original_y - y_1
 
-        top_left = img[y1, x1]
-        top_right = img[y1, x2]
-        bottom_left = img[y2, x1]
-        bottom_right = img[y2, x2]
+        top_left = img[y_1, x_1]
+        top_right = img[y_1, x_2]
+        bottom_left = img[y_2, x_1]
+        bottom_right = img[y_2, x_2]
 
         weight = (1 - alpha) * (1 - beta) * top_left + alpha * (1 - beta) * top_right + (
                 1 - alpha) * beta * bottom_left + alpha * beta * bottom_right
 
         return weight.astype(np.uint8)
 
-    def apply(self, img: np.ndarray, processes_limit: int) -> List[np.ndarray]:
+    def apply(self, img: np.ndarray, processes_limit: int, pool: Pool) -> List[np.ndarray]:
         if self.cache:
             print("USING CACHE...")
             return self.cache
-
-        pool = Pool(processes=processes_limit)
 
         print("BILINEAR SCALE IN PROCESS...")
         input_height, input_width, _ = img.shape

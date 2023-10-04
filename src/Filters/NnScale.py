@@ -1,5 +1,7 @@
-import numpy as np
+from multiprocessing import Pool
 from typing import List
+
+import numpy as np
 
 from .Filter import Filter
 
@@ -10,7 +12,7 @@ class NnScale(Filter):
         super().__init__()
         self.scale_factor: float = float(scale_factor)
 
-    def apply(self, img: np.ndarray, processes_limit: int) -> List[np.ndarray]:
+    def apply(self, img: np.ndarray, processes_limit: int, pool: Pool) -> List[np.ndarray]:
         if self.cache:
             print("USING CACHE...")
             return self.cache
