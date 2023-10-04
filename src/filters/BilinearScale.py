@@ -1,9 +1,11 @@
+from functools import lru_cache
 from typing import List
 from multiprocessing import Pool
 
 import numpy as np
 
 from .Filter import Filter
+from .decorators.bilinear_weight_decorator import bilinear_weight_cache
 
 
 class BilinearScale(Filter):
@@ -12,11 +14,10 @@ class BilinearScale(Filter):
         super().__init__()
         self.scale_factor: float = float(scale_factor)
 
-    # Define process_pixel as a separate function outside the class
     @staticmethod
     def process_pixel(x: int, y: int, scale_factor: float,
                       input_width: int, input_height: int, img: np.ndarray) -> np.ndarray:
-        # This function calculates the pixel value for a given (x, y) coordinate
+
         original_x = int(x / scale_factor)
         original_y = int(y / scale_factor)
 
@@ -36,10 +37,9 @@ class BilinearScale(Filter):
         bottom_left = img[y_2, x_1]
         bottom_right = img[y_2, x_2]
 
-        weight = (1 - alpha) * (1 - beta) * top_left + alpha * (1 - beta) * top_right + (
-                1 - alpha) * beta * bottom_left + alpha * beta * bottom_right
-
-        return weight.astype(np.uint8)
+        # weight = ((1 - alpha) * (1 - beta) * top_left + alpha * (1 - beta) * top_right
+        #     + (1 - alpha) * beta * bottom_left + alpha * beta * bottom_right).astype(np.uint8)
+        return weight_function(alpha, beta, top_left, top_right, bottom_left, bottom_right)
 
     def apply(self, img: np.ndarray, processes_limit: int, pool: Pool) -> List[np.ndarray]:
         if self.cache:
@@ -68,3 +68,10 @@ class BilinearScale(Filter):
             self.cache = [upscaled_image]
 
         return [upscaled_image]
+
+
+@bilinear_weight_cache
+def weight_function(alpha, beta, top_left: np.ndarray, top_right: np.ndarray,
+                    bottom_left: np.ndarray, bottom_right: np.ndarray):
+    return ((1 - alpha) * (1 - beta) * top_left + alpha * (1 - beta) * top_right
+            + (1 - alpha) * beta * bottom_left + alpha * beta * bottom_right).astype(np.uint8)

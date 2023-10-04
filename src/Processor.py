@@ -4,12 +4,12 @@ from typing import List, Dict
 
 import cv2
 
-from .Filters.BilinearScale import BilinearScale
-from .Filters.BicubicScale import BicubicScale
-from .Filters.Crop import Crop
-from .Filters.NnScale import NnScale
-from .Filters.Merge import Merge
-from .Filters.Duplicate import Duplicate
+from .filters.BilinearScale import BilinearScale
+from .filters.BicubicScale import BicubicScale
+from .filters.Crop import Crop
+from .filters.NnScale import NnScale
+from .filters.Merge import Merge
+from .filters.Duplicate import Duplicate
 
 
 class Processor:

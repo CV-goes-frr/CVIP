@@ -1,3 +1,4 @@
+from functools import lru_cache
 from multiprocessing import Pool
 import math
 from typing import List
@@ -5,6 +6,7 @@ from typing import List
 import numpy as np
 
 from .Filter import Filter
+from .decorators.bicubic_hermit_decorator import bicubic_hermit_cache
 
 
 class BicubicScale(Filter):
@@ -15,7 +17,7 @@ class BicubicScale(Filter):
 
     @staticmethod
     def process_pixel(w: int, h: int, scale_factor: float,
-                      input_width: int, input_height: int, img: np.ndarray):
+                      input_width: int, input_height: int, img: np.ndarray) -> np.ndarray:
         original_x = int(w / scale_factor)
         original_y = int(h / scale_factor)
 
@@ -90,10 +92,16 @@ class BicubicScale(Filter):
         return [upscaled_image]
 
 
+@bicubic_hermit_cache
 def bicubic_hermit(a: np.ndarray, b: np.ndarray, c: np.ndarray, d: np.ndarray, t):
-    a_n = -1*a/2 + 3*b/2 - 3*c/2 + d/2
-    b_n = a - 5*b/2 + 2*c - d/2
-    c_n = -1*a/2 + c/2
+    a_n = -1 * a / 2 + 3 * b / 2 - 3 * c / 2 + d / 2
+    b_n = a - 5 * b / 2 + 2 * c - d / 2
+    c_n = -1 * a / 2 + c / 2
     d_n = b
 
-    return a_n*t*t*t + b_n*t*t + c_n*t + d_n
+    return a_n * pow3(t) + b_n * t * t + c_n * t + d_n
+
+
+# @lru_cache(maxsize=128)
+def pow3(t: int):
+    return t * t * t
