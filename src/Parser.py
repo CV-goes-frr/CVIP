@@ -4,7 +4,7 @@ import re
 
 from typing import List
 
-from src.Processor import Processor
+from .Processor import Processor
 
 
 class Parser:
@@ -21,10 +21,11 @@ class Parser:
         inp_parameters: List[str] = self.inp_actions.split('][')
         inp_parameters[0] = inp_parameters[0][1:]  # delete first '['
         inp_parameters[-1] = inp_parameters[-1][:-1]  # delete last ']'
+        inp_commands: List[List[any]] = []
         for i in range(len(inp_parameters)):
-            inp_parameters[i] = re.split('\[|\]', inp_parameters[i])
+            inp_commands.append(re.split('\[|\]', inp_parameters[i]))
 
-        for command in inp_parameters:
+        for command in inp_commands:
             command[1] = command[1].split(':')
             match command[1][0]:
                 case 'crop':
@@ -62,9 +63,9 @@ class Parser:
                     raise Exception("Wrong filter name: " + command[1][0])
 
             # increase calls counter
-            for c in command[0].split(':'):
-                if c in res_obj.label_in_map:
-                    res_obj.label_in_map[c].calls_counter += 1
+            for cmd in command[0].split(':'):
+                if cmd in res_obj.label_in_map:
+                    res_obj.label_in_map[cmd].calls_counter += 1
 
         print("\nDependencies:")
         for key in res_obj.label_dependencies:
@@ -74,7 +75,7 @@ class Parser:
         for key in res_obj.label_in_map:
             print(key, res_obj.label_in_map[key], "calls:", res_obj.label_in_map[key].calls_counter)
 
-        res_obj.fin = inp_parameters[-1][-1]
+        res_obj.fin = inp_commands[-1][-1]
 
         if not os.path.exists(res_obj.inp_image):
             raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), res_obj.inp_image)
