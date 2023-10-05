@@ -31,7 +31,6 @@ class Parser:
                 case 'crop':
                     if len(command[1]) != 5:
                         raise Exception("Wrong number of parameters for crop")
-                    res_obj.label_dependencies[command[2]] = [command[0]]
                     res_obj.label_in_map[command[2]] = res_obj.class_map["crop"](command[1][1],
                                                                                  command[1][2],
                                                                                  command[1][3],
@@ -39,41 +38,50 @@ class Parser:
                 case 'nn_scale':
                     if len(command[1]) != 2:
                         raise Exception("Wrong number of parameters for nn_scale")
-                    res_obj.label_dependencies[command[2]] = [command[0]]
                     res_obj.label_in_map[command[2]] = res_obj.class_map["nn_scale"](command[1][1])
                 case 'bilinear_scale':
                     if len(command[1]) != 2:
                         raise Exception("Wrong number of parameters for bilinear_scale")
-                    res_obj.label_dependencies[command[2]] = [command[0]]
                     res_obj.label_in_map[command[2]] = res_obj.class_map["bilinear_scale"](command[1][1])
                 case 'bicubic_scale':
                     if len(command[1]) != 2:
                         raise Exception("Wrong number of parameters for bicubic_scale")
-                    res_obj.label_dependencies[command[2]] = [command[0]]
                     res_obj.label_in_map[command[2]] = res_obj.class_map["bicubic_scale"](command[1][1])
                 case 'merge':
                     if len(command[1]) != 1:
                         raise Exception("Wrong number of parameters for merge")
-                    res_obj.label_dependencies[command[2]] = []
-                    for c in command[0].split(':'):
-                        res_obj.label_dependencies[command[2]].append(c)
-                    res_obj.label_in_map[command[2]] = res_obj.class_map["merge"]()
 
+                    res_obj.label_in_map[command[2]] = res_obj.class_map["merge"]()
+                case 'duplicate':
+                    if len(command[1]) != 1:
+                        raise Exception("Wrong number of parameters for duplicate")
+                    obj_in_map = res_obj.class_map["duplicate"]()
+                    obj_in_map.return_all = False
+                    res_obj.label_in_map[command[2].split(':')[0]] = obj_in_map
+                    res_obj.label_in_map[command[2].split(':')[1]] = obj_in_map
                 case _:
                     raise Exception("Wrong filter name: " + command[1][0])
 
-            # increase calls counter
-            for cmd in command[0].split(':'):
-                if cmd in res_obj.label_in_map:
-                    res_obj.label_in_map[cmd].calls_counter += 1
+            # create dependencies for each out_label and update calls_counters
+            for out_label in command[2].split(':'):
+                res_obj.label_dependencies[out_label] = []
+                for cmd in command[0].split(':'):
+                    res_obj.label_dependencies[out_label].append(cmd)
+                    if cmd in res_obj.label_in_map:
+                        res_obj.label_in_map[cmd].calls_counter += 1
+                res_obj.labels_to_out[out_label] = command[2].split(':')
 
         print("\nDependencies:")
         for key in res_obj.label_dependencies:
             print(key, res_obj.label_dependencies[key])
 
-        print("\nLabels map to filters:")
+        print("\nLabels mapping to filter objects:")
         for key in res_obj.label_in_map:
             print(key, res_obj.label_in_map[key], "calls:", res_obj.label_in_map[key].calls_counter)
+
+        print("\nLabels to out:")
+        for key in res_obj.labels_to_out:
+            print(key, res_obj.labels_to_out[key])
 
         res_obj.fin = inp_commands[-1][-1]
 
