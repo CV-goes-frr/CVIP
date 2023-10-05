@@ -21,11 +21,11 @@ class Merge(Filter):
         :param pool: processes pool
         :return: edited image
         """
+
+        print("MERGE IN PROCESS...")
         if self.cache:
             print("USING CACHE...")
             return self.cache
-
-        print("DUPLICATE IN PROCESS...")
 
         if self.calls_counter > 1:
             self.cache = [img2]

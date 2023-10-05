@@ -33,6 +33,9 @@ class Processor:
         # what filter is mapped for the label
         self.label_in_map: Dict[str, any] = {}
 
+        # what labels are going to be out-labels
+        self.labels_to_out: Dict[str, List[str]] = {}
+
         self.inp_image: str = ""
 
     def process(self, label: str) -> List:
@@ -60,9 +63,14 @@ class Processor:
         end: float = time.time()
         print("Time elapsed:", end - start)
 
-        print(len(result), "result(s) from", label, "\n")
-        to_return: List = []
-        for img in result:
-            to_return.append(img)
+        print(len(result), "result(s) from", label)
+        to_return_indices = [out_label for out_label in self.labels_to_out[label] if out_label == label]
 
+        if self.label_in_map[label].return_all:
+            print("All images to return\n")
+            return result
+
+        ind = self.labels_to_out[label].index(label)
+        print("Result with", ind, "index to return\n")
+        to_return = [result[ind]]
         return to_return

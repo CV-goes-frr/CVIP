@@ -25,11 +25,12 @@ class Crop(Filter):
         :param pool: processes pool
         :return: edited image
         """
+
+        print("CROP IN PROCESS...")
         if self.cache:
             print("USING CACHE...")
             return self.cache
 
-        print("CROP IN PROCESS...")
         input_height, input_width, _ = img.shape
         if (self.x1 > input_width or self.y1 > input_height or self.x2 > input_width or self.y2 > input_height) or (
                 self.x1 >= self.x2 or self.y1 >= self.y2) or (

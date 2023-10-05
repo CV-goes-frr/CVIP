@@ -22,11 +22,12 @@ class NnScale(Filter):
         :param pool: processes pool
         :return: edited image
         """
+
+        print("NN SCALE IN PROCESS...")
         if self.cache:
             print("USING CACHE...")
             return self.cache
 
-        print("NN SCALE IN PROCESS...")
         input_height, input_width, _ = img.shape
         new_width = int(input_width * self.scale_factor)
         new_height = int(input_height * self.scale_factor)
