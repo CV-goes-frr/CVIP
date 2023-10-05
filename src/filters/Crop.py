@@ -2,10 +2,8 @@ from multiprocessing import Pool
 from typing import List
 
 import numpy as np
-# from functools import lru_cache
 
 from .Filter import Filter
-# from .NpArrayDecorator import npArrToTuple
 
 
 class Crop(Filter):
@@ -17,12 +15,16 @@ class Crop(Filter):
         self.x2: int = int(x2)
         self.y2: int = int(y2)
 
-    # def __hash__(self):
-    #     return hash(tuple([x.tostring() for x in self.cache]))
-
-    # @npArrToTuple
-    #@lru_cache()
     def apply(self, img: np.ndarray, processes_limit: int, pool: Pool) -> List[np.ndarray]:
+        """
+        Apply signature for every Filter object. Method call edit input image and return new one.
+        Shape of new img np.ndarray can be not the same as input shape.
+
+        :param img: np.ndarray of pixels
+        :param processes_limit: split the image into this number of pieces to process in parallel
+        :param pool: processes pool
+        :return: edited image
+        """
         if self.cache:
             print("USING CACHE...")
             return self.cache
