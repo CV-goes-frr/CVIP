@@ -15,7 +15,7 @@ from .filters.Duplicate import Duplicate
 class Processor:
 
     def __init__(self, processes_limit: int):
-        self.fin: str = ""
+        self.fin_labels: List[str] = []
         if processes_limit > 8:
             processes_limit = 8
         self.processes_limit: int = processes_limit

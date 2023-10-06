@@ -83,7 +83,14 @@ class Parser:
         for key in res_obj.labels_to_out:
             print(key, res_obj.labels_to_out[key])
 
-        res_obj.fin = inp_commands[-1][-1]
+        # find final labels with 0 calls
+        for key in res_obj.label_in_map:
+            if res_obj.label_in_map[key].calls_counter == 0:
+                res_obj.fin_labels.append(key)
+
+        print("\nFinal labels:")
+        for label in res_obj.fin_labels:
+            print(label)
 
         if not os.path.exists(res_obj.inp_image):
             raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), res_obj.inp_image)
