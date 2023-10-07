@@ -66,6 +66,10 @@ class Parser:
             for out_label in command[2].split(':'):
                 res_obj.label_dependencies[out_label] = []
                 for cmd in command[0].split(':'):
+                    if cmd not in res_obj.label_in_map and cmd != '-i':
+                        raise Exception("Dependency label for " + command[1][0] +
+                                        " doesn't exist at this moment: " + cmd)
+
                     res_obj.label_dependencies[out_label].append(cmd)
                     if cmd in res_obj.label_in_map:
                         res_obj.label_in_map[cmd].calls_counter += 1

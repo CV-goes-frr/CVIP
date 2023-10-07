@@ -43,8 +43,8 @@ class Processor:
         image: List = []
         if label != '-i':
             for prev_label in self.label_dependencies[label]:
-                if prev_label not in self.label_dependencies and prev_label != '-i':
-                    raise Exception("Label doesn't exist: " + prev_label)
+                # if prev_label not in self.label_dependencies and prev_label != '-i':
+                #     raise Exception("Label doesn't exist: " + prev_label)
 
                 prev_result = self.process(prev_label)
                 for img in prev_result:
