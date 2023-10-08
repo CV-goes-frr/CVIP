@@ -17,11 +17,11 @@ def main():
     proc: Processor = pars.parse()
 
     print("\nPROCESSING...\n")
-    for fin in proc.fin_labels:
-        res_images_list = proc.process(fin)
-        # create as many out files for every final label as we want
-        for res_img_index in range(len(res_images_list)):
-            cv2.imwrite(f'{fin}{res_img_index}.jpg', res_images_list[res_img_index])
+    img: List[np.ndarray] = proc.process(proc.fin)
+
+    # create out file for every result image (there can be more than one)
+    for i in range(len(img)):
+        cv2.imwrite(f'out{i}.jpg', img[i])
 
 
 if __name__ == "__main__":
