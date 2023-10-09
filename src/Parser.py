@@ -6,6 +6,7 @@ from typing import List
 
 from .Processor import Processor
 from .VerifyArgs import VerifyArgs
+from .exceptions.WrongDependency import WrongDependencyException
 
 
 class Parser:
@@ -37,27 +38,24 @@ class Parser:
             check_args: VerifyArgs = VerifyArgs(command[1])
             check_args.check()
 
+            # make dependencies
+            res_obj.label_dependencies[command[2]] = []
+            for c in command[0].split(':'):
+                res_obj.label_dependencies[command[2]].append(c)
+
             match command[1][0]:
                 case 'crop':
-                    res_obj.label_dependencies[command[2]] = [command[0]]
                     res_obj.label_in_map[command[2]] = res_obj.class_map["crop"](command[1][1],
                                                                                  command[1][2],
                                                                                  command[1][3],
-                                                                                 command[1][4],
-                                                                                )
+                                                                                 command[1][4])
                 case 'nn_scale':
-                    res_obj.label_dependencies[command[2]] = [command[0]]
                     res_obj.label_in_map[command[2]] = res_obj.class_map["nn_scale"](command[1][1])
                 case 'bilinear_scale':
-                    res_obj.label_dependencies[command[2]] = [command[0]]
                     res_obj.label_in_map[command[2]] = res_obj.class_map["bilinear_scale"](command[1][1])
                 case 'bicubic_scale':
-                    res_obj.label_dependencies[command[2]] = [command[0]]
                     res_obj.label_in_map[command[2]] = res_obj.class_map["bicubic_scale"](command[1][1])
                 case 'merge':
-                    res_obj.label_dependencies[command[2]] = []
-                    for c in command[0].split(':'):
-                        res_obj.label_dependencies[command[2]].append(c)
                     res_obj.label_in_map[command[2]] = res_obj.class_map["merge"]()
                 case 'duplicate':
                     if len(command[1]) != 1:
@@ -67,11 +65,10 @@ class Parser:
                     res_obj.label_in_map[command[2].split(':')[0]] = obj_in_map
                     res_obj.label_in_map[command[2].split(':')[1]] = obj_in_map
                 case 'face_blur':
-                    res_obj.label_dependencies[command[2]] = [command[0]]
-                    print(command[1])
                     res_obj.label_in_map[command[2]] = res_obj.class_map["face_blur"](command[1][1])
-                case _:
-                    raise Exception("Wrong filter name: " + command[1][0])
+                # crop, nn_scale, bilinear_scale, bicubic_scale and face_blur
+                # case _:
+                #     res_obj.label_in_map[command[2]] = res_obj.class_map[command[1][0]](command[1][1:])
 
             # create dependencies for each out_label and update calls_counters
             for out_label in command[2].split(':'):
@@ -81,8 +78,7 @@ class Parser:
 
                 for in_label in command[0].split(':'):
                     if in_label not in res_obj.label_in_map and in_label[0:3] != '-i=':
-                        raise Exception("Dependency label for " + command[1][0] +
-                                        " doesn't exist at this moment: " + in_label)
+                        raise WrongDependencyException(command[1][0], in_label)
 
                     res_obj.label_dependencies[out_label].append(in_label)
                     if in_label[0:3] != '-i=':
