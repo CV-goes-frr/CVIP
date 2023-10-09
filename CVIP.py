@@ -1,7 +1,6 @@
 import cv2
 import argparse
-import numpy as np
-from typing import List
+
 from src.Parser import Parser
 from src.Processor import Processor
 

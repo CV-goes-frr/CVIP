@@ -1,22 +1,26 @@
-import dlib
-import cv2
-import numpy as np
-from imutils import face_utils
 from typing import List
+from multiprocessing import Pool
 
-from .Filter import Filter
+import numpy as np
+import dlib
+from imutils import face_utils
+import cv2
 
-predictor_path = "src/Filters/shape_predictor_68_face_landmarks_GTX.dat"
+from src.filters.Filter import Filter
+
+
+PREDICTOR_PATH = "src/filters/shape_predictor_68_face_landmarks_GTX.dat"
+
 
 class FaceBlurrer(Filter):
 
     def __init__(self, coef: str):
         super().__init__()
         self.detector = dlib.get_frontal_face_detector()
-        self.predictor = dlib.shape_predictor(predictor_path)
+        self.predictor = dlib.shape_predictor(PREDICTOR_PATH)
         self.coef = int(coef)
 
-    def apply(self, img: np.ndarray, processes_limit: int) -> List[np.ndarray]:
+    def apply(self, img: np.ndarray, processes_limit: int, pool: Pool) -> List[np.ndarray]:
 
         if self.cache:
             print("USING CACHE...")

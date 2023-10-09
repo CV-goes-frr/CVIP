@@ -3,8 +3,8 @@ from multiprocessing import Pool
 
 import numpy as np
 
-from .Filter import Filter
-from .decorators.bilinear_weight_decorator import bilinear_weight_cache
+from src.filters.Filter import Filter
+from src.decorators.bilinear_weight_decorator import bilinear_weight_cache
 
 
 class BilinearScale(Filter):
