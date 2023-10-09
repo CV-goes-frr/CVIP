@@ -9,14 +9,12 @@ from .Processor import Processor
 
 class Parser:
 
-    def __init__(self, inp_file: str, inp_actions: str, processes_limit: str):
-        self.inp_image: str = inp_file
+    def __init__(self, inp_actions: str, processes_limit: str):
         self.inp_actions: str = inp_actions
         self.processes_limit: int = int(processes_limit)
 
     def parse(self) -> Processor:
         res_obj: Processor = Processor(self.processes_limit)
-        res_obj.inp_image = self.inp_image
 
         inp_parameters: List[str] = self.inp_actions.split('][')
         inp_parameters[0] = inp_parameters[0][1:]  # delete first '['
@@ -78,12 +76,12 @@ class Parser:
                     res_obj.label_in_map[out_label].calls_counter += 1
 
                 for in_label in command[0].split(':'):
-                    if in_label not in res_obj.label_in_map and in_label != '-i':
+                    if in_label not in res_obj.label_in_map and in_label[0:3] != '-i=':
                         raise Exception("Dependency label for " + command[1][0] +
                                         " doesn't exist at this moment: " + in_label)
 
                     res_obj.label_dependencies[out_label].append(in_label)
-                    if in_label != '-i':
+                    if in_label[0:3] != '-i=':
                         res_obj.label_in_map[in_label].calls_counter += 1
 
                 res_obj.labels_to_out[out_label] = command[2].split(':')
@@ -100,17 +98,15 @@ class Parser:
         for key in res_obj.labels_to_out:
             print(key, res_obj.labels_to_out[key])
 
-        # find final labels with 0 calls
-        # for key in res_obj.label_in_map:
-        #     if res_obj.label_in_map[key].calls_counter == 0:
-        #         res_obj.fin_labels.append(key)
-
         print("\nFinal labels:")
         for label in res_obj.fin_labels:
             print(label)
 
-        if not os.path.exists(res_obj.inp_image):
-            raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), res_obj.inp_image)
+        for key in res_obj.label_dependencies:
+            if res_obj.label_dependencies[key][0][0:3] == '-i=' and \
+                    not os.path.exists(res_obj.label_dependencies[key][0][3::]):
+                raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT),
+                                        res_obj.label_dependencies[key][0][3::])
 
         print()
         return res_obj

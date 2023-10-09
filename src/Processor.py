@@ -36,12 +36,10 @@ class Processor:
         # what labels are going to be out-labels
         self.labels_to_out: Dict[str, List[str]] = {}
 
-        self.inp_image: str = ""
-
     def process(self, label: str) -> List:
         # get all results from previous filters
         image: List = []
-        if label != '-i':
+        if label[0:3] != '-i=':
             for prev_label in self.label_dependencies[label]:
                 # if prev_label not in self.label_dependencies and prev_label != '-i':
                 #     raise Exception("Label doesn't exist: " + prev_label)
@@ -50,10 +48,9 @@ class Processor:
                 for img in prev_result:
                     image.append(img)
         else:
-            return [cv2.imread(self.inp_image)]
+            return [cv2.imread(f'{label[3::]}')]
 
         # now let our filter process all we've got from previous
-        # print(len(image), "to", label)
         result: List = []
         start: float = time.time()
         if len(image) == 2:
@@ -64,7 +61,6 @@ class Processor:
         print("Time elapsed:", end - start)
 
         print(len(result), "result(s) from", label)
-        to_return_indices = [out_label for out_label in self.labels_to_out[label] if out_label == label]
 
         if self.label_in_map[label].return_all:
             print("All images to return\n")
