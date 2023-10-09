@@ -5,8 +5,8 @@ from typing import List
 
 import numpy as np
 
-from src.filters.Filter import Filter
-from src.decorators.bicubic_hermit_decorator import bicubic_hermit_cache
+from .Filter import Filter
+from ..decorators.bicubic_hermit_decorator import bicubic_hermit_cache
 
 
 class BicubicScale(Filter):

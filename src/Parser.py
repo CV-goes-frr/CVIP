@@ -4,8 +4,8 @@ import re
 
 from typing import List
 
-from src.Processor import Processor
-from src.VerifyArgs import VerifyArgs
+from .Processor import Processor
+from .VerifyArgs import VerifyArgs
 
 
 class Parser:

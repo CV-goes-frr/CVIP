@@ -4,13 +4,13 @@ from typing import List, Dict
 
 import cv2
 
-from src.filters.BilinearScale import BilinearScale
-from src.filters.BicubicScale import BicubicScale
-from src.filters.Crop import Crop
-from src.filters.NnScale import NnScale
-from src.filters.Merge import Merge
-from src.filters.Duplicate import Duplicate
-from src.filters.FaceBlurrer import FaceBlurrer
+from .filters.BilinearScale import BilinearScale
+from .filters.BicubicScale import BicubicScale
+from .filters.Crop import Crop
+from .filters.NnScale import NnScale
+from .filters.Merge import Merge
+from .filters.Duplicate import Duplicate
+from .filters.FaceBlurrer import FaceBlurrer
 
 
 class Processor:
@@ -43,9 +43,6 @@ class Processor:
         image: List = []
         if label[0:3] != '-i=':
             for prev_label in self.label_dependencies[label]:
-                # if prev_label not in self.label_dependencies and prev_label != '-i':
-                #     raise Exception("Label doesn't exist: " + prev_label)
-
                 prev_result = self.process(prev_label)
                 for img in prev_result:
                     image.append(img)
