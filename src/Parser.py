@@ -27,6 +27,15 @@ class Parser:
 
         for command in inp_commands:
             command[1] = command[1].split(':')
+            final: bool = False
+
+            # add label if we want output file there
+            if command[2][0:3] == '-o=':
+                final = True
+                command[2] = command[2][3::]
+                for label in command[2].split(':'):
+                    res_obj.fin_labels.append(label)
+
             match command[1][0]:
                 case 'crop':
                     if len(command[1]) != 5:
@@ -65,14 +74,18 @@ class Parser:
             # create dependencies for each out_label and update calls_counters
             for out_label in command[2].split(':'):
                 res_obj.label_dependencies[out_label] = []
-                for cmd in command[0].split(':'):
-                    if cmd not in res_obj.label_in_map and cmd != '-i':
-                        raise Exception("Dependency label for " + command[1][0] +
-                                        " doesn't exist at this moment: " + cmd)
+                if final:
+                    res_obj.label_in_map[out_label].calls_counter += 1
 
-                    res_obj.label_dependencies[out_label].append(cmd)
-                    if cmd in res_obj.label_in_map:
-                        res_obj.label_in_map[cmd].calls_counter += 1
+                for in_label in command[0].split(':'):
+                    if in_label not in res_obj.label_in_map and in_label != '-i':
+                        raise Exception("Dependency label for " + command[1][0] +
+                                        " doesn't exist at this moment: " + in_label)
+
+                    res_obj.label_dependencies[out_label].append(in_label)
+                    if in_label != '-i':
+                        res_obj.label_in_map[in_label].calls_counter += 1
+
                 res_obj.labels_to_out[out_label] = command[2].split(':')
 
         print("\nDependencies:")
@@ -88,9 +101,9 @@ class Parser:
             print(key, res_obj.labels_to_out[key])
 
         # find final labels with 0 calls
-        for key in res_obj.label_in_map:
-            if res_obj.label_in_map[key].calls_counter == 0:
-                res_obj.fin_labels.append(key)
+        # for key in res_obj.label_in_map:
+        #     if res_obj.label_in_map[key].calls_counter == 0:
+        #         res_obj.fin_labels.append(key)
 
         print("\nFinal labels:")
         for label in res_obj.fin_labels:
