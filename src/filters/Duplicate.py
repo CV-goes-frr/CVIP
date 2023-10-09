@@ -3,7 +3,7 @@ from multiprocessing import Pool
 
 import numpy as np
 
-from .Filter import Filter
+from src.filters.Filter import Filter
 
 
 class Duplicate(Filter):

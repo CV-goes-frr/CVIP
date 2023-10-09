@@ -4,12 +4,13 @@ from typing import List, Dict
 
 import cv2
 
-from .filters.BilinearScale import BilinearScale
-from .filters.BicubicScale import BicubicScale
-from .filters.Crop import Crop
-from .filters.NnScale import NnScale
-from .filters.Merge import Merge
-from .filters.Duplicate import Duplicate
+from src.filters.BilinearScale import BilinearScale
+from src.filters.BicubicScale import BicubicScale
+from src.filters.Crop import Crop
+from src.filters.NnScale import NnScale
+from src.filters.Merge import Merge
+from src.filters.Duplicate import Duplicate
+from src.filters.FaceBlurrer import FaceBlurrer
 
 
 class Processor:
@@ -25,7 +26,8 @@ class Processor:
                                            "bilinear_scale": BilinearScale,
                                            "bicubic_scale": BicubicScale,
                                            "merge": Merge,
-                                           "duplicate": Duplicate}
+                                           "duplicate": Duplicate,
+                                           "face_blur": FaceBlurrer}
 
         # what in-labels should be already done for applying our filter with this out-label
         self.label_dependencies: Dict[str, List[str]] = {}
