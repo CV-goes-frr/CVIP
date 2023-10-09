@@ -5,6 +5,7 @@ import re
 from typing import List
 
 from src.Processor import Processor
+from src.VerifyArgs import VerifyArgs
 
 
 class Parser:
@@ -26,47 +27,34 @@ class Parser:
 
         for command in inp_parameters:
             command[1] = command[1].split(':')
+            check_args: VerifyArgs = VerifyArgs(command[1])
+            check_args.check()
             match command[1][0]:
                 case 'crop':
-                    if len(command[1]) != 5:
-                        raise Exception("Wrong number of parameters for crop")
                     res_obj.label_dependencies[command[2]] = [command[0]]
                     res_obj.label_in_map[command[2]] = res_obj.class_map["crop"](command[1][1],
                                                                                  command[1][2],
                                                                                  command[1][3],
-                                                                                 command[1][4])
+                                                                                 command[1][4],
+                                                                                )
                 case 'nn_scale':
-                    if len(command[1]) != 2:
-                        raise Exception("Wrong number of parameters for nn_scale")
                     res_obj.label_dependencies[command[2]] = [command[0]]
-
                     res_obj.label_in_map[command[2]] = res_obj.class_map["nn_scale"](command[1][1])
                 case 'bilinear_scale':
-                    if len(command[1]) != 2:
-                        raise Exception("Wrong number of parameters for bilinear_scale")
                     res_obj.label_dependencies[command[2]] = [command[0]]
                     res_obj.label_in_map[command[2]] = res_obj.class_map["bilinear_scale"](command[1][1])
                 case 'bicubic_scale':
-                    if len(command[1]) != 2:
-                        raise Exception("Wrong number of parameters for bicubic_scale")
                     res_obj.label_dependencies[command[2]] = [command[0]]
                     res_obj.label_in_map[command[2]] = res_obj.class_map["bicubic_scale"](command[1][1])
                 case 'merge':
-                    if len(command[1]) != 1:
-                        raise Exception("Wrong number of parameters for merge")
                     res_obj.label_dependencies[command[2]] = []
                     for c in command[0].split(':'):
                         res_obj.label_dependencies[command[2]].append(c)
                     res_obj.label_in_map[command[2]] = res_obj.class_map["merge"]()
-
                 case 'face_blur':
-                    if len(command[1]) != 2:
-                        raise Exception("Wrong number of parameters for merge")
                     res_obj.label_dependencies[command[2]] = [command[0]]
+                    print(command[1])
                     res_obj.label_in_map[command[2]] = res_obj.class_map["face_blur"](command[1][1])
-
-                case _:
-                    raise Exception("Wrong filter name: " + command[1][0])
 
             # increase calls counter
             for c in command[0].split(':'):
