@@ -6,7 +6,7 @@ from typing import List
 
 from .Filter import Filter
 
-predictor_path = "src/Filters/shape_predictor_68_face_landmarks.dat"
+predictor_path = "src/Filters/shape_predictor_68_face_landmarks_GTX.dat"
 
 class FaceBlurrer(Filter):
 
