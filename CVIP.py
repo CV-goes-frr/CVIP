@@ -8,12 +8,11 @@ from src.Processor import Processor
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('image_path', type=str, help='Path to input image')
     parser.add_argument('actions', type=str, help='Prompt')
     parser.add_argument('processes_limit', type=str, help='Max number of parallel processes')
     args = parser.parse_args()
 
-    pars: Parser = Parser(args.image_path, args.actions, args.processes_limit)
+    pars: Parser = Parser(args.actions, args.processes_limit)
     proc: Processor = pars.parse()
 
     print("\nPROCESSING...\n")
