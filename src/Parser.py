@@ -27,8 +27,18 @@ class Parser:
 
         for command in inp_parameters:
             command[1] = command[1].split(':')
+            final: bool = False
+
+            # add label if we want output file there
+            if command[2][0:3] == '-o=':
+                final = True
+                command[2] = command[2][3::]
+                for label in command[2].split(':'):
+                    res_obj.fin_labels.append(label)
+
             check_args: VerifyArgs = VerifyArgs(command[1])
             check_args.check()
+
             match command[1][0]:
                 case 'crop':
                     res_obj.label_dependencies[command[2]] = [command[0]]
@@ -51,15 +61,36 @@ class Parser:
                     for c in command[0].split(':'):
                         res_obj.label_dependencies[command[2]].append(c)
                     res_obj.label_in_map[command[2]] = res_obj.class_map["merge"]()
+                case 'duplicate':
+                    if len(command[1]) != 1:
+                        raise Exception("Wrong number of parameters for duplicate")
+                    obj_in_map = res_obj.class_map["duplicate"]()
+                    obj_in_map.return_all = False
+                    res_obj.label_in_map[command[2].split(':')[0]] = obj_in_map
+                    res_obj.label_in_map[command[2].split(':')[1]] = obj_in_map
                 case 'face_blur':
                     res_obj.label_dependencies[command[2]] = [command[0]]
                     print(command[1])
                     res_obj.label_in_map[command[2]] = res_obj.class_map["face_blur"](command[1][1])
+                case _:
+                    raise Exception("Wrong filter name: " + command[1][0])
 
-            # increase calls counter
-            for c in command[0].split(':'):
-                if c in res_obj.label_in_map:
-                    res_obj.label_in_map[c].calls_counter += 1
+            # create dependencies for each out_label and update calls_counters
+            for out_label in command[2].split(':'):
+                res_obj.label_dependencies[out_label] = []
+                if final:
+                    res_obj.label_in_map[out_label].calls_counter += 1
+
+                for in_label in command[0].split(':'):
+                    if in_label not in res_obj.label_in_map and in_label != '-i':
+                        raise Exception("Dependency label for " + command[1][0] +
+                                        " doesn't exist at this moment: " + in_label)
+
+                    res_obj.label_dependencies[out_label].append(in_label)
+                    if in_label != '-i':
+                        res_obj.label_in_map[in_label].calls_counter += 1
+
+                res_obj.labels_to_out[out_label] = command[2].split(':')
 
         print("\nDependencies:")
         for key in res_obj.label_dependencies:
@@ -69,7 +100,18 @@ class Parser:
         for key in res_obj.label_in_map:
             print(key, res_obj.label_in_map[key], "calls:", res_obj.label_in_map[key].calls_counter)
 
-        res_obj.fin = inp_parameters[-1][-1]
+        print("\nLabels to out:")
+        for key in res_obj.labels_to_out:
+            print(key, res_obj.labels_to_out[key])
+
+        # find final labels with 0 calls
+        # for key in res_obj.label_in_map:
+        #     if res_obj.label_in_map[key].calls_counter == 0:
+        #         res_obj.fin_labels.append(key)
+
+        print("\nFinal labels:")
+        for label in res_obj.fin_labels:
+            print(label)
 
         if not os.path.exists(res_obj.inp_image):
             raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), res_obj.inp_image)
