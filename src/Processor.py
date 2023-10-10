@@ -4,21 +4,21 @@ from typing import List, Dict
 
 import cv2
 
-from src.filters.BilinearScale import BilinearScale
-from src.filters.BicubicScale import BicubicScale
-from src.filters.Crop import Crop
-from src.filters.NnScale import NnScale
-from src.filters.Merge import Merge
-from src.filters.Duplicate import Duplicate
-from src.filters.FaceBlurrer import FaceBlurrer
+from .filters.BilinearScale import BilinearScale
+from .filters.BicubicScale import BicubicScale
+from .filters.Crop import Crop
+from .filters.NnScale import NnScale
+from .filters.Merge import Merge
+from .filters.Duplicate import Duplicate
+from .filters.FaceBlurrer import FaceBlurrer
 
 
 class Processor:
 
     def __init__(self, processes_limit: int):
         self.fin_labels: List[str] = []
-        if processes_limit > 8:
-            processes_limit = 8
+        if processes_limit > 4:
+            processes_limit = 4
         self.processes_limit: int = processes_limit
         self.pool: Pool = Pool(processes=processes_limit)
         self.class_map: Dict[str, type] = {"crop": Crop,
@@ -43,9 +43,6 @@ class Processor:
         image: List = []
         if label[0:3] != '-i=':
             for prev_label in self.label_dependencies[label]:
-                # if prev_label not in self.label_dependencies and prev_label != '-i':
-                #     raise Exception("Label doesn't exist: " + prev_label)
-
                 prev_result = self.process(prev_label)
                 for img in prev_result:
                     image.append(img)
@@ -55,6 +52,7 @@ class Processor:
         # now let our filter process all we've got from previous
         result: List = []
         start: float = time.time()
+        # go deeper into dependencies
         if len(image) == 2:
             result = self.label_in_map[label].apply(image[0], image[1], self.processes_limit, self.pool)
         elif len(image) == 1:
@@ -63,12 +61,8 @@ class Processor:
         print("Time elapsed:", end - start)
 
         print(len(result), "result(s) from", label)
-
-        if self.label_in_map[label].return_all:
-            print("All images to return\n")
-            return result
-
         ind = self.labels_to_out[label].index(label)
         print("Result with", ind, "index to return\n")
         to_return = [result[ind]]
+
         return to_return

@@ -1,3 +1,7 @@
+from .exceptions.WrongParameters import WrongParametersException
+from .exceptions.WrongFiltername import WrongFilterNameException
+
+
 class VerifyArgs:
 
     def __init__(self, args: str):
@@ -8,22 +12,23 @@ class VerifyArgs:
         match self.name:
             case 'crop':
                 if len(self.args) != 5:
-                    raise Exception("Wrong number of parameters for crop")
+                    raise WrongParametersException(self.name, str(self.args[1:]))
             case 'nn_scale':
                 if len(self.args) != 2:
-                    raise Exception("Wrong number of parameters for nn_scale")
+                    raise WrongParametersException(self.name, str(self.args[1:]))
             case 'bilinear_scale':
                 if len(self.args) != 2:
-                    raise Exception("Wrong number of parameters for bilinear_scale")
+                    raise WrongParametersException(self.name, str(self.args[1:]))
             case 'bicubic_scale':
                 if len(self.args) != 2:
-                    raise Exception("Wrong number of parameters for bicubic_scale")
+                    raise WrongParametersException(self.name, str(self.args[1:]))
             case 'merge':
                 if len(self.args) != 1:
-                    raise Exception("Wrong number of parameters for merge")
+                    raise WrongParametersException(self.name, str(self.args[1:]))
             case 'face_blur':
                 if len(self.args) != 2:
-                    raise Exception("Wrong number of parameters for face_blur")
+                    raise WrongParametersException(self.name, str(self.args[1:]))
+            case 'duplicate':
+                pass
             case _:
-                raise Exception("Wrong filter name: " + self.name)
-
+                raise WrongFilterNameException(self.name)
