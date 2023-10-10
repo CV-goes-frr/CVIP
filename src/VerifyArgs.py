@@ -28,5 +28,7 @@ class VerifyArgs:
             case 'face_blur':
                 if len(self.args) != 2:
                     raise WrongParametersException(self.name, str(self.args[1:]))
+            case 'duplicate':
+                pass
             case _:
                 raise WrongFilterNameException(self.name)

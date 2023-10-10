@@ -7,4 +7,3 @@ class Filter:
         """
         self.calls_counter: int = 0
         self.cache: list = []
-        self.return_all = True
