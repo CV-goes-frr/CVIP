@@ -27,7 +27,8 @@ class Processor:
                                            "bicubic_scale": BicubicScale,
                                            "merge": Merge,
                                            "duplicate": Duplicate,
-                                           "face_blur": FaceBlurrer}
+                                           "face_blur": FaceBlurrer,
+                                           "face_detection": FaceDetection}
 
         # what in-labels should be already done for applying our filter with this out-label
         self.label_dependencies: Dict[str, List[str]] = {}
