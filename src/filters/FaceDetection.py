@@ -5,11 +5,14 @@ from multiprocessing import Pool
 
 from .Filter import Filter
 
+
 HAARCASCADE_PATH = "src/filters/haarcascade_frontalface_alt2.xml"
+
 
 class FaceDetection(Filter):
     def __init__(self):
         super().__init__()
+
     def apply(self, img: np.ndarray, processes_limit: int, pool: Pool) -> List[np.ndarray]:
         if self.cache:
             print("USING CACHE...")

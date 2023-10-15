@@ -39,7 +39,6 @@ class FaceBlurrer(Filter):
             if blurred_face is not None:
                 img[y:y + h, x:x + w] = blurred_face
 
-
         return [img]
 
     @staticmethod

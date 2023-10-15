@@ -4,6 +4,7 @@ from typing import List, Dict
 
 import cv2
 
+from .filters.FaceDetection import FaceDetection
 from .filters.BilinearScale import BilinearScale
 from .filters.BicubicScale import BicubicScale
 from .filters.Crop import Crop
