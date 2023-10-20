@@ -32,6 +32,20 @@ class FaceBlurrer(Filter):
             shape = self.predictor(gray, rect)
             shape = face_utils.shape_to_np(shape)
             jawline_points = shape[0:17]
+
+            mirror_y = shape[0][1]
+            for mirror_ind in range(1, 9):
+                new_y = jawline_points[17 - mirror_ind][1] - 2 * (jawline_points[17 - mirror_ind][1] - mirror_y)
+                jawline_points = np.append(jawline_points,
+                                           np.array([np.array([jawline_points[17 - mirror_ind][0], new_y])]),
+                                           axis=0)
+
+            for mirror_ind in range(9, 0, -1):  # mirroring jawline
+                new_y = jawline_points[mirror_ind][1] - 2 * (jawline_points[mirror_ind][1] - mirror_y)
+                jawline_points = np.append(jawline_points,
+                                           np.array([np.array([jawline_points[mirror_ind][0], new_y])]),
+                                           axis=0)
+
             mask = np.zeros_like(img)
             cv2.fillPoly(mask, [jawline_points], (255, 255, 255))
             blurred_face = cv2.GaussianBlur(img, (0, 0), 30)
