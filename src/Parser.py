@@ -46,7 +46,6 @@ class Parser:
 
             # create filter objects with parameters
             for label in command[2].split(":"):
-                print(command[1][1:])
                 res_obj.label_in_map[label] = res_obj.class_map[command[1][0]](*(command[1][1:]))
 
             # create dependencies for each out_label and update calls_counters

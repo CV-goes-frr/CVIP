@@ -1,3 +1,4 @@
+import math
 from typing import List
 from multiprocessing import Pool
 
@@ -20,6 +21,15 @@ class FaceBlurrer(Filter):
         self.coef = int(coef)
 
     def apply(self, img: np.ndarray, processes_limit: int, pool: Pool) -> List[np.ndarray]:
+        """
+        Face detection with dlib.get_frontal_face_detector().
+        Blurring faces according to jawline and reflected jawline (relative to the nose line).
+
+        :param img: np.ndarray of pixels
+        :param processes_limit: we'll try to parallel it later
+        :param pool: processes pool
+        :return: edited image
+        """
 
         if self.cache:
             print("USING CACHE...")
@@ -31,51 +41,50 @@ class FaceBlurrer(Filter):
         for (i, rect) in enumerate(rects):
             shape = self.predictor(gray, rect)
             shape = face_utils.shape_to_np(shape)
-            jawline_points = shape[0:17]
+            jawline = shape[0:17]
 
-            mirror_y = shape[0][1]
-            for mirror_ind in range(1, 9):
-                new_y = jawline_points[17 - mirror_ind][1] - 2 * (jawline_points[17 - mirror_ind][1] - mirror_y)
-                jawline_points = np.append(jawline_points,
-                                           np.array([np.array([jawline_points[17 - mirror_ind][0], new_y])]),
-                                           axis=0)
+            x0 = shape[0][0]
+            y0 = shape[0][1]
+            x1 = shape[16][0]
+            y1 = shape[16][1]
+            for mirror_ind in range(1, 9):  # mirroring jawline
+                jawline = np.append(jawline,
+                                    np.array([np.array(self.reflect(self, jawline[17 - mirror_ind], x0, y0, x1, y1))]),
+                                    axis=0)
 
-            for mirror_ind in range(9, 0, -1):  # mirroring jawline
-                new_y = jawline_points[mirror_ind][1] - 2 * (jawline_points[mirror_ind][1] - mirror_y)
-                jawline_points = np.append(jawline_points,
-                                           np.array([np.array([jawline_points[mirror_ind][0], new_y])]),
-                                           axis=0)
+            for mirror_ind in range(9, 0, -1):
+                jawline = np.append(jawline,
+                                    np.array([np.array(self.reflect(self, jawline[mirror_ind], x0, y0, x1, y1))]),
+                                    axis=0)
 
             mask = np.zeros_like(img)
-            cv2.fillPoly(mask, [jawline_points], (255, 255, 255))
+            cv2.fillPoly(mask, [jawline], (255, 255, 255))
             blurred_face = cv2.GaussianBlur(img, (0, 0), 30)
             img = np.where(mask != 0, blurred_face, img)
 
         return [img]
 
     @staticmethod
-    def custom_gaussian_kernel(size: int, sigma: float) -> np.ndarray:
-        kernel = np.fromfunction(
-            lambda x, y: (1 / (2 * np.pi * sigma ** 2)) *
-                         np.exp(-((x - (size - 1) / 2) ** 2 + (y - (size - 1) / 2) ** 2) / (2 * sigma ** 2)),
-            (size, size)
-        )
-        return kernel / np.sum(kernel)
+    def reflect(self, p: np.array, x0: int, y0: int, x1: int, y1: int):
+        """
+        Point reflection relative to the line that is set by (x0, y0) and (x1, y1).
 
-    @staticmethod
-    def apply_custom_gaussian_blur(img: np.ndarray, kernel: np.ndarray) -> np.ndarray:
-        height, width, channels = img.shape
-        ksize = kernel.shape[0]
-        pad = ksize // 2
+        :param self: self
+        :param p: point to reflect (np.array(x, y))
+        :param x0: x of the first point of the line
+        :param y0: y of the first point of the line
+        :param x1: x of the second point of the line
+        :param y1: y of the second point of the line
+        :return: edited image
+        """
 
-        padded_img = cv2.copyMakeBorder(img, pad, pad, pad, pad, cv2.BORDER_REPLICATE)
+        dx = x1 - x0
+        dy = y1 - y0
 
-        blurred_img = np.zeros_like(img, dtype=float)
+        a = (dx * dx - dy * dy) / (dx * dx + dy * dy)
+        b = 2 * dx * dy / (dx * dx + dy * dy)
 
-        for i in range(pad, height + pad):
-            for j in range(pad, width + pad):
-                for c in range(channels):
-                    region = padded_img[i - pad:i + pad + 1, j - pad:j + pad + 1, c]
-                    blurred_img[i - pad, j - pad, c] = np.sum(region * kernel)
+        x2 = int(a * (p[0] - x0) + b * (p[1] - y0) + x0)
+        y2 = int(b * (p[0] - x0) - a * (p[1] - y0) + y0)
 
-        return blurred_img.astype(np.uint8)
+        return np.array([x2, y2])
