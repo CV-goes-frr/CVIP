@@ -33,7 +33,7 @@ class FaceBlurrer(Filter):
             shape = face_utils.shape_to_np(shape)
             jawline_points = shape[0:17]
             mask = np.zeros_like(img)
-            cv2.fillPoly(mask, [jawline_points], (255, 255, 255))
+            cv2.fillConvexPoly(mask, jawline_points, (255, 255, 255))
             blurred_face = cv2.GaussianBlur(img, (0, 0), 30)
             img = np.where(mask != 0, blurred_face, img)
 
