@@ -8,7 +8,6 @@ import cv2
 
 from .Filter import Filter
 
-
 PREDICTOR_PATH = "src/filters/shape_predictor_68_face_landmarks_GTX.dat"
 
 
@@ -30,14 +29,13 @@ class FaceBlurrer(Filter):
         rects = self.detector(gray, 0)
 
         for (i, rect) in enumerate(rects):
-
-            (x, y, w, h) = face_utils.rect_to_bb(rect)
-            roi = img[y:y + h, x:x + w]
-
-            blurred_face = self.apply_custom_gaussian_blur(roi, self.custom_gaussian_kernel(99, self.coef))
-
-            if blurred_face is not None:
-                img[y:y + h, x:x + w] = blurred_face
+            shape = self.predictor(gray, rect)
+            shape = face_utils.shape_to_np(shape)
+            jawline_points = shape[0:17]
+            mask = np.zeros_like(img)
+            cv2.fillPoly(mask, [jawline_points], (255, 255, 255))
+            blurred_face = cv2.GaussianBlur(img, (0, 0), 30)
+            img = np.where(mask != 0, blurred_face, img)
 
         return [img]
 
