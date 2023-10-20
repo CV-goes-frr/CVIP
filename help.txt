@@ -1,0 +1,2 @@
+this is a help file
+example of prompt:[-i=arcane.png]face_blur:20[-o=faceblur]

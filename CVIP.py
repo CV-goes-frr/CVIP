@@ -32,6 +32,6 @@ def main():
         end: float = time.time()
         print(f"\nALL TASKS WERE COMPLETED\nTIME ELAPSED: {end - start}\n")
 
-
+        
 if __name__ == "__main__":
     main()
