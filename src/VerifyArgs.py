@@ -3,7 +3,6 @@ import re
 from .exceptions.WrongParameters import WrongParametersException
 from .exceptions.WrongFiltername import WrongFilterNameException
 
-
 class VerifyArgs:
 
     def __init__(self, args: str):
@@ -11,11 +10,12 @@ class VerifyArgs:
         self.name: str = args[0]
 
     def check(self):
+        # Check the filter name and its parameters based on the name
         match self.name:
             case 'crop':
                 if len(self.args) != 5:
                     raise WrongParametersException(self.name, str(self.args[1:]))
-
+                # Validate that all parameters are numeric
                 for param in self.args[1:]:
                     if not re.match(r'^[0-9]+$', param):
                         raise WrongParametersException(self.name, param)
@@ -23,6 +23,7 @@ class VerifyArgs:
             case 'nn_scale':
                 if len(self.args) != 2:
                     raise WrongParametersException(self.name, str(self.args[1:]))
+                # Validate that all parameters are numeric
                 for param in self.args[1:]:
                     if not re.match(r'^[0-9]+$', param):
                         raise WrongParametersException(self.name, param)
@@ -30,6 +31,7 @@ class VerifyArgs:
             case 'bilinear_scale':
                 if len(self.args) != 2:
                     raise WrongParametersException(self.name, str(self.args[1:]))
+                # Validate that all parameters are numeric
                 for param in self.args[1:]:
                     if not re.match(r'^[0-9]+$', param):
                         raise WrongParametersException(self.name, param)
@@ -37,6 +39,7 @@ class VerifyArgs:
             case 'bicubic_scale':
                 if len(self.args) != 2:
                     raise WrongParametersException(self.name, str(self.args[1:]))
+                # Validate that all parameters are numeric
                 for param in self.args[1:5]:
                     if not re.match(r'^[0-9]+$', param):
                         raise WrongParametersException(self.name, param)
@@ -48,6 +51,7 @@ class VerifyArgs:
             case 'face_blur':
                 if len(self.args) != 2:
                     raise WrongParametersException(self.name, str(self.args[1:]))
+                # Validate that all parameters are numeric
                 for param in self.args[1:5]:
                     if not re.match(r'^[0-9]+$', param):
                         raise WrongParametersException(self.name, param)
@@ -60,4 +64,5 @@ class VerifyArgs:
                 pass
 
             case _:
+                # If the filter name is not recognized, raise an exception
                 raise WrongFilterNameException(self.name)
