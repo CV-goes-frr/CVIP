@@ -1,7 +1,5 @@
-import math
 from typing import List
 from multiprocessing import Pool
-
 import numpy as np
 import dlib
 from imutils import face_utils
@@ -11,43 +9,42 @@ from .Filter import Filter
 
 PREDICTOR_PATH = "src/filters/shape_predictor_68_face_landmarks_GTX.dat"
 
-
 class FaceBlurrer(Filter):
 
     def __init__(self, coef: str):
-        super().__init__()
-        self.detector = dlib.get_frontal_face_detector()
-        self.predictor = dlib.shape_predictor(PREDICTOR_PATH)
-        self.coef = int(coef)
+        super().__init__()  # Call the constructor of the parent class (Filter)
+        self.detector = dlib.get_frontal_face_detector()  # Initialize the face detector
+        self.predictor = dlib.shape_predictor(PREDICTOR_PATH)  # Initialize the face landmarks predictor
+        self.coef = int(coef)  # Convert the coefficient to an integer
 
     def apply(self, img: np.ndarray, processes_limit: int, pool: Pool) -> List[np.ndarray]:
         """
         Face detection with dlib.get_frontal_face_detector().
         Blurring faces according to jawline and reflected jawline (relative to the nose line).
 
-        :param img: np.ndarray of pixels
+        :param img: np.ndarray of pixels - Input image as a NumPy array
         :param processes_limit: we'll try to parallel it later
         :param pool: processes pool
-        :return: edited image
+        :return: edited image - List containing the edited image as a NumPy array
         """
 
-        if self.cache:
+        if self.cache:  # Check if a cached result exists
             print("USING CACHE...")
-            return self.cache
+            return self.cache  # Return the cached result
 
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        rects = self.detector(gray, 0)
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # Convert the image to grayscale
+        rects = self.detector(gray, 0)  # Detect faces in the grayscale image
 
-        for (i, rect) in enumerate(rects):
-            shape = self.predictor(gray, rect)
-            shape = face_utils.shape_to_np(shape)
-            jawline = shape[0:17]
+        for (i, rect) in enumerate(rects):  # Iterate over the detected faces
+            shape = self.predictor(gray, rect)  # Get the facial landmarks for the current face
+            shape = face_utils.shape_to_np(shape)  # Convert the landmarks to NumPy array
+            jawline = shape[0:17]  # Extract the points of the jawline
 
             x0 = shape[0][0]
             y0 = shape[0][1]
             x1 = shape[16][0]
             y1 = shape[16][1]
-            for mirror_ind in range(1, 9):  # mirroring jawline
+            for mirror_ind in range(1, 9):
                 jawline = np.append(jawline,
                                     np.array([np.array(self.reflect(self, jawline[17 - mirror_ind], x0, y0, x1, y1))]),
                                     axis=0)
@@ -57,12 +54,12 @@ class FaceBlurrer(Filter):
                                     np.array([np.array(self.reflect(self, jawline[mirror_ind], x0, y0, x1, y1))]),
                                     axis=0)
 
-            mask = np.zeros_like(img)
-            cv2.fillPoly(mask, [jawline], (255, 255, 255))
-            blurred_face = cv2.GaussianBlur(img, (0, 0), 30)
-            img = np.where(mask != 0, blurred_face, img)
+            mask = np.zeros_like(img)  # Create a mask with the same shape as the image
+            cv2.fillPoly(mask, [jawline], (255, 255, 255))  # Fill the mask with the jawline
+            blurred_face = cv2.GaussianBlur(img, (0, 0), 30)  # Apply Gaussian blur to the face
+            img = np.where(mask != 0, blurred_face, img)  # Apply blurring to the face region
 
-        return [img]
+        return [img]  # Return the edited image as a list
 
     @staticmethod
     def reflect(self, p: np.array, x0: int, y0: int, x1: int, y1: int):
@@ -70,12 +67,12 @@ class FaceBlurrer(Filter):
         Point reflection relative to the line that is set by (x0, y0) and (x1, y1).
 
         :param self: self
-        :param p: point to reflect (np.array(x, y))
-        :param x0: x of the first point of the line
-        :param y0: y of the first point of the line
-        :param x1: x of the second point of the line
-        :param y1: y of the second point of the line
-        :return: edited image
+        :param p: point to reflect (np.array(x, y)) - Point to be reflected
+        :param x0: x of the first point of the line - X-coordinate of the first point of the line
+        :param y0: y of the first point of the line - Y-coordinate of the first point of the line
+        :param x1: x of the second point of the line - X-coordinate of the second point of the line
+        :param y1: y of the second point of the line - Y-coordinate of the second point of the line
+        :return: edited image - The reflected point as a NumPy array
         """
 
         dx = x1 - x0
