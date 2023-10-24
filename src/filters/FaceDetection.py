@@ -42,10 +42,8 @@ class FaceDetection(Filter):
 
         frontal_rect = face_detect.detectMultiScale(
             gray, scaleFactor=1.1, minNeighbors=5)
+        #detectMultiScale method returns boundary rectangles for the detected faces (i.e., x, y, w, h).
 
-        """
-        detectMultiScale method returns boundary rectangles for the detected faces (i.e., x, y, w, h).
-        """
 
         for (x, y, w, h) in frontal_rect: # Rectangles are drawn around the detected faces
             cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
