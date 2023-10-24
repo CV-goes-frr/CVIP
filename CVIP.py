@@ -1,4 +1,5 @@
 import time
+import argparse
 
 import cv2
 
@@ -6,20 +7,28 @@ from src.Parser import Parser
 
 
 def main():
-    while True:
-        user_input = input("Enter a prompt or type 'exit' to quit or 'help' for information: ")
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument(
+        "-h",
+        "--help",
+        action="store_true")
+    parser.add_argument(
+        'actions',
+        type=str,
+        nargs=argparse.OPTIONAL,
+        help='Prompt')
+    parser.add_argument(
+        'processes_limit',
+        type=str,
+        nargs=argparse.OPTIONAL,
+        help='Max number of parallel processes')
+    args = parser.parse_args()
 
-        if user_input.lower() == 'exit':
-            break
-        elif user_input.lower() == 'help':
-            with open('help.txt', 'r') as help_file:
-                print(help_file.read())
-            continue
-
-        prompt = user_input
-        processes_limit = input("Enter the number of parallel processes: ")
-
-        pars = Parser(prompt, processes_limit)
+    if args.help:
+        with open('help.txt', 'r') as help_file:
+            print(help_file.read())
+    else:
+        pars = Parser(args.actions, args.processes_limit)
         proc = pars.parse()
 
         start: float = time.time()
