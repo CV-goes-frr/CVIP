@@ -5,7 +5,7 @@ from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 import numpy as np
 from multiprocessing import Pool
-from .Filter import Filter
+from src.filters.Filter import Filter
 
 
 MODEL_PATH = 'src/filters/face_landmarker.task'
