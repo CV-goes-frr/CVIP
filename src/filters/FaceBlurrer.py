@@ -1,5 +1,6 @@
 from typing import List
 from multiprocessing import Pool
+
 import numpy as np
 import dlib
 from imutils import face_utils
@@ -7,81 +8,62 @@ import cv2
 
 from .Filter import Filter
 
+
 PREDICTOR_PATH = "src/filters/shape_predictor_68_face_landmarks_GTX.dat"
+
 
 class FaceBlurrer(Filter):
 
     def __init__(self, coef: str):
-        super().__init__()  # Call the constructor of the parent class (Filter)
-        self.detector = dlib.get_frontal_face_detector()  # Initialize the face detector
-        self.predictor = dlib.shape_predictor(PREDICTOR_PATH)  # Initialize the face landmarks predictor
-        self.coef = int(coef)  # Convert the coefficient to an integer
+        super().__init__()
+        self.detector = dlib.get_frontal_face_detector()
+        self.predictor = dlib.shape_predictor(PREDICTOR_PATH)
+        self.coef = int(coef)
 
     def apply(self, img: np.ndarray, processes_limit: int, pool: Pool) -> List[np.ndarray]:
-        """
-        Face detection with dlib.get_frontal_face_detector().
-        Blurring faces according to jawline and reflected jawline (relative to the nose line).
 
-        :param img: np.ndarray of pixels - Input image as a NumPy array
-        :param processes_limit: we'll try to parallel it later
-        :param pool: processes pool
-        :return: edited image - List containing the edited image as a NumPy array
-        """
-
-        if self.cache:  # Check if a cached result exists
+        if self.cache:
             print("USING CACHE...")
-            return self.cache  # Return the cached result
+            return self.cache
 
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # Convert the image to grayscale
-        rects = self.detector(gray, 0)  # Detect faces in the grayscale image
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        rects = self.detector(gray, 0)
 
-        for (i, rect) in enumerate(rects):  # Iterate over the detected faces
-            shape = self.predictor(gray, rect)  # Get the facial landmarks for the current face
-            shape = face_utils.shape_to_np(shape)  # Convert the landmarks to NumPy array
-            jawline = shape[0:17]  # Extract the points of the jawline
+        for (i, rect) in enumerate(rects):
 
-            x0 = shape[0][0]
-            y0 = shape[0][1]
-            x1 = shape[16][0]
-            y1 = shape[16][1]
-            for mirror_ind in range(1, 9):
-                jawline = np.append(jawline,
-                                    np.array([np.array(self.reflect(self, jawline[17 - mirror_ind], x0, y0, x1, y1))]),
-                                    axis=0)
+            (x, y, w, h) = face_utils.rect_to_bb(rect)
+            roi = img[y:y + h, x:x + w]
 
-            for mirror_ind in range(9, 0, -1):
-                jawline = np.append(jawline,
-                                    np.array([np.array(self.reflect(self, jawline[mirror_ind], x0, y0, x1, y1))]),
-                                    axis=0)
+            blurred_face = self.apply_custom_gaussian_blur(roi, self.custom_gaussian_kernel(99, self.coef))
 
-            mask = np.zeros_like(img)  # Create a mask with the same shape as the image
-            cv2.fillPoly(mask, [jawline], (255, 255, 255))  # Fill the mask with the jawline
-            blurred_face = cv2.GaussianBlur(img, (0, 0), 30)  # Apply Gaussian blur to the face
-            img = np.where(mask != 0, blurred_face, img)  # Apply blurring to the face region
+            if blurred_face is not None:
+                img[y:y + h, x:x + w] = blurred_face
 
-        return [img]  # Return the edited image as a list
+        return [img]
 
     @staticmethod
-    def reflect(self, p: np.array, x0: int, y0: int, x1: int, y1: int):
-        """
-        Point reflection relative to the line that is set by (x0, y0) and (x1, y1).
+    def custom_gaussian_kernel(size: int, sigma: float) -> np.ndarray:
+        kernel = np.fromfunction(
+            lambda x, y: (1 / (2 * np.pi * sigma ** 2)) *
+                         np.exp(-((x - (size - 1) / 2) ** 2 + (y - (size - 1) / 2) ** 2) / (2 * sigma ** 2)),
+            (size, size)
+        )
+        return kernel / np.sum(kernel)
 
-        :param self: self
-        :param p: point to reflect (np.array(x, y)) - Point to be reflected
-        :param x0: x of the first point of the line - X-coordinate of the first point of the line
-        :param y0: y of the first point of the line - Y-coordinate of the first point of the line
-        :param x1: x of the second point of the line - X-coordinate of the second point of the line
-        :param y1: y of the second point of the line - Y-coordinate of the second point of the line
-        :return: edited image - The reflected point as a NumPy array
-        """
+    @staticmethod
+    def apply_custom_gaussian_blur(img: np.ndarray, kernel: np.ndarray) -> np.ndarray:
+        height, width, channels = img.shape
+        ksize = kernel.shape[0]
+        pad = ksize // 2
 
-        dx = x1 - x0
-        dy = y1 - y0
+        padded_img = cv2.copyMakeBorder(img, pad, pad, pad, pad, cv2.BORDER_REPLICATE)
 
-        a = (dx * dx - dy * dy) / (dx * dx + dy * dy)
-        b = 2 * dx * dy / (dx * dx + dy * dy)
+        blurred_img = np.zeros_like(img, dtype=float)
 
-        x2 = int(a * (p[0] - x0) + b * (p[1] - y0) + x0)
-        y2 = int(b * (p[0] - x0) - a * (p[1] - y0) + y0)
+        for i in range(pad, height + pad):
+            for j in range(pad, width + pad):
+                for c in range(channels):
+                    region = padded_img[i - pad:i + pad + 1, j - pad:j + pad + 1, c]
+                    blurred_img[i - pad, j - pad, c] = np.sum(region * kernel)
 
-        return np.array([x2, y2])
+        return blurred_img.astype(np.uint8)
