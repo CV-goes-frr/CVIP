@@ -37,4 +37,4 @@ class FaceMeshProcessor:
 
 if __name__ == "__main__":
     processor = FaceMeshProcessor(min_detection_confidence=0.5, min_tracking_confidence=0.5)
-    processor.process_image('face.jpg', 'output_lines_only.jpg')
+    processor.process_image('../resources/face.jpg', 'output_lines_only.jpg')
