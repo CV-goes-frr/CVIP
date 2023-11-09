@@ -26,20 +26,22 @@ class FaceBlurrer(Filter):
             print("USING CACHE...")
             return self.cache
 
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        img_copy = np.copy(img)
+
+        gray = cv2.cvtColor(img_copy, cv2.COLOR_BGR2GRAY)
         rects = self.detector(gray, 0)
 
         for (i, rect) in enumerate(rects):
 
             (x, y, w, h) = face_utils.rect_to_bb(rect)
-            roi = img[y:y + h, x:x + w]
+            roi = img_copy[y:y + h, x:x + w]
 
             blurred_face = self.apply_custom_gaussian_blur(roi, self.custom_gaussian_kernel(99, self.coef))
 
             if blurred_face is not None:
-                img[y:y + h, x:x + w] = blurred_face
+                img_copy[y:y + h, x:x + w] = blurred_face
 
-        return [img]
+        return [img_copy]
 
     @staticmethod
     def custom_gaussian_kernel(size: int, sigma: float) -> np.ndarray:
@@ -48,6 +50,9 @@ class FaceBlurrer(Filter):
                          np.exp(-((x - (size - 1) / 2) ** 2 + (y - (size - 1) / 2) ** 2) / (2 * sigma ** 2)),
             (size, size)
         )
+
+
+
         return kernel / np.sum(kernel)
 
     @staticmethod

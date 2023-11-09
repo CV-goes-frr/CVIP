@@ -24,7 +24,8 @@ class FaceDetection(Filter):
         if self.cache: # Check if a cached result exists
             print("USING CACHE...")
             return self.cache # Return the cached result
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) # Convert the image to grayscale
+        img_copy = np.copy(img)
+        gray = cv2.cvtColor(img_copy, cv2.COLOR_BGR2GRAY) # Convert the image to grayscale
 
         face_detect = cv2.CascadeClassifier(HAARCASCADE_PATH) # Detect faces in the grayscale image
 
@@ -46,6 +47,6 @@ class FaceDetection(Filter):
 
 
         for (x, y, w, h) in frontal_rect: # Rectangles are drawn around the detected faces
-            cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            cv2.rectangle(img_copy, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
-        return [img] # Return the edited image as a list
+        return [img_copy] # Return the edited image as a list
