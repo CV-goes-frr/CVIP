@@ -56,10 +56,10 @@ class FaceBlurrer(Filter):
                                     np.array([np.array(self.reflect(self, jawline[mirror_ind], x0, y0, x1, y1))]),
                                     axis=0)
 
-            mask = np.zeros_like(img)  # Create a mask with the same shape as the image
+            mask = np.zeros_like(img_copy)  # Create a mask with the same shape as the image
             cv2.fillPoly(mask, [jawline], (255, 255, 255))  # Fill the mask with the jawline
-            blurred_face = cv2.GaussianBlur(img, (0, 0), 30)  # Apply Gaussian blur to the face
-            img_copy = np.where(mask != 0, blurred_face, img)  # Apply blurring to the face region
+            blurred_face = cv2.GaussianBlur(img_copy, (0, 0), 30)  # Apply Gaussian blur to the face
+            img_copy = np.where(mask != 0, blurred_face, img_copy)  # Apply blurring to the face region
 
         return [img_copy]  # Return the edited image as a list
 
