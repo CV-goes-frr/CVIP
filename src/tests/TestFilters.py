@@ -172,7 +172,7 @@ class TestBicubicScale(unittest.TestCase):
         self.assertTrue(np.array_equal(test_image, blurred_image))  # nothing has changed
 
     def test_face_blurrer_face(self):
-        test_image = cv2.imread('src/tests/test_face.jpg')
+        test_image = cv2.imread('src/resources/face.jpg')
 
         blurrer = FaceBlurrer(coef='30')
 
@@ -193,14 +193,13 @@ class TestBicubicScale(unittest.TestCase):
         self.assertTrue(np.array_equal(test_image, detected_image))  # nothing has changed
 
     def test_face_detection_face(self):
-        test_image = cv2.imread('src/tests/test_face.jpg')
+        test_image = cv2.imread('src/resources/face.jpg')
 
         detection = FaceDetection()
 
         with Pool(processes=2) as pool:
             detected_image = detection.apply(test_image, 2, pool)[0]
 
-        # why test fails?????
         self.assertFalse(np.array_equal(test_image, detected_image))  # face detected
 
 
