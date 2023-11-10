@@ -3,12 +3,14 @@ import unittest
 import cv2
 import numpy as np
 from multiprocessing import Pool
-from ..filters.BilinearScale import BilinearScale, weight_function
-from ..filters.BicubicScale import BicubicScale
-from ..filters.Crop import Crop
-from ..filters.NnScale import NnScale
-from ..filters.FaceBlurrer import FaceBlurrer
-from ..filters.FaceDetection import FaceDetection
+
+from settings import BASE_DIR
+from src.filters.BilinearScale import BilinearScale, weight_function
+from src.filters.BicubicScale import BicubicScale
+from src.filters.Crop import Crop
+from src.filters.NnScale import NnScale
+from src.filters.FaceBlurrer import FaceBlurrer
+from src.filters.FaceDetection import FaceDetection
 
 
 class TestBicubicScale(unittest.TestCase):
@@ -172,7 +174,7 @@ class TestBicubicScale(unittest.TestCase):
         self.assertTrue(np.array_equal(test_image, blurred_image))  # nothing has changed
 
     def test_face_blurrer_face(self):
-        test_image = cv2.imread('src/resources/face.jpg')
+        test_image = cv2.imread(BASE_DIR + '/resources/face.jpg')
 
         blurrer = FaceBlurrer(coef='30')
 
@@ -193,7 +195,7 @@ class TestBicubicScale(unittest.TestCase):
         self.assertTrue(np.array_equal(test_image, detected_image))  # nothing has changed
 
     def test_face_detection_face(self):
-        test_image = cv2.imread('src/resources/face.jpg')
+        test_image = cv2.imread(BASE_DIR + '/resources/face.jpg')
 
         detection = FaceDetection()
 

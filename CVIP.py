@@ -3,6 +3,7 @@ import argparse
 
 import cv2
 
+from settings import BASE_DIR
 from src.Parser import Parser
 
 
@@ -25,7 +26,7 @@ def main():
     args = parser.parse_args()
 
     if args.help:
-        with open('help.txt', 'r') as help_file:
+        with open(BASE_DIR + '/help.txt', 'r') as help_file:
             print(help_file.read())
     else:
         pars = Parser(args.actions, args.processes_limit)

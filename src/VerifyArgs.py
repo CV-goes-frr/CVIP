@@ -1,7 +1,7 @@
 import re
 
-from .exceptions.WrongParameters import WrongParametersException
-from .exceptions.WrongFiltername import WrongFilterNameException
+from src.exceptions.WrongParameters import WrongParametersException
+from src.exceptions.WrongFiltername import WrongFilterNameException
 
 class VerifyArgs:
 
