@@ -4,7 +4,6 @@ import cv2
 import numpy as np
 from multiprocessing import Pool
 
-from settings import BASE_DIR
 from src.filters.BilinearScale import BilinearScale, weight_function
 from src.filters.BicubicScale import BicubicScale
 from src.filters.Crop import Crop
@@ -174,7 +173,7 @@ class TestBicubicScale(unittest.TestCase):
         self.assertTrue(np.array_equal(test_image, blurred_image))  # nothing has changed
 
     def test_face_blurrer_face(self):
-        test_image = cv2.imread(BASE_DIR + '/resources/face.jpg')
+        test_image = cv2.imread('resources/face.jpg')
 
         blurrer = FaceBlurrer(coef='30')
 
@@ -195,7 +194,7 @@ class TestBicubicScale(unittest.TestCase):
         self.assertTrue(np.array_equal(test_image, detected_image))  # nothing has changed
 
     def test_face_detection_face(self):
-        test_image = cv2.imread(BASE_DIR + '/resources/face.jpg')
+        test_image = cv2.imread('resources/face.jpg')
 
         detection = FaceDetection()
 

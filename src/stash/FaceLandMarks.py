@@ -6,10 +6,9 @@ from mediapipe.tasks.python import vision
 import numpy as np
 from multiprocessing import Pool
 
-from settings import BASE_DIR
 from src.filters.Filter import Filter
 
-MODEL_PATH = BASE_DIR + '/src/filters/face_landmarker.task'
+MODEL_PATH = 'src/filters/face_landmarker.task'
 
 
 class FaceLandMarks(Filter):
