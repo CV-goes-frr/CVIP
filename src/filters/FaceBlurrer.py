@@ -5,10 +5,9 @@ import dlib
 from imutils import face_utils
 import cv2
 
-from settings import BASE_DIR
 from src.filters.Filter import Filter
 
-PREDICTOR_PATH = BASE_DIR + "/src/filters/shape_predictor_68_face_landmarks_GTX.dat"
+PREDICTOR_PATH = "src/filters/shape_predictor_68_face_landmarks_GTX.dat"
 
 
 class FaceBlurrer(Filter):

@@ -3,11 +3,10 @@ import numpy as np
 from typing import List
 from multiprocessing import Pool
 
-from settings import BASE_DIR
 from src.filters.Filter import Filter
 
 
-HAARCASCADE_PATH = BASE_DIR + "/src/filters/haarcascade_frontalface_alt2.xml"
+HAARCASCADE_PATH = "src/filters/haarcascade_frontalface_alt2.xml"
 
 
 class FaceDetection(Filter):

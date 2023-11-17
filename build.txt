@@ -1,0 +1,7 @@
+TO BUILD THE PROJECT WE'VE USED pyinstaller with the following command:
+pyinstaller --onefile CVIP.py
+
+After that pyinstaller will create CVIP.spec, build directory and dist directory.
+Executable file of CVIP will be placed in /dist.
+You can test the tool with the following prompt:
+./CVIP [-i=input.png]face_blur:30[-o=out] 
