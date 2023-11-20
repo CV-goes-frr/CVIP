@@ -34,6 +34,7 @@ class FaceBlurrer(Filter):
             return self.cache  # Return the cached result
 
         img_copy = np.copy(img)
+        blurred_face = cv2.GaussianBlur(img_copy, (0, 0), self.coef)  # Apply Gaussian blur to the face
 
         gray = cv2.cvtColor(img_copy, cv2.COLOR_BGR2GRAY)  # Convert the image to grayscale
         rects = self.detector(gray, 0)  # Detect faces in the grayscale image
@@ -59,7 +60,6 @@ class FaceBlurrer(Filter):
 
             mask = np.zeros_like(img_copy)  # Create a mask with the same shape as the image
             cv2.fillPoly(mask, [jawline], (255, 255, 255))  # Fill the mask with the jawline
-            blurred_face = cv2.GaussianBlur(img_copy, (0, 0), 30)  # Apply Gaussian blur to the face
             img_copy = np.where(mask != 0, blurred_face, img_copy)  # Apply blurring to the face region
 
         return [img_copy]  # Return the edited image as a list
