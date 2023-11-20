@@ -9,8 +9,6 @@ def RtcUmeyama(A: np.ndarray, B: np.ndarray) -> tuple:
     variance = np.mean(np.linalg.norm(A - centroid_A, axis=1) ** 2)
 
     H = (np.dot((A - centroid_A).T, (B - centroid_B))) / n
-    print("H: ", H)
-    print()
 
     U, D, VT = np.linalg.svd(H)
     d = np.sign(np.linalg.det(U) * np.linalg.det(VT))

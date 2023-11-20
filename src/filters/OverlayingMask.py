@@ -45,13 +45,16 @@ class Mask(Filter):
                 points = np.array(landmarks)
                 landmarks_all.append(points)
 
-        print(landmarks_all)
+        print(len(landmarks_all))
         for landmarks in landmarks_all:
             R, t, c = RtcUmeyama(landmarks, mask_landmarks)
-            print(R, t, c)
+            print("R:", R)
+            print("t:", t)
+            print("c:", c)
+            print()
 
 
 if __name__ == "__main__":
-    processor = Mask("face.jpg")
-    input_image = cv2.imread("arcane.png")
+    processor = Mask("elon.jpg")
+    input_image = cv2.imread("face.jpg")
     processor.apply(input_image, 2)
