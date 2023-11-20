@@ -17,7 +17,7 @@ class Mask(Filter):
         # Find points on the mask
         mask_image = cv2.imread(self.mask_name)
         mp_face_mesh = mp.solutions.face_mesh
-        face_points = mp_face_mesh.FaceMesh(
+        face_points = mp_face_mesh.FaceMesh(max_num_faces=20,
             min_detection_confidence=0.5, min_tracking_confidence=0.5)
         rgb_image = cv2.cvtColor(mask_image, cv2.COLOR_BGR2RGB)
         mask_points = face_points.process(rgb_image)
