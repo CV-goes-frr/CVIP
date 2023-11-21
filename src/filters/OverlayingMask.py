@@ -28,7 +28,7 @@ class Mask(Filter):
 
         # Find landmarks on the mask
         mp_face_mesh = mp.solutions.face_mesh
-        face_points = mp_face_mesh.FaceMesh(max_num_faces=1,
+        face_points = mp_face_mesh.FaceMesh(max_num_faces=50,
                                             min_detection_confidence=0.8,
                                             min_tracking_confidence=0.8)
         rgb_image = cv2.cvtColor(mask_image, cv2.COLOR_BGR2RGB)
@@ -55,8 +55,8 @@ class Mask(Filter):
         # Find points on target faces
         rgb_image = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         face_points = mp_face_mesh.FaceMesh(max_num_faces=50,
-                                            min_detection_confidence=0.4,
-                                            min_tracking_confidence=0.4)
+                                            min_detection_confidence=0.6,
+                                            min_tracking_confidence=0.6)
         target_faces_points = face_points.process(rgb_image)
         landmarks_all = list()
 
@@ -91,10 +91,10 @@ class Mask(Filter):
 
             jawline = landmarks[0:17]  # Extract the points of the jawline
 
-            x0 = landmarks[0][0]
-            y0 = landmarks[0][1]
-            x1 = landmarks[16][0]
-            y1 = landmarks[16][1]
+            x0 = landmarks[1][0]
+            y0 = landmarks[1][1]
+            x1 = landmarks[15][0]
+            y1 = landmarks[15][1]
             for mirror_ind in range(1, 9):
                 jawline = np.append(jawline,
                                     np.array([np.array(self.reflect(self, jawline[17 - mirror_ind], x0, y0, x1, y1))]),
