@@ -20,5 +20,6 @@ class Duplicate(Filter):
         :param pool: processes pool
         :return: edited image
         """
-        print("DUPLICATE IN PROCESS...")
+
+        print("DUPLICATE IN PROGRESS...")
         return [img, img]

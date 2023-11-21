@@ -60,7 +60,7 @@ class BilinearScale(Filter):
         :param pool: processes pool
         :return: edited image
         """
-        print("BILINEAR SCALE IN PROCESS...")
+        print("BILINEAR SCALE IN PROGRESS...")
         if self.cache:  # Check if a cached result exists
             print("USING CACHE...")
             return self.cache  # Return the cached result

@@ -21,6 +21,8 @@ class FaceDetection(Filter):
         :param pool: processes pool
         :return: List containing the edited image as a NumPy array
         """
+
+        print("FACE DETECTION IN PROGRESS...")
         if self.cache: # Check if a cached result exists
             print("USING CACHE...")
             return self.cache # Return the cached result

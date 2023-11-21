@@ -86,7 +86,7 @@ class BicubicScale(Filter):
         :return: edited image
         """
 
-        print("BICUBIC SCALE IN PROCESS...")
+        print("BICUBIC SCALE IN PROGRESS...")
         if self.cache:
             print("USING CACHE...")
             return self.cache
