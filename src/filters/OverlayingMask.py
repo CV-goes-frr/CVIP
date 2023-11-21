@@ -38,12 +38,26 @@ class Mask(Filter):
         rgb_image = cv2.cvtColor(mask_image, cv2.COLOR_BGR2RGB)
         mask_points = face_points.process(rgb_image)
 
+        # Specify what landmarks will we use
+        landmark_points_68 = [162, 234, 93, 58, 172, 136, 149, 148, 152, 377, 378, 365, 397, 288, 323, 454, 389, 71, 63,
+                              105, 66, 107, 336,
+                              296, 334, 293, 301, 168, 197, 5, 4, 75, 97, 2, 326, 305, 33, 160, 158, 133, 153, 144, 362,
+                              385, 387, 263, 373,
+                              380, 61, 39, 37, 0, 267, 269, 291, 405, 314, 17, 84, 181, 78, 82, 13, 312, 308, 317, 14,
+                              87]
+
         # get landmarks from FaceMesh class
         for face_landmarks in mask_points.multi_face_landmarks:
             landmarks = []
-            for landmark in face_landmarks.landmark:
-                x, y = int(landmark.x * img.shape[1]), int(landmark.y * img.shape[0])
+            for index in landmark_points_68:
+                x = int(face_landmarks.landmark[index].x * w_mask)
+                y = int(face_landmarks.landmark[index].y * h_mask)
                 landmarks.append((x, y))
+
+            # landmarks = []
+            # for landmark in landmarks_extracted:
+            #     x, y = int(landmark[0] * img.shape[1]), int(landmark[1] * img.shape[0])
+            #     landmarks.append((x, y))
 
             mask_landmarks = np.array(landmarks)
 
@@ -55,17 +69,25 @@ class Mask(Filter):
         if target_faces_points.multi_face_landmarks:
             for face_landmarks in target_faces_points.multi_face_landmarks:
                 landmarks = []
-                for landmark in face_landmarks.landmark:
-                    x, y = int(landmark.x * img.shape[1]), int(landmark.y * img.shape[0])
+                for index in landmark_points_68:
+                    x = int(face_landmarks.landmark[index].x * w_mask)
+                    y = int(face_landmarks.landmark[index].y * h_mask)
                     landmarks.append((x, y))
+
+                # landmarks = []
+                # for landmark in landmarks_extracted:
+                #     x, y = int(landmark[0] * img.shape[1]), int(landmark[1] * img.shape[0])
+                #     landmarks.append((x, y))
 
                 points = np.array(landmarks)
                 landmarks_all.append(points)  # Get landmarks to the list
 
-        print(len(landmarks_all))
+        print("Number of faces: ", len(landmarks_all))
 
         # Process all faces
         for landmarks in landmarks_all:
+            print("Number of landmarks on the face: ", len(landmarks))
+            print("Number of landmarks on the mask: ", len(mask_landmarks))
             R, t, c = RtcUmeyama(landmarks, mask_landmarks)  # Calculating rotation, translation and scale
             print("R:", R)
             print("t:", t)
