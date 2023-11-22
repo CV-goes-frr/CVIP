@@ -8,7 +8,7 @@ import cv2
 from settings import prefix
 from src.filters.Filter import Filter
 
-PREDICTOR_PATH = prefix + "src/filters/shape_predictor_68_face_landmarks_GTX.dat"
+PREDICTOR_PATH = prefix + "src/filters/shape_predictor_81_face_landmarks.dat"
 
 
 class FaceBlurrer(Filter):
@@ -22,7 +22,7 @@ class FaceBlurrer(Filter):
     def apply(self, img: np.ndarray, processes_limit: int, pool: Pool) -> List[np.ndarray]:
         """
         Face detection with dlib.get_frontal_face_detector().
-        Blurring faces according to jawline and reflected jawline (relative to the nose line).
+        Creating a mask to outline the face silhouette based on specific facial landmarks.
 
         :param img: np.ndarray of pixels - Input image as a NumPy array
         :param processes_limit: we'll try to parallel it later
@@ -30,7 +30,7 @@ class FaceBlurrer(Filter):
         :return: edited image - List containing the edited image as a NumPy array
         """
 
-        print("BLURRING FACES IN PROGRESS...")
+        print("OUTLINING FACE SILHOUETTE...")
         if self.cache:  # Check if a cached result exists
             print("USING CACHE...")
             return self.cache  # Return the cached result
@@ -44,25 +44,29 @@ class FaceBlurrer(Filter):
         for (i, rect) in enumerate(rects):  # Iterate over the detected faces
             shape = self.predictor(gray, rect)  # Get the facial landmarks for the current face
             shape = face_utils.shape_to_np(shape)  # Convert the landmarks to NumPy array
-            jawline = shape[0:17]  # Extract the points of the jawline
 
-            x0 = shape[0][0]
-            y0 = shape[0][1]
-            x1 = shape[16][0]
-            y1 = shape[16][1]
-            for mirror_ind in range(1, 9):
-                jawline = np.append(jawline,
-                                    np.array([np.array(self.reflect(self, jawline[17 - mirror_ind], x0, y0, x1, y1))]),
-                                    axis=0)
-
-            for mirror_ind in range(9, 0, -1):
-                jawline = np.append(jawline,
-                                    np.array([np.array(self.reflect(self, jawline[mirror_ind], x0, y0, x1, y1))]),
-                                    axis=0)
+            # Define points to outline the face silhouette in the specified order
+            face_silhouette = np.concatenate((
+                shape[0:17],  # Points 0 to 16
+                shape[78:79],  # Point 78
+                shape[74:75],  # Point 74
+                shape[79:80],  # Point 79
+                shape[73:74],  # Point 73
+                shape[72:73],  # Point 72
+                shape[80:81],  # Point 80
+                shape[71:72],  # Point 71
+                shape[70:71],  # Point 70
+                shape[69:70],  # Point 69
+                shape[68:69],  # Point 68
+                shape[76:77],  # Point 76
+                shape[75:76],  # Point 75
+                shape[77:78],  # Point 77
+                shape[0:1]  # Point 0 (to close the loop)
+            ), axis=0)
 
             mask = np.zeros_like(img_copy)  # Create a mask with the same shape as the image
-            cv2.fillPoly(mask, [jawline], (255, 255, 255))  # Fill the mask with the jawline
-            img_copy = np.where(mask != 0, blurred_face, img_copy)  # Apply blurring to the face region
+            cv2.fillPoly(mask, [face_silhouette], (255, 255, 255))  # Fill the mask to outline face silhouette
+            img_copy = np.where(mask != 0, blurred_face, img_copy)  # Set non-silhouette areas to black
 
         return [img_copy]  # Return the edited image as a list
 
