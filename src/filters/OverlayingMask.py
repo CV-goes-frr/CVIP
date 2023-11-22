@@ -10,8 +10,28 @@ from src.linal.RtcUmeyama import RtcUmeyama
 
 class Mask(Filter):
     def __init__(self, mask_name: str):
-        self.mask_name = mask_name
         super().__init__()  # Call the constructor of the parent class (Filter)
+
+        self.mask_name = mask_name
+        self.jaw_mark_l = 1
+        self.jaw_mark_r = 15
+
+        self.mask_detection_confidence = 0.5
+        self.mask_tracking_confidence = 0.5
+        self.mask_max_faces = 1
+
+        self.target_face_max_faces = 50
+        self.target_face_detection_confidence = 0.5
+        self.target_face_tracking_confidence = 0.95
+
+        # Specify what landmarks will we use
+        self.landmark_points_68 = [162, 234, 93, 58, 172, 136, 149, 148, 152, 377,
+                                   378, 365, 397, 288, 323, 454, 389, 71, 63, 105,
+                                   66, 107, 336, 296, 334, 293, 301, 168, 197, 5,
+                                   4, 75, 97, 2, 326, 305, 33, 160, 158, 133, 153,
+                                   144, 362, 385, 387, 263, 373, 380, 61, 39, 37,
+                                   0, 267, 269, 291, 405, 314, 17, 84, 181, 78, 82,
+                                   13, 312, 308, 317, 14, 87]
 
     def apply(self, img: np.ndarray, processes_limit: int, pool: Pool):
         print("OVERLAYING MASKING IN PROCESS...")
@@ -28,24 +48,17 @@ class Mask(Filter):
 
         # Find landmarks on the mask
         mp_face_mesh = mp.solutions.face_mesh
-        face_points = mp_face_mesh.FaceMesh(max_num_faces=50,
-                                            min_detection_confidence=0.8,
-                                            min_tracking_confidence=0.8)
+        face_points = mp_face_mesh.FaceMesh(max_num_faces=self.mask_max_faces,
+                                            refine_landmarks=True,
+                                            min_detection_confidence=self.mask_detection_confidence,
+                                            min_tracking_confidence=self.mask_tracking_confidence)
         rgb_image = cv2.cvtColor(mask_image, cv2.COLOR_BGR2RGB)
         mask_points = face_points.process(rgb_image)
-
-        # Specify what landmarks will we use
-        landmark_points_68 = [162, 234, 93, 58, 172, 136, 149, 148, 152, 377, 378, 365, 397, 288, 323, 454, 389, 71, 63,
-                              105, 66, 107, 336,
-                              296, 334, 293, 301, 168, 197, 5, 4, 75, 97, 2, 326, 305, 33, 160, 158, 133, 153, 144, 362,
-                              385, 387, 263, 373,
-                              380, 61, 39, 37, 0, 267, 269, 291, 405, 314, 17, 84, 181, 78, 82, 13, 312, 308, 317, 14,
-                              87]
 
         # get landmarks from FaceMesh class
         for face_landmarks in mask_points.multi_face_landmarks:
             landmarks = []
-            for index in landmark_points_68:
+            for index in self.landmark_points_68:
                 x = int(face_landmarks.landmark[index].x * w_mask)
                 y = int(face_landmarks.landmark[index].y * h_mask)
                 landmarks.append((x, y))
@@ -54,16 +67,18 @@ class Mask(Filter):
 
         # Find points on target faces
         rgb_image = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        face_points = mp_face_mesh.FaceMesh(max_num_faces=50,
-                                            min_detection_confidence=0.6,
-                                            min_tracking_confidence=0.6)
+        face_points = mp_face_mesh.FaceMesh(static_image_mode=True,
+                                            refine_landmarks=True,
+                                            max_num_faces=self.target_face_max_faces,
+                                            min_detection_confidence=self.target_face_detection_confidence,
+                                            min_tracking_confidence=self.target_face_tracking_confidence)
         target_faces_points = face_points.process(rgb_image)
         landmarks_all = list()
 
         if target_faces_points.multi_face_landmarks:
             for face_landmarks in target_faces_points.multi_face_landmarks:
                 landmarks = []
-                for index in landmark_points_68:
+                for index in self.landmark_points_68:
                     x = int(face_landmarks.landmark[index].x * w_mask)
                     y = int(face_landmarks.landmark[index].y * h_mask)
                     landmarks.append((x, y))
@@ -90,17 +105,16 @@ class Mask(Filter):
             # cv2.imwrite("rotated.jpg", mask_copy)
 
             jawline = landmarks[0:17]  # Extract the points of the jawline
-
-            x0 = landmarks[1][0]
-            y0 = landmarks[1][1]
-            x1 = landmarks[15][0]
-            y1 = landmarks[15][1]
-            for mirror_ind in range(1, 9):
+            x0 = landmarks[self.jaw_mark_l][0]
+            y0 = landmarks[self.jaw_mark_l][1]
+            x1 = landmarks[self.jaw_mark_r][0]
+            y1 = landmarks[self.jaw_mark_r][1]
+            for mirror_ind in range(self.jaw_mark_l, 9):
                 jawline = np.append(jawline,
-                                    np.array([np.array(self.reflect(self, jawline[17 - mirror_ind], x0, y0, x1, y1))]),
+                                    np.array([np.array(self.reflect(self, jawline[self.jaw_mark_r - mirror_ind], x0, y0, x1, y1))]),
                                     axis=0)
 
-            for mirror_ind in range(9, 0, -1):
+            for mirror_ind in range(9, self.jaw_mark_l, -1):
                 jawline = np.append(jawline,
                                     np.array([np.array(self.reflect(self, jawline[mirror_ind], x0, y0, x1, y1))]),
                                     axis=0)
@@ -148,7 +162,7 @@ class Mask(Filter):
 
 
 if __name__ == "__main__":
-    processor = Mask("Danya.png")
+    processor = Mask("anon.png")
     input_image = cv2.imread("photo.jpg")
 
     Pool = Pool(processes=2)
