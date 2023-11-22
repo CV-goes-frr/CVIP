@@ -25,13 +25,12 @@ class Mask(Filter):
         self.target_face_tracking_confidence = 0.95
 
         # Specify what landmarks will we use
-        self.landmark_points_68 = [162, 234, 93, 58, 172, 136, 149, 148, 152, 377,
-                                   378, 365, 397, 288, 323, 454, 389, 71, 63, 105,
-                                   66, 107, 336, 296, 334, 293, 301, 168, 197, 5,
-                                   4, 75, 97, 2, 326, 305, 33, 160, 158, 133, 153,
-                                   144, 362, 385, 387, 263, 373, 380, 61, 39, 37,
-                                   0, 267, 269, 291, 405, 314, 17, 84, 181, 78, 82,
-                                   13, 312, 308, 317, 14, 87]
+        self.landmark_points_81 = [127, 234, 93, 58, 172, 136, 149, 148, 152, 377, 378, 365, 397, 288, 323, 454, 389, 71, 63,
+                              105, 66, 107, 336,
+                              296, 334, 293, 301, 168, 197, 5, 4, 75, 97, 2, 326, 305, 33, 160, 158, 133, 153, 144, 362,
+                              385, 387, 263, 373,
+                              380, 61, 39, 37, 0, 267, 269, 291, 405, 314, 17, 84, 181, 78, 82, 13, 312, 308, 317, 14,
+                              87, 103, 67, 109, 10, 297, 332, 251, 21, 54, 162, 356, 284, 338]
 
     def apply(self, img: np.ndarray, processes_limit: int, pool: Pool):
         print("OVERLAYING MASKING IN PROCESS...")
@@ -58,7 +57,7 @@ class Mask(Filter):
         # get landmarks from FaceMesh class
         for face_landmarks in mask_points.multi_face_landmarks:
             landmarks = []
-            for index in self.landmark_points_68:
+            for index in self.landmark_points_81:
                 x = int(face_landmarks.landmark[index].x * w_mask)
                 y = int(face_landmarks.landmark[index].y * h_mask)
                 landmarks.append((x, y))
@@ -78,7 +77,7 @@ class Mask(Filter):
         if target_faces_points.multi_face_landmarks:
             for face_landmarks in target_faces_points.multi_face_landmarks:
                 landmarks = []
-                for index in self.landmark_points_68:
+                for index in self.landmark_points_81:
                     x = int(face_landmarks.landmark[index].x * w_mask)
                     y = int(face_landmarks.landmark[index].y * h_mask)
                     landmarks.append((x, y))
@@ -104,24 +103,27 @@ class Mask(Filter):
             mask_copy = cv2.warpAffine(mask_copy, A, (w_mask, h_mask))  # Edit mask image
             # cv2.imwrite("rotated.jpg", mask_copy)
 
-            jawline = landmarks[0:17]  # Extract the points of the jawline
-            x0 = landmarks[self.jaw_mark_l][0]
-            y0 = landmarks[self.jaw_mark_l][1]
-            x1 = landmarks[self.jaw_mark_r][0]
-            y1 = landmarks[self.jaw_mark_r][1]
-            for mirror_ind in range(self.jaw_mark_l, 9):
-                jawline = np.append(jawline,
-                                    np.array([np.array(self.reflect(self, jawline[self.jaw_mark_r - mirror_ind], x0, y0, x1, y1))]),
-                                    axis=0)
-
-            for mirror_ind in range(9, self.jaw_mark_l, -1):
-                jawline = np.append(jawline,
-                                    np.array([np.array(self.reflect(self, jawline[mirror_ind], x0, y0, x1, y1))]),
-                                    axis=0)
+            face_silhouette = np.concatenate((
+                landmarks[0:17],  # Points 0 to 16
+                landmarks[78:79],  # Point 78
+                landmarks[74:75],  # Point 74
+                landmarks[79:80],  # Point 79
+                landmarks[73:74],  # Point 73
+                landmarks[72:73],  # Point 72
+                landmarks[80:81],  # Point 80
+                landmarks[71:72],  # Point 71
+                landmarks[70:71],  # Point 70
+                landmarks[69:70],  # Point 69
+                landmarks[68:69],  # Point 68
+                landmarks[76:77],  # Point 76
+                landmarks[75:76],  # Point 75
+                landmarks[77:78],  # Point 77
+                landmarks[0:1]
+            ), axis=0)
 
             # Create a poly on the face, where we'll change pixels to mask's pixels
             mask_poly = np.zeros_like(mask_copy)
-            cv2.fillPoly(mask_poly, [jawline], (255, 255, 255))
+            cv2.fillPoly(mask_poly, [face_silhouette], (255, 255, 255))
             img = np.where(mask_poly != 0, mask_copy, img)
             cv2.imwrite("result.jpg", img)
 
