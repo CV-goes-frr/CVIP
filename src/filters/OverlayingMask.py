@@ -2,15 +2,21 @@ import cv2
 import numpy as np
 import mediapipe as mp
 from multiprocessing import Pool
+import dlib
+from imutils import face_utils
 
-from src.filters.BilinearScale import BilinearScale
 from src.filters.Filter import Filter
+from settings import prefix
 from src.linal.RtcUmeyama import RtcUmeyama
 
-
+PREDICTOR_PATH = prefix + "src/filters/shape_predictor_81_face_landmarks.dat"
 class Mask(Filter):
     def __init__(self, mask_name: str):
         super().__init__()  # Call the constructor of the parent class (Filter)
+
+        self.detector = dlib.get_frontal_face_detector()  # Initialize the face detector
+        self.predictor = dlib.shape_predictor(PREDICTOR_PATH)  # Initialize the face landmarks predictor
+        self.coef = 1.25
 
         self.mask_name = mask_name
         self.jaw_mark_l = 1
@@ -19,10 +25,7 @@ class Mask(Filter):
         self.mask_detection_confidence = 0.5
         self.mask_tracking_confidence = 0.5
         self.mask_max_faces = 1
-
-        self.target_face_max_faces = 50
-        self.target_face_detection_confidence = 0.5
-        self.target_face_tracking_confidence = 0.95
+        # Parameters for mp_face_mesh
 
         # Specify what landmarks will we use
         self.landmark_points_81 = [127, 234, 93, 58, 172, 136, 149, 148, 152, 377, 378, 365, 397, 288, 323, 454, 389, 71, 63,
@@ -33,6 +36,14 @@ class Mask(Filter):
                               87, 103, 67, 109, 10, 297, 332, 251, 21, 54, 162, 356, 284, 338]
 
     def apply(self, img: np.ndarray, processes_limit: int, pool: Pool):
+        """
+        :param self: self
+        :param img: np.ndarray of pixels - Input image as a NumPy array
+        :param processes_limit:we'll try to parallel it later
+        :param pool: processes pool
+        :return: edited image - List containing the edited image as a NumPy array
+        """
+
         print("OVERLAYING MASKING IN PROCESS...")
 
         # Find points on the mask
@@ -43,7 +54,6 @@ class Mask(Filter):
 
         # Change the size of the mask
         mask_image = np.array(self.scale(mask_image, h_mask, w_mask))
-        print(mask_image.shape)
 
         # Find landmarks on the mask
         mp_face_mesh = mp.solutions.face_mesh
@@ -56,45 +66,24 @@ class Mask(Filter):
 
         # get landmarks from FaceMesh class
         for face_landmarks in mask_points.multi_face_landmarks:
-            landmarks = []
+            mask_landmarks = []
             for index in self.landmark_points_81:
                 x = int(face_landmarks.landmark[index].x * w_mask)
                 y = int(face_landmarks.landmark[index].y * h_mask)
-                landmarks.append((x, y))
-
-            mask_landmarks = np.array(landmarks)
+                mask_landmarks.append((x, y))
 
         # Find points on target faces
-        rgb_image = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        face_points = mp_face_mesh.FaceMesh(static_image_mode=True,
-                                            refine_landmarks=True,
-                                            max_num_faces=self.target_face_max_faces,
-                                            min_detection_confidence=self.target_face_detection_confidence,
-                                            min_tracking_confidence=self.target_face_tracking_confidence)
-        target_faces_points = face_points.process(rgb_image)
-        landmarks_all = list()
 
-        if target_faces_points.multi_face_landmarks:
-            for face_landmarks in target_faces_points.multi_face_landmarks:
-                landmarks = []
-                for index in self.landmark_points_81:
-                    x = int(face_landmarks.landmark[index].x * w_mask)
-                    y = int(face_landmarks.landmark[index].y * h_mask)
-                    landmarks.append((x, y))
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # Convert the image to grayscale
+        rects = self.detector(gray, 0)  # Detect faces in the grayscale image
 
-                points = np.array(landmarks)
-                landmarks_all.append(points)  # Get landmarks to the list
-
-        print("Number of faces: ", len(landmarks_all))
         # Process all faces
-        for landmarks in landmarks_all:
-            print("Number of landmarks on the face: ", len(landmarks))
-            print("Number of landmarks on the mask: ", len(mask_landmarks))
-            R, t, c = RtcUmeyama(landmarks, mask_landmarks)  # Calculating rotation, translation and scale
-            print("R:", R)
-            print("t:", t)
-            print("c:", c)
-            print()
+        for (i, rect) in enumerate(rects):
+            shape = self.predictor(gray, rect)  # Get the facial landmarks for the current face
+            shape = face_utils.shape_to_np(shape)  # Convert the landmarks to NumPy array
+
+            R, t, c = RtcUmeyama(shape, mask_landmarks)  # Calculating rotation, translation and scale
+
             mask_copy = mask_image.copy()
 
             # Form am Affine transformation matrix
@@ -104,34 +93,33 @@ class Mask(Filter):
             # cv2.imwrite("rotated.jpg", mask_copy)
 
             face_silhouette = np.concatenate((
-                landmarks[0:17],  # Points 0 to 16
-                landmarks[78:79],  # Point 78
-                landmarks[74:75],  # Point 74
-                landmarks[79:80],  # Point 79
-                landmarks[73:74],  # Point 73
-                landmarks[72:73],  # Point 72
-                landmarks[80:81],  # Point 80
-                landmarks[71:72],  # Point 71
-                landmarks[70:71],  # Point 70
-                landmarks[69:70],  # Point 69
-                landmarks[68:69],  # Point 68
-                landmarks[76:77],  # Point 76
-                landmarks[75:76],  # Point 75
-                landmarks[77:78],  # Point 77
-                landmarks[0:1]
+                shape[0:17],   # Points 0 to 16
+                shape[78:79],  # Point 78
+                shape[74:75],  # Point 74
+                shape[79:80],  # Point 79
+                shape[73:74],  # Point 73
+                shape[72:73],  # Point 72
+                shape[80:81],  # Point 80
+                shape[71:72],  # Point 71
+                shape[70:71],  # Point 70
+                shape[69:70],  # Point 69
+                shape[68:69],  # Point 68
+                shape[76:77],  # Point 76
+                shape[75:76],  # Point 75
+                shape[77:78],  # Point 77
+                shape[0:1]     # Point 0 (to close the loop)
             ), axis=0)
 
             # Create a poly on the face, where we'll change pixels to mask's pixels
-            mask_poly = np.zeros_like(mask_copy)
-            cv2.fillPoly(mask_poly, [face_silhouette], (255, 255, 255))
-            img = np.where(mask_poly != 0, mask_copy, img)
-            cv2.imwrite("result.jpg", img)
+            mask_poly = np.zeros_like(mask_copy) # Create a mask with the same shape as the image
+            cv2.fillPoly(mask_poly, [face_silhouette], (255, 255, 255)) # Fill the mask to outline face silhouette
+            img = np.where(mask_poly != 0, mask_copy, img) # Set non-silhouette areas to black
 
-        return img
+        return [img] # Return the edited image as a list
 
 
     @staticmethod
-    def scale(im, nR, nC):
+    def scale(im: np.ndarray, nR: np.array, nC: np.array):
         nR0 = len(im)  # source number of rows
         nC0 = len(im[0])  # source number of columns
         return [[im[int(nR0 * r / nR)][int(nC0 * c / nC)]
