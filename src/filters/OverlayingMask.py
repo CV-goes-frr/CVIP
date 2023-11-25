@@ -9,7 +9,9 @@ from src.filters.Filter import Filter
 from settings import prefix
 from src.linal.RtcUmeyama import RtcUmeyama
 
-PREDICTOR_PATH = prefix + "src/filters/shape_predictor_81_face_landmarks.dat"
+PREDICTOR_PATH = prefix + "shape_predictor_81_face_landmarks.dat"
+
+
 class Mask(Filter):
     def __init__(self, mask_name: str):
         super().__init__()  # Call the constructor of the parent class (Filter)
@@ -116,7 +118,6 @@ class Mask(Filter):
             img = np.where(mask_poly != 0, mask_copy, img) # Set non-silhouette areas to black
 
         return [img] # Return the edited image as a list
-
 
     @staticmethod
     def scale(im: np.ndarray, nR: np.array, nC: np.array):
