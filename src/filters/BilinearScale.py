@@ -12,44 +12,6 @@ class BilinearScale(Filter):
         super().__init__()  # Call the constructor of the parent class (Filter)
         self.scale_factor: float = float(scale_factor)  # Initialize the scale_factor attribute with the given value
 
-    @staticmethod
-    def process_pixel(x: int, y: int, scale_factor: float,
-                      input_width: int, input_height: int, img: np.ndarray) -> np.ndarray:
-        """
-        Process a single pixel for bilinear scaling.
-
-        :param x: x-coordinate of the pixel
-        :param y: y-coordinate of the pixel
-        :param scale_factor: how many times should we upscale the given image
-        :param input_width: width of the input image
-        :param input_height: height of the input image
-        :param img: input image as a NumPy array
-        :return: processed pixel as a NumPy array
-        """
-
-        original_x = int(x / scale_factor)  # Calculate the original x coordinate
-        original_y = int(y / scale_factor)  # Calculate the original y coordinate
-
-        x_1, y_1 = int(original_x), int(original_y)  # Determine the integer part of original coordinates
-        x_2, y_2 = x_1 + 1, y_1 + 1  # Calculate the coordinates of the pixel to the right and the one below
-
-        # Ensure that the coordinates are within the image boundaries
-        x_1 = min(max(x_1, 0), input_width - 1)
-        x_2 = min(max(x_2, 0), input_width - 1)
-        y_1 = min(max(y_1, 0), input_height - 1)
-        y_2 = min(max(y_2, 0), input_height - 1)
-
-        alpha = original_x - x_1  # Calculate the alpha value for interpolation
-        beta = original_y - y_1  # Calculate the beta value for interpolation
-
-        top_left = img[y_1, x_1]  # Get the pixel value of the top-left corner
-        top_right = img[y_1, x_2]  # Get the pixel value of the top-right corner
-        bottom_left = img[y_2, x_1]  # Get the pixel value of the bottom-left corner
-        bottom_right = img[y_2, x_2]  # Get the pixel value of the bottom-right corner
-
-        return weight_function(alpha, beta, top_left, top_right, bottom_left,
-                               bottom_right)  # Call the weight_function for interpolation
-
     def apply(self, img: np.ndarray, processes_limit: int, pool: Pool) -> List[np.ndarray]:
         """
         Apply signature for every Filter object. Method call edit input image and return new one.
@@ -87,6 +49,44 @@ class BilinearScale(Filter):
             self.cache = [upscaled_image]  # Cache the upscaled image
 
         return [upscaled_image]  # Return the edited image as a list
+
+    @staticmethod
+    def process_pixel(x: int, y: int, scale_factor: float,
+                      input_width: int, input_height: int, img: np.ndarray) -> np.ndarray:
+        """
+        Process a single pixel for bilinear scaling.
+
+        :param x: x-coordinate of the pixel
+        :param y: y-coordinate of the pixel
+        :param scale_factor: how many times should we upscale the given image
+        :param input_width: width of the input image
+        :param input_height: height of the input image
+        :param img: input image as a NumPy array
+        :return: processed pixel as a NumPy array
+        """
+
+        original_x = int(x / scale_factor)  # Calculate the original x coordinate
+        original_y = int(y / scale_factor)  # Calculate the original y coordinate
+
+        x_1, y_1 = int(original_x), int(original_y)  # Determine the integer part of original coordinates
+        x_2, y_2 = x_1 + 1, y_1 + 1  # Calculate the coordinates of the pixel to the right and the one below
+
+        # Ensure that the coordinates are within the image boundaries
+        x_1 = min(max(x_1, 0), input_width - 1)
+        x_2 = min(max(x_2, 0), input_width - 1)
+        y_1 = min(max(y_1, 0), input_height - 1)
+        y_2 = min(max(y_2, 0), input_height - 1)
+
+        alpha = original_x - x_1  # Calculate the alpha value for interpolation
+        beta = original_y - y_1  # Calculate the beta value for interpolation
+
+        top_left = img[y_1, x_1]  # Get the pixel value of the top-left corner
+        top_right = img[y_1, x_2]  # Get the pixel value of the top-right corner
+        bottom_left = img[y_2, x_1]  # Get the pixel value of the bottom-left corner
+        bottom_right = img[y_2, x_2]  # Get the pixel value of the bottom-right corner
+
+        return weight_function(alpha, beta, top_left, top_right, bottom_left,
+                               bottom_right)  # Call the weight_function for interpolation
 
 
 @bilinear_weight_cache  # Apply the bilinear_weight_cache decorator to the following function

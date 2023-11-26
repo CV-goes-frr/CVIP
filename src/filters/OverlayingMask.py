@@ -9,10 +9,10 @@ from src.filters.Filter import Filter
 from settings import prefix
 from src.linal.RtcUmeyama import RtcUmeyama
 
-PREDICTOR_PATH = prefix + "shape_predictor_81_face_landmarks.dat"
+PREDICTOR_PATH = prefix + "src/filters/shape_predictor_81_face_landmarks.dat"
 
 
-class Mask(Filter):
+class OverlayingMask(Filter):
     def __init__(self, mask_name: str):
         super().__init__()  # Call the constructor of the parent class (Filter)
 
@@ -113,11 +113,11 @@ class Mask(Filter):
             ), axis=0)
 
             # Create a poly on the face, where we'll change pixels to mask's pixels
-            mask_poly = np.zeros_like(mask_copy) # Create a mask with the same shape as the image
-            cv2.fillPoly(mask_poly, [face_silhouette], (255, 255, 255)) # Fill the mask to outline face silhouette
-            img = np.where(mask_poly != 0, mask_copy, img) # Set non-silhouette areas to black
+            mask_poly = np.zeros_like(mask_copy)  # Create a mask with the same shape as the image
+            cv2.fillPoly(mask_poly, [face_silhouette], (255, 255, 255))  # Fill the mask to outline face silhouette
+            img = np.where(mask_poly != 0, mask_copy, img)  # Set non-silhouette areas to black
 
-        return [img] # Return the edited image as a list
+        return [img]  # Return the edited image as a list
 
     @staticmethod
     def scale(im: np.ndarray, nR: np.array, nC: np.array):
@@ -153,7 +153,7 @@ class Mask(Filter):
 
 
 if __name__ == "__main__":
-    processor = Mask("anon.png")
+    processor = OverlayingMask("Danya.png")
     input_image = cv2.imread("photo.jpg")
 
     Pool = Pool(processes=2)
