@@ -150,11 +150,3 @@ class OverlayingMask(Filter):
         y2 = int(b * (p[0] - x0) - a * (p[1] - y0) + y0)
 
         return np.array([x2, y2])
-
-
-if __name__ == "__main__":
-    processor = OverlayingMask("Danya.png")
-    input_image = cv2.imread("photo.jpg")
-
-    Pool = Pool(processes=2)
-    processor.apply(input_image, 2, Pool)

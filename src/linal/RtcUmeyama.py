@@ -19,29 +19,3 @@ def RtcUmeyama(A: np.ndarray, B: np.ndarray) -> tuple:
     t = centroid_A - c * np.dot(R, centroid_B)
 
     return R, t, c
-
-
-def main():
-    A = np.array([[23, 178],
-                  [66, 173],
-                  [88, 187],
-                  [119, 202],
-                  [122, 229],
-                  [170, 232],
-                  [179, 199]])
-    B = np.array([[232, 38],
-                  [208, 32],
-                  [181, 31],
-                  [155, 45],
-                  [142, 33],
-                  [121, 59],
-                  [139, 69]])
-
-    R, t, c = RtcUmeyama(A, B)
-    print("R: ", R)
-    print("t: ", t)
-    print("c: ", c)
-
-
-if __name__ == "__main__":
-    main()
