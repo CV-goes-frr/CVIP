@@ -84,10 +84,6 @@ class Parser:
         for key in res_obj.label_in_map:
             print(key, res_obj.label_in_map[key], "calls:", res_obj.label_in_map[key].calls_counter)
 
-        print("\nLabels to out:")
-        for key in res_obj.labels_to_out:
-            print(key, res_obj.labels_to_out[key])
-
         print("\nFinal labels:")
         for label in res_obj.fin_labels:
             print(label)

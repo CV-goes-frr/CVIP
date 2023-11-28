@@ -22,7 +22,7 @@ class NnScale(Filter):
         :return: edited image - List containing the edited image as a NumPy array
         """
 
-        print("NN SCALE IN PROCESS...")
+        print("NN SCALE IN PROGRESS...")
         if self.cache:  # Check if a cached result exists
             print("USING CACHE...")
             return self.cache  # Return the cached result

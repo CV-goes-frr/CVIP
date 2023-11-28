@@ -6,9 +6,10 @@ from mediapipe.tasks.python import vision
 import numpy as np
 from multiprocessing import Pool
 
+from settings import prefix
 from src.filters.Filter import Filter
 
-MODEL_PATH = 'src/filters/face_landmarker.task'
+MODEL_PATH = prefix + 'src/filters/face_landmarker.task'
 
 
 class FaceLandMarks(Filter):

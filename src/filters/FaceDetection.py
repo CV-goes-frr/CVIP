@@ -3,10 +3,11 @@ import numpy as np
 from typing import List
 from multiprocessing import Pool
 
+from settings import prefix
 from src.filters.Filter import Filter
 
 
-HAARCASCADE_PATH = "src/filters/haarcascade_frontalface_alt2.xml"
+HAARCASCADE_PATH = prefix + "src/filters/haarcascade_frontalface_alt2.xml"
 
 
 class FaceDetection(Filter):
@@ -21,6 +22,8 @@ class FaceDetection(Filter):
         :param pool: processes pool
         :return: List containing the edited image as a NumPy array
         """
+
+        print("FACE DETECTION IN PROGRESS...")
         if self.cache: # Check if a cached result exists
             print("USING CACHE...")
             return self.cache # Return the cached result
