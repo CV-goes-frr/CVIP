@@ -7,6 +7,7 @@ from typing import List
 from .Processor import Processor
 from .VerifyArgs import VerifyArgs
 from src.exceptions.WrongDependency import WrongDependencyException
+from settings import prefix
 
 
 class Parser:
@@ -91,9 +92,9 @@ class Parser:
         # check if input files are incorrect
         for key in res_obj.label_dependencies:
             if res_obj.label_dependencies[key][0][0:3] == '-i=' and \
-                    not os.path.exists(res_obj.label_dependencies[key][0][3::]):
+                    not os.path.exists(prefix + '/' + res_obj.label_dependencies[key][0][3::]):
                 raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT),
-                                        res_obj.label_dependencies[key][0][3::])
+                                        prefix + '/' +res_obj.label_dependencies[key][0][3::])
 
         print()
         return res_obj

@@ -7,7 +7,7 @@ from settings import prefix
 from src.filters.Filter import Filter
 
 
-HAARCASCADE_PATH = prefix + "src/filters/haarcascade_frontalface_alt2.xml"
+HAARCASCADE_PATH = "haarcascade_frontalface_alt2.xml"
 
 
 class FaceDetection(Filter):
