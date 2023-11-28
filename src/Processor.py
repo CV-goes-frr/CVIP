@@ -13,6 +13,7 @@ from src.filters.FaceDetection import FaceDetection
 from src.filters.Merge import Merge
 from src.filters.NnScale import NnScale
 from src.filters.OverlayingMask import OverlayingMask
+from settings import prefix
 
 
 class Processor:
@@ -64,7 +65,7 @@ class Processor:
                 for img in prev_result:
                     image.append(img)
         else:
-            return [cv2.imread(f'{label[3::]}')]  # or read image and return it
+            return [cv2.imread(f'{prefix}/{label[3::]}')]  # or read image and return it
 
         # now let our filter process all we've got from previous
         result: List = []

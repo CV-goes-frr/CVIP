@@ -4,6 +4,7 @@ import argparse
 import cv2
 
 from src.Parser import Parser
+from settings import prefix
 
 
 def main():
@@ -37,7 +38,7 @@ def main():
             res_images_list = proc.process(fin)
             # create as many out files for every final label as we want
             for res_img_index in range(len(res_images_list)):
-                cv2.imwrite(f'{fin}{res_img_index}.jpg', res_images_list[res_img_index])
+                cv2.imwrite(f'{prefix}/{fin}{res_img_index}.jpg', res_images_list[res_img_index])
         end: float = time.time()
         print(f"\nALL TASKS WERE COMPLETED\nTIME ELAPSED: {end - start}\n")
 

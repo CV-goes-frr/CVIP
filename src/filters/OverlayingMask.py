@@ -9,7 +9,7 @@ from src.filters.Filter import Filter
 from settings import prefix
 from src.linal.RtcUmeyama import RtcUmeyama
 
-PREDICTOR_PATH = prefix + "src/filters/shape_predictor_81_face_landmarks.dat"
+PREDICTOR_PATH = "shape_predictor_81_face_landmarks.dat"
 
 
 class OverlayingMask(Filter):
