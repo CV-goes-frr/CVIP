@@ -49,13 +49,14 @@ class OverlayingMask(Filter):
         print("OVERLAYING MASKING IN PROCESS...")
 
         # Find points on the mask
-        mask_image = cv2.imread(self.mask_name)
+        mask_image = cv2.imread(f'{prefix}/{self.mask_name}')
 
         # Shape of the mask we need to calculate transformation
         h_mask, w_mask, c_mask = img.shape
 
         # Change the size of the mask
         mask_image = np.array(self.scale(mask_image, h_mask, w_mask))
+        cv2.imwrite(f'{prefix}/scaled.jpg', mask_image)
 
         # Find landmarks on the mask
         mp_face_mesh = mp.solutions.face_mesh
