@@ -13,7 +13,7 @@ a = Analysis(
     binaries=[],
     datas=[
             ('src/filters/shape_predictor_81_face_landmarks.dat', '.'),
-            ('src/filters/shape_predictor_81_face_landmarks.dat', '.'),
+            ('src/filters/haarcascade_frontalface_alt2.xml', '.'),
             ('help.txt', '.')
     ],
     hiddenimports=["mediapipe"],
@@ -43,7 +43,7 @@ exe = EXE(
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
-    upx=True,
+    upx=False,
     upx_exclude=[],
     runtime_tmpdir=None,
     console=True,

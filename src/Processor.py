@@ -72,10 +72,10 @@ class Processor:
         start: float = time.time()
 
         # go deeper into dependencies
-        if len(image) == 2:
-            result = self.label_in_map[label].apply(image[0], image[1], self.processes_limit, self.pool)
-        elif len(image) == 1:
-            result = self.label_in_map[label].apply(image[0], self.processes_limit, self.pool)
+        for prev_res in image:
+            res = self.label_in_map[label].apply(prev_res, self.processes_limit, self.pool)
+            for r in res:
+                result.append(r)
 
         end: float = time.time()
         print("Time elapsed:", end - start)
