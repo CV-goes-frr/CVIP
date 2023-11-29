@@ -33,7 +33,7 @@ class FaceBlurrer(Filter):
         :return: edited image - List containing the edited image as a NumPy array
         """
 
-        print("OUTLINING FACE SILHOUETTE...")
+        print("OUTLINING FACE SILHOUETTE AND APPLYING BLUR...")
         if self.cache:  # Check if a cached result exists
             print("USING CACHE...")
             return self.cache  # Return the cached result

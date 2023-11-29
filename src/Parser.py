@@ -43,14 +43,6 @@ class Parser:
         # command[2] - 'out-label1:out-label2...'
         for command in inp_parameters:
             command[1] = command[1].split(':')
-            final: bool = False
-
-            # add label if we want to create output file from that filter
-            if command[2][0:3] == '-o=':
-                final = True
-                command[2] = command[2][3::]
-                for label in command[2].split(':'):
-                    res_obj.fin_labels.append(label)  # update the list of final labels
 
             # check filter name and connected arguments
             check_args: VerifyArgs = VerifyArgs(command[1])
@@ -58,34 +50,47 @@ class Parser:
 
             # create filter objects with parameters
             for label in command[2].split(":"):
-                res_obj.label_in_map[label] = res_obj.class_map[command[1][0]](*(command[1][1:]))
+                if label[0:3] != '-o=':
+                    res_obj.label_in_map[label] = res_obj.class_map[command[1][0]](*(command[1][1:]))
+                else:
+                    res_obj.label_in_map[label[3::]] = res_obj.class_map[command[1][0]](*(command[1][1:]))
 
-            # create dependencies for each out_label and update calls_counters
-            for out_label in command[2].split(':'):
-                res_obj.label_dependencies[out_label] = []
-                if final:
-                    res_obj.label_in_map[out_label].calls_counter += 1
+            # now for every filter we specify dependencies
+            inp_labels_splited = command[2].split(':')
+            for ind in range(len(inp_labels_splited)):
+                # mark the label as an output file if it is marked with -o=
+                if inp_labels_splited[ind][0:3] == '-o=':
+                    inp_labels_splited[ind] = inp_labels_splited[ind][3::]
+                    res_obj.label_in_map[inp_labels_splited[ind]].calls_counter += 1
+                    res_obj.fin_labels.append(inp_labels_splited[ind])  # update the list of final labels
 
+                # create dependencies and update calls_counters
+                res_obj.label_dependencies[inp_labels_splited[ind]] = []
                 for in_label in command[0].split(':'):
                     if in_label not in res_obj.label_in_map and in_label[0:3] != '-i=':
                         raise WrongDependencyException(command[1][0], in_label)
-
-                    res_obj.label_dependencies[out_label].append(in_label)
+                    res_obj.label_dependencies[inp_labels_splited[ind]].append(in_label)
                     if in_label[0:3] != '-i=':  # don't increase calls_counter if the label is an input image
                         res_obj.label_in_map[in_label].calls_counter += 1
+                # store all list of out labels to restore indices later
+                # (to choose input label, corresponding to the index of the out-label)
+                res_obj.labels_to_out[inp_labels_splited[ind]] = inp_labels_splited
 
-                res_obj.labels_to_out[out_label] = command[2].split(':')
+        # trace for debug
+        # print("\nDependencies:")
+        # for key in res_obj.label_dependencies:
+        #     print(key, res_obj.label_dependencies[key])
+        #
+        # print("\nLabels map to filters:")
+        # for key in res_obj.label_in_map:
+        #     print(key, res_obj.label_in_map[key], "calls:", res_obj.label_in_map[key].calls_counter)
+        #
+        # print("\nLabels to out:")
+        # for key in res_obj.labels_to_out:
+        #     print(key, res_obj.labels_to_out[key])
 
         # trace for user
-        print("\nDependencies:")
-        for key in res_obj.label_dependencies:
-            print(key, res_obj.label_dependencies[key])
-
-        print("\nLabels map to filters:")
-        for key in res_obj.label_in_map:
-            print(key, res_obj.label_in_map[key], "calls:", res_obj.label_in_map[key].calls_counter)
-
-        print("\nFinal labels:")
+        print("\nFiles with the following names will be created:")
         for label in res_obj.fin_labels:
             print(label)
 

@@ -46,7 +46,7 @@ class OverlayingMask(Filter):
         :return: edited image - List containing the edited image as a NumPy array
         """
 
-        print("OVERLAYING MASKING IN PROCESS...")
+        print("OVERLAYING MASKING IN PROGRESS...")
 
         # Find points on the mask
         mask_image = cv2.imread(f'{prefix}/{self.mask_name}')
@@ -91,9 +91,7 @@ class OverlayingMask(Filter):
 
             # Form am Affine transformation matrix
             A = np.concatenate((c * R, np.expand_dims(t, axis=1)), axis=1)
-            print("Affine transformation matrix:\n", A)
             mask_copy = cv2.warpAffine(mask_copy, A, (w_mask, h_mask))  # Edit mask image
-            # cv2.imwrite("rotated.jpg", mask_copy)
 
             face_silhouette = np.concatenate((
                 shape[0:17],   # Points 0 to 16
