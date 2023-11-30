@@ -6,7 +6,7 @@ from typing import List
 
 from .Processor import Processor
 from .VerifyArgs import VerifyArgs
-from src.exceptions.WrongDependency import WrongDependencyException
+from .exceptions.WrongDependency import WrongDependencyException
 from settings import prefix
 
 

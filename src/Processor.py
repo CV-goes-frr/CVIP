@@ -4,15 +4,15 @@ from typing import List, Dict
 
 import cv2
 
-from src.filters.BilinearScale import BilinearScale
-from src.filters.BicubicScale import BicubicScale
-from src.filters.Crop import Crop
-from src.filters.Duplicate import Duplicate
-from src.filters.FaceBlurrer import FaceBlurrer
-from src.filters.FaceDetection import FaceDetection
-from src.filters.Merge import Merge
-from src.filters.NnScale import NnScale
-from src.filters.OverlayingMask import OverlayingMask
+from .filters.BilinearScale import BilinearScale
+from .filters.BicubicScale import BicubicScale
+from .filters.Crop import Crop
+from .filters.Duplicate import Duplicate
+from .filters.FaceBlurrer import FaceBlurrer
+from .filters.FaceDetection import FaceDetection
+from .filters.Merge import Merge
+from .filters.NnScale import NnScale
+from .filters.OverlayingMask import OverlayingMask
 from settings import prefix
 
 
