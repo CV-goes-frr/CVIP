@@ -1,15 +1,16 @@
-from typing import List
+import os
+import sys
 from multiprocessing import Pool
-import numpy as np
-import dlib
-from imutils import face_utils
-import cv2
+from typing import List
 
-import sys, os
+import cv2
+import dlib
+import numpy as np
+from imutils import face_utils
+
 os.chdir(sys._MEIPASS)
 
-from settings import prefix
-from src.filters.Filter import Filter
+from .Filter import Filter
 
 PREDICTOR_PATH = "shape_predictor_81_face_landmarks.dat"
 

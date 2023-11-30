@@ -3,7 +3,7 @@ from typing import List
 
 import numpy as np
 
-from src.filters.Filter import Filter
+from .Filter import Filter
 
 
 class Merge(Filter):
