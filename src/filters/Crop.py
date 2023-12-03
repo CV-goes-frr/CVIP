@@ -26,7 +26,7 @@ class Crop(Filter):
         :return: edited image
         """
 
-        print("CROP IN PROCESS...")
+        print("CROP IN PROGRESS...")
         if self.cache:
             print("USING CACHE...")
             return self.cache

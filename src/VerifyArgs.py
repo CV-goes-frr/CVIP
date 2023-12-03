@@ -3,6 +3,7 @@ import re
 from .exceptions.WrongParameters import WrongParametersException
 from .exceptions.WrongFiltername import WrongFilterNameException
 
+
 class VerifyArgs:
 
     def __init__(self, args: str):
@@ -58,6 +59,10 @@ class VerifyArgs:
 
             case 'face_detection':
                 if len(self.args) != 1:
+                    raise WrongParametersException(self.name, str(self.args[1:]))
+
+            case 'mask':
+                if len(self.args) != 2:
                     raise WrongParametersException(self.name, str(self.args[1:]))
 
             case 'duplicate':

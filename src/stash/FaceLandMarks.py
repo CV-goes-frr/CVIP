@@ -5,14 +5,16 @@ from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 import numpy as np
 from multiprocessing import Pool
+
+from settings import prefix
 from src.filters.Filter import Filter
 
+MODEL_PATH = prefix + 'src/filters/face_landmarker.task'
 
-MODEL_PATH = 'src/filters/face_landmarker.task'
 
 class FaceLandMarks(Filter):
     def __init__(self):
-        super().__init__() # Call the constructor of the parent class (Filter)
+        super().__init__()  # Call the constructor of the parent class (Filter)
 
     def draw_landmarks_on_image(self, rgb_image, detection_result):
         face_landmarks_list = detection_result.face_landmarks

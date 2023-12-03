@@ -22,7 +22,7 @@ class Merge(Filter):
         :return: edited image
         """
 
-        print("MERGE IN PROCESS...")
+        print("MERGE IN PROGRESS...")
         if self.cache:
             print("USING CACHE...")
             return self.cache

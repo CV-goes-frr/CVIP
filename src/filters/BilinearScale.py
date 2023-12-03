@@ -3,7 +3,7 @@ from multiprocessing import Pool
 import numpy as np
 
 from .Filter import Filter
-from ..decorators.bilinear_weight_decorator import bilinear_weight_cache
+from .decorators.bilinear_weight_decorator import bilinear_weight_cache
 
 
 class BilinearScale(Filter):
@@ -11,6 +11,44 @@ class BilinearScale(Filter):
     def __init__(self, scale_factor: float):
         super().__init__()  # Call the constructor of the parent class (Filter)
         self.scale_factor: float = float(scale_factor)  # Initialize the scale_factor attribute with the given value
+
+    def apply(self, img: np.ndarray, processes_limit: int, pool: Pool) -> List[np.ndarray]:
+        """
+        Apply signature for every Filter object. Method call edit input image and return new one.
+        Shape of new img np.ndarray can be not the same as input shape.
+
+        :param img: np.ndarray of pixels
+        :param processes_limit: split the image into this number of pieces to process in parallel
+        :param pool: processes pool
+        :return: edited image
+        """
+        print("BILINEAR SCALE IN PROGRESS...")
+        if self.cache:  # Check if a cached result exists
+            print("USING CACHE...")
+            return self.cache  # Return the cached result
+
+        input_height, input_width, _ = img.shape  # Get the height and width of the input image
+        new_width = int(input_width * self.scale_factor)  # Calculate the new width after scaling
+        new_height = int(input_height * self.scale_factor)  # Calculate the new height after scaling
+
+        upscaled_image = np.zeros((new_height, new_width, 3), dtype=np.uint8)  # Create an empty upscaled image
+
+        part_height = new_height // processes_limit  # Calculate the height of each processing part
+        coordinates = [(x, y) for x in range(new_width) for y in range(new_height)]  # Generate pixel coordinates
+        parts = [coordinates[i:i + part_height] for i in
+                 range(0, len(coordinates), part_height)]  # Split coordinates into parts
+
+        processed_pixels = pool.starmap(self.process_pixel,
+                                        [(x, y, self.scale_factor, input_width, input_height, img)
+                                         for part in parts for (x, y) in part])  # Process pixels in parallel
+
+        for (x, y), pixel_value in zip(coordinates, processed_pixels):  # Assign processed pixels to the upscaled image
+            upscaled_image[y, x] = pixel_value
+
+        if self.calls_counter > 1:  # Check if the method has been called more than once
+            self.cache = [upscaled_image]  # Cache the upscaled image
+
+        return [upscaled_image]  # Return the edited image as a list
 
     @staticmethod
     def process_pixel(x: int, y: int, scale_factor: float,
@@ -49,44 +87,6 @@ class BilinearScale(Filter):
 
         return weight_function(alpha, beta, top_left, top_right, bottom_left,
                                bottom_right)  # Call the weight_function for interpolation
-
-    def apply(self, img: np.ndarray, processes_limit: int, pool: Pool) -> List[np.ndarray]:
-        """
-        Apply signature for every Filter object. Method call edit input image and return new one.
-        Shape of new img np.ndarray can be not the same as input shape.
-
-        :param img: np.ndarray of pixels
-        :param processes_limit: split the image into this number of pieces to process in parallel
-        :param pool: processes pool
-        :return: edited image
-        """
-        print("BILINEAR SCALE IN PROCESS...")
-        if self.cache:  # Check if a cached result exists
-            print("USING CACHE...")
-            return self.cache  # Return the cached result
-
-        input_height, input_width, _ = img.shape  # Get the height and width of the input image
-        new_width = int(input_width * self.scale_factor)  # Calculate the new width after scaling
-        new_height = int(input_height * self.scale_factor)  # Calculate the new height after scaling
-
-        upscaled_image = np.zeros((new_height, new_width, 3), dtype=np.uint8)  # Create an empty upscaled image
-
-        part_height = new_height // processes_limit  # Calculate the height of each processing part
-        coordinates = [(x, y) for x in range(new_width) for y in range(new_height)]  # Generate pixel coordinates
-        parts = [coordinates[i:i + part_height] for i in
-                 range(0, len(coordinates), part_height)]  # Split coordinates into parts
-
-        processed_pixels = pool.starmap(self.process_pixel,
-                                        [(x, y, self.scale_factor, input_width, input_height, img)
-                                         for part in parts for (x, y) in part])  # Process pixels in parallel
-
-        for (x, y), pixel_value in zip(coordinates, processed_pixels):  # Assign processed pixels to the upscaled image
-            upscaled_image[y, x] = pixel_value
-
-        if self.calls_counter > 1:  # Check if the method has been called more than once
-            self.cache = [upscaled_image]  # Cache the upscaled image
-
-        return [upscaled_image]  # Return the edited image as a list
 
 
 @bilinear_weight_cache  # Apply the bilinear_weight_cache decorator to the following function

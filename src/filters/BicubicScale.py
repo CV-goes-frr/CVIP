@@ -6,7 +6,7 @@ from typing import List
 import numpy as np
 
 from .Filter import Filter
-from ..decorators.bicubic_hermit_decorator import bicubic_hermit_cache
+from .decorators.bicubic_hermit_decorator import bicubic_hermit_cache
 
 
 class BicubicScale(Filter):
@@ -86,7 +86,7 @@ class BicubicScale(Filter):
         :return: edited image
         """
 
-        print("BICUBIC SCALE IN PROCESS...")
+        print("BICUBIC SCALE IN PROGRESS...")
         if self.cache:
             print("USING CACHE...")
             return self.cache
