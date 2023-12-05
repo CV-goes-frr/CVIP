@@ -19,9 +19,8 @@ def main():
         nargs=argparse.OPTIONAL,
         help='Prompt')
     parser.add_argument(
-        'processes_limit',
-        type=str,
-        nargs=argparse.OPTIONAL,
+        '--process_limit',
+        type=int,
         help='Max number of parallel processes')
     args = parser.parse_args()
 
@@ -29,7 +28,10 @@ def main():
         with open('help.txt', 'r') as help_file:
             print(help_file.read())
     else:
-        pars = Parser(args.actions, args.processes_limit)
+        process_lim = 1
+        if args.process_limit:
+            process_lim = args.process_limit
+        pars = Parser(args.actions, process_lim)
         proc = pars.parse()
 
         start: float = time.time()
