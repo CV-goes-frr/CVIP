@@ -38,7 +38,7 @@ class VerifyArgs:
                         raise WrongParametersException(self.name, param)
 
             case 'bicubic_scale':
-                if len(self.args) != 2:
+                if (len(self.args) != 2) and (len(self.args) != 3):
                     raise WrongParametersException(self.name, str(self.args[1:]))
                 # Validate that all parameters are numeric
                 for param in self.args[1:5]:
