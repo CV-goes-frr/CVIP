@@ -87,14 +87,10 @@ class BicubicScale(Filter):
 
         input_height, input_width, _ = img.shape
 
-        current_resolution = input_width / input_height
-        result_resolution = self.size_x / self.size_y
-
-        width_scale_factor = result_resolution / current_resolution
-        heigth_scale_factor = 1
-
-        new_width = int(input_width * width_scale_factor)
-        new_height = int(input_height * heigth_scale_factor)
+        width_scale_factor = self.size_x / input_width
+        heigth_scale_factor = self.size_y / input_height
+        new_width = self.size_x
+        new_height = self.size_y
 
         upscaled_image = np.zeros((new_height, new_width, 3), dtype=np.uint8)
 
@@ -103,7 +99,7 @@ class BicubicScale(Filter):
         parts = [coordinates[i:i + part_height] for i in range(0, len(coordinates), part_height)]
 
         processed_pixels = pool.starmap(self.process_pixel_resolution,
-                                        [(x, y, self.size_x, self.size_y, input_width, input_height, img)
+                                        [(x, y, width_scale_factor, heigth_scale_factor, input_width, input_height, img)
                                          for part in parts for (x, y) in part])
 
         for (x, y), pixel_value in zip(coordinates, processed_pixels):
