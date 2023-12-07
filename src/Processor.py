@@ -5,7 +5,7 @@ from typing import List, Dict
 import cv2
 
 from .filters.BilinearScale import BilinearScale
-from .filters.BicubicScale import BicubicScale
+from .filters.ScaleToResolution import ScaleToResolution
 from .filters.Crop import Crop
 from .filters.Duplicate import Duplicate
 from .filters.FaceBlurrer import FaceBlurrer
@@ -31,9 +31,9 @@ class Processor:
 
         # dictionary to create filter objects
         self.class_map: Dict[str, type] = {"crop": Crop,
-                                           "nn_scale": NnScale,
-                                           "bilinear_scale": BilinearScale,
-                                           "bicubic_scale": BicubicScale,
+                                           "nn_scale_with_factor": NnScale,
+                                           "bilinear_scale_with_factor": BilinearScale,
+                                           "scale_to_resolution": ScaleToResolution,
                                            "merge": Merge,
                                            "duplicate": Duplicate,
                                            "face_blur": FaceBlurrer,

@@ -21,7 +21,7 @@ class VerifyArgs:
                     if not re.match(r'^[0-9]+$', param):
                         raise WrongParametersException(self.name, param)
 
-            case 'nn_scale':
+            case 'nn_scale_with_factor':
                 if len(self.args) != 2:
                     raise WrongParametersException(self.name, str(self.args[1:]))
                 # Validate that all parameters are numeric
@@ -29,7 +29,7 @@ class VerifyArgs:
                     if not re.match(r'^[0-9]+$', param):
                         raise WrongParametersException(self.name, param)
 
-            case 'bilinear_scale':
+            case 'bilinear_scale_with_factor':
                 if len(self.args) != 2:
                     raise WrongParametersException(self.name, str(self.args[1:]))
                 # Validate that all parameters are numeric
@@ -37,8 +37,8 @@ class VerifyArgs:
                     if not re.match(r'^[0-9]+$', param):
                         raise WrongParametersException(self.name, param)
 
-            case 'bicubic_scale':
-                if (len(self.args) != 2) and (len(self.args) != 3):
+            case 'scale_to_resolution':
+                if len(self.args) != 3:
                     raise WrongParametersException(self.name, str(self.args[1:]))
                 # Validate that all parameters are numeric
                 for param in self.args[1:5]:

@@ -16,7 +16,7 @@ a = Analysis(
             ('src/filters/haarcascade_frontalface_alt2.xml', '.'),
             ('help.txt', '.')
     ],
-    hiddenimports=["mediapipe", "multipledispatch"],
+    hiddenimports=["mediapipe"],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
