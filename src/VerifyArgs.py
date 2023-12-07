@@ -45,10 +45,6 @@ class VerifyArgs:
                     if not re.match(r'^[0-9]+$', param):
                         raise WrongParametersException(self.name, param)
 
-            case 'merge':
-                if len(self.args) != 1:
-                    raise WrongParametersException(self.name, str(self.args[1:]))
-
             case 'face_blur':
                 if len(self.args) != 2:
                     raise WrongParametersException(self.name, str(self.args[1:]))
@@ -64,9 +60,6 @@ class VerifyArgs:
             case 'mask':
                 if len(self.args) != 2:
                     raise WrongParametersException(self.name, str(self.args[1:]))
-
-            case 'duplicate':
-                pass
 
             case _:
                 # If the filter name is not recognized, raise an exception

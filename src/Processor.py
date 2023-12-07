@@ -7,10 +7,8 @@ import cv2
 from .filters.BilinearScale import BilinearScale
 from .filters.ScaleToResolution import ScaleToResolution
 from .filters.Crop import Crop
-from .filters.Duplicate import Duplicate
 from .filters.FaceBlurrer import FaceBlurrer
 from .filters.FaceDetection import FaceDetection
-from .filters.Merge import Merge
 from .filters.NnScale import NnScale
 from .filters.OverlayingMask import OverlayingMask
 from settings import prefix
@@ -34,8 +32,6 @@ class Processor:
                                            "nn_scale_with_factor": NnScale,
                                            "bilinear_scale_with_factor": BilinearScale,
                                            "scale_to_resolution": ScaleToResolution,
-                                           "merge": Merge,
-                                           "duplicate": Duplicate,
                                            "face_blur": FaceBlurrer,
                                            "face_detection": FaceDetection,
                                            "mask": OverlayingMask}
