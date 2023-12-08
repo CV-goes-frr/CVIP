@@ -4,7 +4,7 @@ import numpy as np
 from typing import List
 from multiprocessing import Pool
 
-from src.filters.Filter import Filter
+from .Filter import Filter
 
 
 class FaceDetection(Filter):
