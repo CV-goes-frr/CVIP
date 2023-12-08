@@ -1,21 +1,19 @@
 import cv2
+import dlib
 import numpy as np
 from typing import List
 from multiprocessing import Pool
 
-from .Filter import Filter
-
-
-HAARCASCADE_PATH = "haarcascade_frontalface_alt2.xml"
+from src.filters.Filter import Filter
 
 
 class FaceDetection(Filter):
     def __init__(self):
-        super().__init__() # Call the constructor of the parent class (Filter)
+        super().__init__()  # Call the constructor of the parent class (Filter)
 
     def apply(self, img: np.ndarray, processes_limit: int, pool: Pool) -> List[np.ndarray]:
         """
-        Face detection with cv2.CascadeClassifier().
+        Face detection with dlib frontal face detector.
         :param img: np.ndarray of pixels - Input image as a NumPy array
         :param processes_limit: we'll try to parallel it later
         :param pool: processes pool
@@ -23,32 +21,17 @@ class FaceDetection(Filter):
         """
 
         print("FACE DETECTION IN PROGRESS...")
-        if self.cache: # Check if a cached result exists
+        if self.cache:  # Check if a cached result exists
             print("USING CACHE...")
-            return self.cache # Return the cached result
+            return self.cache  # Return the cached result
+
         img_copy = np.copy(img)
-        gray = cv2.cvtColor(img_copy, cv2.COLOR_BGR2GRAY) # Convert the image to grayscale
+        gray = cv2.cvtColor(img_copy, cv2.COLOR_BGR2GRAY)  # Convert the image to grayscale
 
-        face_detect = cv2.CascadeClassifier(HAARCASCADE_PATH) # Detect faces in the grayscale image
+        detector = dlib.get_frontal_face_detector()  # Initialize the face detector
+        rects = detector(gray, 0)
 
-        """
-        Haar-feature - a Haar-like feature consists of dark regions and light regions. 
-        It produces a single value by taking the difference of the sum of the intensities of the dark regions
-        and the sum of the intensities of light regions
-        """
+        for (_, rect) in enumerate(rects):  # Iterate over the detected faces
+            cv2.rectangle(img_copy, (rect.left(), rect.top()), (rect.right(), rect.bottom()), (0, 255, 0), 2)
 
-        """
-        Cascading is a particular case of ensemble learning based on the concatenation of several classifiers,
-        using all information collected from the output from a given classifier
-        as additional information for the next classifier in the cascade.
-        """
-
-        frontal_rect = face_detect.detectMultiScale(
-            gray, scaleFactor=1.1, minNeighbors=5)
-        #detectMultiScale method returns boundary rectangles for the detected faces (i.e., x, y, w, h).
-
-
-        for (x, y, w, h) in frontal_rect: # Rectangles are drawn around the detected faces
-            cv2.rectangle(img_copy, (x, y), (x + w, y + h), (0, 255, 0), 2)
-
-        return [img_copy] # Return the edited image as a list
+        return [img_copy]  # Return the edited image as a list

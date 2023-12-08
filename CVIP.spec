@@ -13,7 +13,6 @@ a = Analysis(
     binaries=[],
     datas=[
             ('src/filters/shape_predictor_81_face_landmarks.dat', '.'),
-            ('src/filters/haarcascade_frontalface_alt2.xml', '.'),
             ('help.txt', '.')
     ],
     hiddenimports=["mediapipe"],
