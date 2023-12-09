@@ -56,7 +56,6 @@ class OverlayingMask(Filter):
 
         # Change the size of the mask
         mask_image = np.array(self.scale(mask_image, h_mask, w_mask))
-        cv2.imwrite(f'{prefix}/scaled.jpg', mask_image)
 
         # Find landmarks on the mask
         mp_face_mesh = mp.solutions.face_mesh
