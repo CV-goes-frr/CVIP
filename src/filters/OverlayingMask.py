@@ -48,6 +48,10 @@ class OverlayingMask(Filter):
 
         print("OVERLAYING MASKING IN PROGRESS...")
 
+        if self.cache:
+            print("USING CACHE...")
+            return self.cache
+
         # Find points on the mask
         mask_image = cv2.imread(f'{prefix}/{self.mask_name}')
 
@@ -114,6 +118,9 @@ class OverlayingMask(Filter):
             mask_poly = np.zeros_like(mask_copy)  # Create a mask with the same shape as the image
             cv2.fillPoly(mask_poly, [face_silhouette], (255, 255, 255))  # Fill the mask to outline face silhouette
             img = np.where(mask_poly != 0, mask_copy, img)  # Set non-silhouette areas to black
+
+        if self.calls_counter > 1:
+            self.cache = [img]
 
         return [img]  # Return the edited image as a list
 
