@@ -75,5 +75,6 @@ class Processor:
 
         end: float = time.time()
         print("Time elapsed:", end - start)
+        print()
 
         return result
