@@ -7,8 +7,8 @@ Main features:
   - Blurring faces
   - Overlaying masking
   - Face detection
-  - Upscaling/Descaling with some scale factor
-  - Upscaling/Descaling to some resolution
+  - Upscaling/Downscaling with some scale factor
+  - Upscaling/Downscaling to some resolution
 
 ## Building:
 Open the root directory of the CVIP project you've downloaded. There should be CVIP.spec file.
