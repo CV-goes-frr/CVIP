@@ -72,6 +72,9 @@ class FaceBlurrer(Filter):
             cv2.fillPoly(mask, [face_silhouette], (255, 255, 255))  # Fill the mask to outline face silhouette
             img_copy = np.where(mask != 0, blurred_face, img_copy)  # Set non-silhouette areas to black
 
+        if self.calls_counter > 1:
+            self.cache = [img_copy]
+
         return [img_copy]  # Return the edited image as a list
 
     @staticmethod

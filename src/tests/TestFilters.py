@@ -6,7 +6,7 @@ from multiprocessing import Pool
 
 from settings import prefix
 from src.filters.BilinearScale import BilinearScale, weight_function
-from src.filters.BicubicScale import BicubicScale
+from src.filters.ScaleToResolution import ScaleToResolution
 from src.filters.Crop import Crop
 from src.filters.NnScale import NnScale
 from src.filters.FaceBlurrer import FaceBlurrer
@@ -23,7 +23,7 @@ class TestBicubicScale(unittest.TestCase):
         ], dtype=np.uint8)
 
         scale_factor = 2.0
-        bicubic_filter = BicubicScale(scale_factor)
+        bicubic_filter = ScaleToResolution(scale_factor)
 
         with Pool(processes=2) as pool:
             scaled_image = bicubic_filter.apply(test_image, 2, pool)[0]

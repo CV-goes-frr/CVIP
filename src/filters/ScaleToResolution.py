@@ -9,15 +9,58 @@ from .Filter import Filter
 from .decorators.bicubic_hermit_decorator import bicubic_hermit_cache
 
 
-class BicubicScale(Filter):
+class ScaleToResolution(Filter):
 
-    def __init__(self, scale_factor: float):
+    def __init__(self, size_x: str, size_y: str):
         super().__init__()
-        self.scale_factor: float = float(scale_factor)
+        self.size_x: int = int(size_x)
+        self.size_y: int = int(size_y)
+        # size_x and size_y means the ratio of x and y
+
+    def apply(self, img: np.ndarray, processes_limit: int, pool: Pool) -> List[np.ndarray]:
+        """
+        Apply signature for every Filter object. Method call edit input image and return new one.
+        Shape of new img np.ndarray can be not the same as input shape.
+
+        :param img: np.ndarray of pixels
+        :param processes_limit: split the image into this number of pieces to process in parallel
+        :param pool: processes pool
+        :return: edited image
+        """
+
+        print("BICUBIC SCALE TO RESOLUTION IN PROCESS...")
+        if self.cache:
+            print("USING CACHE...")
+            return self.cache
+
+        input_height, input_width, _ = img.shape
+
+        width_scale_factor = self.size_x / input_width
+        heigth_scale_factor = self.size_y / input_height
+        new_width = self.size_x
+        new_height = self.size_y
+
+        upscaled_image = np.zeros((new_height, new_width, 3), dtype=np.uint8)
+
+        part_height = new_height // processes_limit
+        coordinates = [(x, y) for x in range(new_width) for y in range(new_height)]
+        parts = [coordinates[i:i + part_height] for i in range(0, len(coordinates), part_height)]
+
+        processed_pixels = pool.starmap(self.process_pixel_resolution,
+                                        [(x, y, width_scale_factor, heigth_scale_factor, input_width, input_height, img)
+                                         for part in parts for (x, y) in part])
+
+        for (x, y), pixel_value in zip(coordinates, processed_pixels):
+            upscaled_image[y, x] = pixel_value
+
+        if self.calls_counter > 1:
+            self.cache = [upscaled_image]
+
+        return [upscaled_image]
 
     @staticmethod
-    def process_pixel(x: int, y: int, scale_factor: float,
-                      input_width: int, input_height: int, img: np.ndarray) -> np.ndarray:
+    def process_pixel_resolution(x: int, y: int, scale_x: float, scale_y: float,
+                                 input_width: int, input_height: int, img: np.ndarray) -> np.ndarray:
         """
         Method to parallel computations (it's static because we need to call it in other processes).
         Method gets 16 nearest pixels to make computations with bicubic hermit to set color of the pixel at (x,y).
@@ -30,8 +73,8 @@ class BicubicScale(Filter):
         :param img: np.ndarray of image pixels (2D)
         :return: (R, G, B) np.ndarray that is our processed pixel
         """
-        original_x = int(x / scale_factor)
-        original_y = int(y / scale_factor)
+        original_x = int(x / scale_x)
+        original_y = int(y / scale_y)
 
         dx = original_x - math.floor(original_x)
         dy = original_y - math.floor(original_y)
@@ -74,44 +117,6 @@ class BicubicScale(Filter):
         val = bicubic_hermit(arr1, arr2, arr3, arr4, dx)
 
         return val.astype(np.uint8)
-
-    def apply(self, img: np.ndarray, processes_limit: int, pool: Pool) -> List[np.ndarray]:
-        """
-        Apply signature for every Filter object. Method call edit input image and return new one.
-        Shape of new img np.ndarray can be not the same as input shape.
-
-        :param img: np.ndarray of pixels
-        :param processes_limit: split the image into this number of pieces to process in parallel
-        :param pool: processes pool
-        :return: edited image
-        """
-
-        print("BICUBIC SCALE IN PROGRESS...")
-        if self.cache:
-            print("USING CACHE...")
-            return self.cache
-
-        input_height, input_width, _ = img.shape
-        new_width = int(input_width * self.scale_factor)
-        new_height = int(input_height * self.scale_factor)
-
-        upscaled_image = np.zeros((new_height, new_width, 3), dtype=np.uint8)
-
-        part_height = new_height // processes_limit
-        coordinates = [(x, y) for x in range(new_width) for y in range(new_height)]
-        parts = [coordinates[i:i + part_height] for i in range(0, len(coordinates), part_height)]
-
-        processed_pixels = pool.starmap(self.process_pixel,
-                                        [(x, y, self.scale_factor, input_width, input_height, img)
-                                         for part in parts for (x, y) in part])
-
-        for (x, y), pixel_value in zip(coordinates, processed_pixels):
-            upscaled_image[y, x] = pixel_value
-
-        if self.calls_counter > 1:
-            self.cache = [upscaled_image]
-
-        return [upscaled_image]
 
 
 @bicubic_hermit_cache

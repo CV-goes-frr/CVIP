@@ -7,7 +7,7 @@ from .Filter import Filter
 
 class NnScale(Filter):
 
-    def __init__(self, scale_factor: float):
+    def __init__(self, scale_factor: str):
         super().__init__()  # Call the constructor of the parent class (Filter)
         self.scale_factor: float = float(scale_factor)
 

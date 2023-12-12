@@ -8,7 +8,7 @@ from .Filter import Filter
 
 class Crop(Filter):
 
-    def __init__(self, x_1: int, y_1: int, x_2: int, y_2: int):
+    def __init__(self, x_1: str, y_1: str, x_2: str, y_2: str):
         super().__init__()
         self.x_1: int = int(x_1)
         self.y_1: int = int(y_1)
