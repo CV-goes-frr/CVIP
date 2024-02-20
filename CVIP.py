@@ -4,8 +4,11 @@ import argparse
 import cv2
 
 from settings import prefix
-from src.exceptions import WrongDependency, WrongFiltername, WrongParameters
+from src.exceptions.WrongFiltername import WrongFilterNameException
+from src.exceptions.WrongDependency import WrongDependencyException
+from src.exceptions.WrongParameters import WrongParametersException
 from src.Parser import Parser
+from src.exceptions.NoFace import NoFaceException
 
 
 def main():
@@ -46,15 +49,16 @@ def main():
                 #     cv2.imwrite(f'{prefix}/{fin}{res_img_index}.jpg', res_images_list[res_img_index])
             end: float = time.time()
             print(f"\nALL TASKS WERE COMPLETED\nTIME ELAPSED: {end - start}\n")
-        except WrongDependency as err:
-            print("Unknown dependency:", err)
-        except WrongFiltername as err:
-            print("Call of the unknown operation:", err)
-        except WrongParameters as err:
-            print("Wrong set of parameters for the operation:", err)
-        except Exception as err:
-            print(f"Unexpected {err=}, {type(err)=}")
-            raise
+        except WrongDependencyException as e:
+            print("\n\n!!! Error occurred !!!\n" + str(e))
+        except WrongFilterNameException as e:
+            print("\n\n!!! Error occurred !!!\n" + str(e))
+        except WrongParametersException as e:
+            print("\n\n!!! Error occurred !!!\n" + str(e))
+        except NoFaceException as e:
+            print("\n\n!!! Error occurred !!!\n" + str(e))
+        except FileNotFoundError as e:
+            print("\n\n!!! Error occurred !!!\n" + str(e))
 
         
 if __name__ == "__main__":

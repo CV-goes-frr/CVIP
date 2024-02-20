@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-import mediapipe as mp
 from multiprocessing import Pool
 import dlib
 from imutils import face_utils
@@ -8,6 +7,7 @@ from imutils import face_utils
 from .Filter import Filter
 from settings import prefix
 from .linal.RtcUmeyama import RtcUmeyama
+from ..exceptions.NoFace import NoFaceException
 
 PREDICTOR_PATH = "shape_predictor_81_face_landmarks.dat"
 
@@ -52,7 +52,7 @@ class OverlayingMask(Filter):
             print("USING CACHE...")
             return self.cache
 
-        # Find points on the mask
+        # ## Find points on the mask
         mask_image = cv2.imread(f'{prefix}/{self.mask_name}')
 
         # Shape of the mask we need to calculate transformation
@@ -62,24 +62,17 @@ class OverlayingMask(Filter):
         mask_image = np.array(self.scale(mask_image, h_mask, w_mask))
 
         # Find landmarks on the mask
-        mp_face_mesh = mp.solutions.face_mesh
-        face_points = mp_face_mesh.FaceMesh(max_num_faces=self.mask_max_faces,
-                                            refine_landmarks=True,
-                                            min_detection_confidence=self.mask_detection_confidence,
-                                            min_tracking_confidence=self.mask_tracking_confidence)
-        rgb_image = cv2.cvtColor(mask_image, cv2.COLOR_BGR2RGB)
-        mask_points = face_points.process(rgb_image)
+        mask_gray = cv2.cvtColor(mask_image, cv2.COLOR_BGR2GRAY)  # Convert the image to grayscale
+        rects = self.detector(mask_gray, 0)  # Detect faces in the grayscale image
 
-        # get landmarks from FaceMesh class
-        for face_landmarks in mask_points.multi_face_landmarks:
-            mask_landmarks = []
-            for index in self.landmark_points_81:
-                x = int(face_landmarks.landmark[index].x * w_mask)
-                y = int(face_landmarks.landmark[index].y * h_mask)
-                mask_landmarks.append((x, y))
+        if len(rects) == 0:
+            raise NoFaceException(self.mask_name)  # if there is no face on mask_image
 
-        # Find points on target faces
+        for (i, rect) in enumerate(rects):
+            mask_shape = self.predictor(mask_gray, rect)  # Get the facial landmarks for the current face
+        mask_landmarks = face_utils.shape_to_np(mask_shape)  # Convert the landmarks to NumPy array
 
+        # ## Find points on target faces
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # Convert the image to grayscale
         rects = self.detector(gray, 0)  # Detect faces in the grayscale image
 
