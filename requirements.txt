@@ -9,7 +9,6 @@ fonttools==4.44.0
 imutils==0.5.4
 kiwisolver==1.4.5
 matplotlib==3.8.1
-mediapipe==0.10.7
 numpy==1.26.1
 opencv-contrib-python==4.8.1.78
 opencv-python==4.8.1.78

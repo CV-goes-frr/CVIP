@@ -1,12 +1,4 @@
 # -*- mode: python ; coding: utf-8 -*-
-
-block_cipher = None
-def get_mediapipe_path():
-    import mediapipe
-    mediapipe_path = mediapipe.__path__[0]
-    return mediapipe_path
-
-
 a = Analysis(
     ['CVIP.py'],
     pathex=[],
@@ -15,21 +7,16 @@ a = Analysis(
             ('src/filters/shape_predictor_81_face_landmarks.dat', '.'),
             ('help.txt', '.')
     ],
-    hiddenimports=["mediapipe"],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
     excludes=[],
-    cipher=block_cipher,
     noarchive=False,
 )
 
 pyz = PYZ(a.pure,
-    a.zipped_data,
-    cipher=block_cipher)
+    a.zipped_data)
 
-mediapipe_tree = Tree(get_mediapipe_path(), prefix='mediapipe', excludes=["*.pyc"])
-a.datas += mediapipe_tree
 
 exe = EXE(
     pyz,

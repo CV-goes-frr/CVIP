@@ -1,3 +1,6 @@
+Try this prompt with replacing img.format:
+./CVIP [-i=img.format]face_blur:10[-o=out]
+
 The prompt for the CVIP tool is formed with such tokens (optional flags and parameters are in round brackets):
 [(-i=)input_label]action:parameter1:parameter2...[(-o=)output_label]... (--parallel_processes=2)
 
@@ -18,4 +21,5 @@ Labels with -o= can be an intermediate result, that you want to save.
 
 Examples of a CVIP call:
 ./CVIP [-i=input_img.png]face_blur:2[-o=blurred][blurred]crop:100:100:400:400[cropped][cropped]scale_to_resolution:600:600[-o=cropped_center] --parallel_processes=2
+
 ./CVIP [-i=input_img.jpg]crop:0:0:1000:500[cropped][cropped]face_detection[-o=detected][cropped]mask:mask_filename.png[-o=masked][-i=input_image2.png]face_blur:5[-o=blurred_original_size][blurred_original_size]scale_to_resolution:1920:1080[-o=blurred_good_resolution]
