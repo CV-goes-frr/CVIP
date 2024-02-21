@@ -4,6 +4,11 @@ import argparse
 import cv2
 
 from settings import prefix
+from src.VerifyQuery import VerifyQuery
+from src.exceptions.InvalidBrackets import InvalidBracketsException
+from src.exceptions.InvalidFlags import InvalidFlagsException
+from src.exceptions.WrongFileFormat import WrongFileFormatException
+from src.exceptions.WrongFilename import WrongFilenameException
 from src.exceptions.WrongFiltername import WrongFilterNameException
 from src.exceptions.WrongDependency import WrongDependencyException
 from src.exceptions.WrongParameters import WrongParametersException
@@ -39,6 +44,10 @@ def main():
             process_lim = 1
             if args.parallel_processes:
                 process_lim = args.parallel_processes
+
+            # Checking prompt correctness
+            VerifyQuery.check(args.actions)  # if something is wrong exceptions will occur
+
             pars = Parser(args.actions, process_lim)
             proc = pars.parse()
 
@@ -52,16 +61,22 @@ def main():
                 #     cv2.imwrite(f'{prefix}/{fin}{res_img_index}.jpg', res_images_list[res_img_index])
             end: float = time.time()
             print(f"\nALL TASKS WERE COMPLETED\nTIME ELAPSED: {end - start}\n")
-        except WrongDependencyException as e:
-            print("\n\n!!! Error occurred !!!\n" + str(e))
-        except WrongFilterNameException as e:
-            print("\n\n!!! Error occurred !!!\n" + str(e))
-        except WrongParametersException as e:
-            print("\n\n!!! Error occurred !!!\n" + str(e))
-        except NoFaceException as e:
-            print("\n\n!!! Error occurred !!!\n" + str(e))
+        # except WrongDependencyException as e:
+        #     print("\n\n!!! Error occurred !!!\n" + str(e) + "\n")
+        # except WrongFilterNameException as e:
+        #     print("\n\n!!! Error occurred !!!\n" + str(e) + "\n")
+        # except WrongParametersException as e:
+        #     print("\n\n!!! Error occurred !!!\n" + str(e) + "\n")
+        # except NoFaceException as e:
+        #     print("\n\n!!! Error occurred !!!\n" + str(e) + "\n")
+        # except InvalidBracketsException as e:
+        #     print("\n\n!!! Error occurred !!!\n" + str(e) + "\n")
+        except (WrongDependencyException, WrongFilterNameException, WrongParametersException,
+                NoFaceException, InvalidBracketsException, InvalidFlagsException, WrongFileFormatException,
+                WrongFilenameException) as e:
+            print("\n\n!!! Error occurred !!!\n" + str(e) + "\n")
         except FileNotFoundError as e:
-            print("\n\n!!! Error occurred !!!\n" + str(e))
+            print("\n\n!!! Error occurred !!!\n" + str(e) + "\n")
 
         
 if __name__ == "__main__":
