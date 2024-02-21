@@ -32,6 +32,9 @@ def main():
         with open('help.txt', 'r') as help_file:
             print(help_file.read())
     else:
+        if args.actions is None:
+            print("Give CVIP a prompt or check help with -h or --help...")
+            return
         try:
             process_lim = 1
             if args.parallel_processes:
