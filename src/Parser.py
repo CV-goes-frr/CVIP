@@ -20,14 +20,14 @@ class Parser:
         self.inp_actions: str = inp_actions
         self.processes_limit: int = int(processes_limit)
 
-    def parse(self) -> Processor:
+    def parse(self, video_editing: bool) -> Processor:
         """
         Parser collects everything into one working structure - Processor.
 
         :return: Processor object
         """
 
-        res_obj: Processor = Processor(self.processes_limit)
+        res_obj: Processor = Processor(self.processes_limit, video_editing)
 
         inp_parameters: List[str] = self.inp_actions.split('][')  # split the whole line into filters with in/out labels
         inp_parameters[0] = inp_parameters[0][1:]  # delete first '[' and
