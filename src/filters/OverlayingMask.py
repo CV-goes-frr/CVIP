@@ -15,27 +15,31 @@ PREDICTOR_PATH = "shape_predictor_81_face_landmarks.dat"
 class OverlayingMask(Filter):
     def __init__(self, mask_name: str):
         super().__init__()  # Call the constructor of the parent class (Filter)
+        self.log = "OVERLAYING MASKING IN PROGRESS..."
 
         self.detector = dlib.get_frontal_face_detector()  # Initialize the face detector
         self.predictor = dlib.shape_predictor(PREDICTOR_PATH)  # Initialize the face landmarks predictor
         self.coef = 1.25
 
-        self.mask_name = mask_name
+        # ## Find points on the mask
+        self.mask_image = cv2.imread(f'{prefix}/{mask_name}')
+        # Find landmarks on the mask
+        mask_gray = cv2.cvtColor(self.mask_image, cv2.COLOR_BGR2GRAY)  # Convert the image to grayscale
+        rects = self.detector(mask_gray, 0)  # Detect faces in the grayscale image
+
+        if len(rects) == 0:
+            raise NoFaceException(mask_name)  # if there is no face on mask_image
+
+        for (i, rect) in enumerate(rects):
+            mask_shape = self.predictor(mask_gray, rect)  # Get the facial landmarks for the current face
+        self.mask_landmarks = face_utils.shape_to_np(mask_shape)  # Convert the landmarks to NumPy array
+
         self.jaw_mark_l = 1
         self.jaw_mark_r = 15
 
         self.mask_detection_confidence = 0.5
         self.mask_tracking_confidence = 0.5
         self.mask_max_faces = 1
-        # Parameters for mp_face_mesh
-
-        # Specify what landmarks will we use
-        self.landmark_points_81 = [127, 234, 93, 58, 172, 136, 149, 148, 152, 377, 378, 365, 397, 288, 323, 454, 389, 71, 63,
-                              105, 66, 107, 336,
-                              296, 334, 293, 301, 168, 197, 5, 4, 75, 97, 2, 326, 305, 33, 160, 158, 133, 153, 144, 362,
-                              385, 387, 263, 373,
-                              380, 61, 39, 37, 0, 267, 269, 291, 405, 314, 17, 84, 181, 78, 82, 13, 312, 308, 317, 14,
-                              87, 103, 67, 109, 10, 297, 332, 251, 21, 54, 162, 356, 284, 338]
 
     def apply(self, img: np.ndarray, processes_limit: int, pool: Pool):
         """
@@ -46,31 +50,12 @@ class OverlayingMask(Filter):
         :return: edited image - List containing the edited image as a NumPy array
         """
 
-        print("OVERLAYING MASKING IN PROGRESS...")
-
         if self.cache:
             print("USING CACHE...")
             return self.cache
 
-        # ## Find points on the mask
-        mask_image = cv2.imread(f'{prefix}/{self.mask_name}')
-
         # Shape of the mask we need to calculate transformation
         h_mask, w_mask, c_mask = img.shape
-
-        # Change the size of the mask
-        mask_image = np.array(self.scale(mask_image, h_mask, w_mask))
-
-        # Find landmarks on the mask
-        mask_gray = cv2.cvtColor(mask_image, cv2.COLOR_BGR2GRAY)  # Convert the image to grayscale
-        rects = self.detector(mask_gray, 0)  # Detect faces in the grayscale image
-
-        if len(rects) == 0:
-            raise NoFaceException(self.mask_name)  # if there is no face on mask_image
-
-        for (i, rect) in enumerate(rects):
-            mask_shape = self.predictor(mask_gray, rect)  # Get the facial landmarks for the current face
-        mask_landmarks = face_utils.shape_to_np(mask_shape)  # Convert the landmarks to NumPy array
 
         # ## Find points on target faces
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # Convert the image to grayscale
@@ -81,9 +66,9 @@ class OverlayingMask(Filter):
             shape = self.predictor(gray, rect)  # Get the facial landmarks for the current face
             shape = face_utils.shape_to_np(shape)  # Convert the landmarks to NumPy array
 
-            R, t, c = RtcUmeyama(shape, mask_landmarks)  # Calculating rotation, translation and scale
+            R, t, c = RtcUmeyama(shape, self.mask_landmarks)  # Calculating rotation, translation and scale
 
-            mask_copy = mask_image.copy()
+            mask_copy = self.mask_image.copy()
 
             # Form am Affine transformation matrix
             A = np.concatenate((c * R, np.expand_dims(t, axis=1)), axis=1)

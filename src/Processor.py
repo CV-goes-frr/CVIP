@@ -97,14 +97,12 @@ class Processor:
         result: List = []
         start: float = time.time()
 
-        print(len(prev_result))
         for prev_res in prev_result:
-            print("Processor breakpoint")
-            if self.video_editing:
-                # applying filter frame by frame with VideoEditor class
+            self.label_in_map[label].start_log()
+            if self.video_editing:  # applying filter frame by frame with VideoEditor class
                 res = VideoEditor.apply(prev_res, self.processes_limit, self.pool, self.label_in_map[label],
                                         self.num_frames, self.width, self.height)
-            else:
+            else:  # apply operation for the image
                 res = self.label_in_map[label].apply(prev_res, self.processes_limit, self.pool)
             for r in res:
                 result.append(r)
