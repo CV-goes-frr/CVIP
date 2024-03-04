@@ -3,6 +3,7 @@ import dlib
 import numpy as np
 from typing import List
 from multiprocessing import Pool
+import logging
 
 from .Filter import Filter
 
@@ -10,6 +11,8 @@ from .Filter import Filter
 class FaceDetection(Filter):
     def __init__(self):
         super().__init__()  # Call the constructor of the parent class (Filter)
+        self.logged_messages = set()
+        self.message = "FACE_DETECTION IN PROGRESS..."
 
     def apply(self, img: np.ndarray, processes_limit: int, pool: Pool) -> List[np.ndarray]:
         """
@@ -20,7 +23,9 @@ class FaceDetection(Filter):
         :return: List containing the edited image as a NumPy array
         """
 
-        print("FACE DETECTION IN PROGRESS...")
+        if self.message not in self.logged_messages:
+            print(self.message)
+            self.logged_messages.add(self.message)
         if self.cache:  # Check if a cached result exists
             print("USING CACHE...")
             return self.cache  # Return the cached result

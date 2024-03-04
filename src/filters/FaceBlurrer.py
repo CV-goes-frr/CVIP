@@ -22,6 +22,8 @@ class FaceBlurrer(Filter):
         self.detector = dlib.get_frontal_face_detector()  # Initialize the face detector
         self.predictor = dlib.shape_predictor(PREDICTOR_PATH)  # Initialize the face landmarks predictor
         self.coef = int(coef)  # Convert the coefficient to an integer
+        self.logged_messages = set()
+        self.message = "OUTLINING FACE SILHOUETTE AND APPLYING BLUR..."
 
     def apply(self, img: np.ndarray, processes_limit: int, pool: Pool) -> List[np.ndarray]:
         """
@@ -34,7 +36,9 @@ class FaceBlurrer(Filter):
         :return: edited image - List containing the edited image as a NumPy array
         """
 
-        print("OUTLINING FACE SILHOUETTE AND APPLYING BLUR...")
+        if self.message not in self.logged_messages:
+            print(self.message)
+            self.logged_messages.add(self.message)
         if self.cache:  # Check if a cached result exists
             print("USING CACHE...")
             return self.cache  # Return the cached result

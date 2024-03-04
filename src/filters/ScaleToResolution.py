@@ -16,6 +16,8 @@ class ScaleToResolution(Filter):
         self.size_x: int = int(size_x)
         self.size_y: int = int(size_y)
         # size_x and size_y means the ratio of x and y
+        self.logged_messages = set()
+        self.message = "BICUBIC SCALE TO RESOLUTION IN PROCESS..."
 
     def apply(self, img: np.ndarray, processes_limit: int, pool: Pool) -> List[np.ndarray]:
         """
@@ -28,7 +30,9 @@ class ScaleToResolution(Filter):
         :return: edited image
         """
 
-        print("BICUBIC SCALE TO RESOLUTION IN PROCESS...")
+        if self.message not in self.logged_messages:
+            print(self.message)
+            self.logged_messages.add(self.message)
         if self.cache:
             print("USING CACHE...")
             return self.cache

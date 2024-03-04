@@ -14,6 +14,8 @@ class Crop(Filter):
         self.y_1: int = int(y_1)
         self.x_2: int = int(x_2)
         self.y_2: int = int(y_2)
+        self.logged_messages = set()
+        self.message = "CROP IN PROGRESS..."
 
     def apply(self, img: np.ndarray, processes_limit: int, pool: Pool) -> List[np.ndarray]:
         """
@@ -26,7 +28,9 @@ class Crop(Filter):
         :return: edited image
         """
 
-        print("CROP IN PROGRESS...")
+        if self.message not in self.logged_messages:
+            print(self.message)
+            self.logged_messages.add(self.message)
         if self.cache:
             print("USING CACHE...")
             return self.cache

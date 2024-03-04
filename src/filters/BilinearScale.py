@@ -11,6 +11,8 @@ class BilinearScale(Filter):
     def __init__(self, scale_factor: str):
         super().__init__()  # Call the constructor of the parent class (Filter)
         self.scale_factor: float = float(scale_factor)  # Initialize the scale_factor attribute with the given value
+        self.logged_messages = set()
+        self.message = "BILINEAR SCALE IN PROGRESS..."
 
     def apply(self, img: np.ndarray, processes_limit: int, pool: Pool) -> List[np.ndarray]:
         """
@@ -22,7 +24,9 @@ class BilinearScale(Filter):
         :param pool: processes pool
         :return: edited image
         """
-        print("BILINEAR SCALE IN PROGRESS...")
+        if self.message not in self.logged_messages:
+            print(self.message)
+            self.logged_messages.add(self.message)
         if self.cache:  # Check if a cached result exists
             print("USING CACHE...")
             return self.cache  # Return the cached result
