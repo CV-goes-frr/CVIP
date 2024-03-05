@@ -1,6 +1,3 @@
-from typing import Dict
-
-import cv2
 import numpy as np
 from multiprocessing import Pool
 
@@ -11,10 +8,6 @@ class VideoEditor(Filter):
 
     def __init__(self, filter_name: str):
         super().__init__()
-        # self.class_map: Dict[str, type] = {
-        #                                    "face_detection": FaceDetection}
-        # self.filter = self.class_map[filter_name]
-
     @staticmethod
     def apply(frames: np.ndarray, processes_limit: int, pool: Pool, filter: type, num_frames: int, width: int, height: int):
         """
@@ -30,9 +23,9 @@ class VideoEditor(Filter):
         """
         print("Start VideoEditor")
         output = np.empty((num_frames, height, width, 3), np.uint8)  # Create array of frames
-        index = 0
+        index = 0 # index of frame
         for frame in frames:
             frame = filter.apply(frame, processes_limit, pool)  # Use filter to frame
             output[index, :, :, :] = frame[0]  # Add edited frame to array
             index += 1 # Next frame
-        return [output]
+        return [output] # array of frames

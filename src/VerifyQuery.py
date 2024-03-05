@@ -193,20 +193,3 @@ class VerifyQuery:
                 VerifyQuery.validate_brackets(string) and VerifyQuery.validate_flags(string)
                 and VerifyQuery.validate_filenames(string) and VerifyQuery.validate_formats(string)
                 )
-
-# print(check("[-i=filename.png]filter[-o=out]filter"))  # should be False
-# print(check("[-i=filename.png]filter[-o=out]filter[-i=filename.png]filter[-o=out]"))  # should be False
-# print(check("[-i=filename.png]filter[-o=out][-i=filename.png]filter[-o=out]"))  # should be True
-#
-# print(check("[-i=filename.mov]filter[-o=out][-i=filename.png]filter[-o=out]"))  # should be False
-# print(check("[-a=filename.png]filter[-o=out][-i=filename.png]filter[-o=out]"))  # should be False
-# print(check("[-i =filename.png]filter[-o=out][-i=filename.png]filter[-o=out]"))  # should be False
-# print(check("[-i=filename.png] filter[-o=out][-i=filename.png]filter[-o=out]"))  # should be False
-#
-# print(check("[-i=filename .png]filter[-o=out][-i=filename.png]filter[-o=out]"))  # should be True
-#
-# print(check("[-i=filename.png][]][-o=out][-i=filename.png]filter[-o=out]"))  # should be False
-# print(check("[]filter[-o=out][-i=filename.png]filter[-o=out]"))  # should be False
-#
-# print(check("[-i=filename .png]filter[-o=out][out]filter[-o=out]"))  # should be True
-# print(check("[-i=filename .png]filter[-o=out ][out ]filter[-o=out]"))  # should be True but is False!!!
