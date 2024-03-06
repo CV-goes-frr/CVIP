@@ -1,6 +1,6 @@
 import time
 import argparse
-
+from multiprocessing import freeze_support
 import cv2
 
 from settings import prefix
@@ -17,6 +17,7 @@ from src.exceptions.NoFace import NoFaceException
 
 
 def main():
+    freeze_support()
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument(
         "-h",
