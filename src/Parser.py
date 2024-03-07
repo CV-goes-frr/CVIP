@@ -20,14 +20,14 @@ class Parser:
         self.inp_actions: str = inp_actions
         self.processes_limit: int = int(processes_limit)
 
-    def parse(self) -> Processor:
+    def parse(self, video_editing: bool) -> Processor:
         """
         Parser collects everything into one working structure - Processor.
 
         :return: Processor object
         """
 
-        res_obj: Processor = Processor(self.processes_limit)
+        res_obj: Processor = Processor(self.processes_limit, video_editing)
 
         inp_parameters: List[str] = self.inp_actions.split('][')  # split the whole line into filters with in/out labels
         inp_parameters[0] = inp_parameters[0][1:]  # delete first '[' and
@@ -76,18 +76,6 @@ class Parser:
                 # (to choose input label, corresponding to the index of the out-label)
                 res_obj.labels_to_out[inp_labels_splited[ind]] = inp_labels_splited
 
-        # trace for debug
-        # print("\nDependencies:")
-        # for key in res_obj.label_dependencies:
-        #     print(key, res_obj.label_dependencies[key])
-        #
-        # print("\nLabels map to filters:")
-        # for key in res_obj.label_in_map:
-        #     print(key, res_obj.label_in_map[key], "calls:", res_obj.label_in_map[key].calls_counter)
-        #
-        # print("\nLabels to out:")
-        # for key in res_obj.labels_to_out:
-        #     print(key, res_obj.labels_to_out[key])
 
         # trace for user
         print("\nFiles with the following names will be created:")

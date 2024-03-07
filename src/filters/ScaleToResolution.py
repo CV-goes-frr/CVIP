@@ -33,30 +33,32 @@ class ScaleToResolution(Filter):
             print("USING CACHE...")
             return self.cache
 
-        input_height, input_width, _ = img.shape
+        input_height, input_width, _ = img.shape # Original height and width
 
         width_scale_factor = self.size_x / input_width
         heigth_scale_factor = self.size_y / input_height
+
         new_width = self.size_x
         new_height = self.size_y
+        # Modified height and width
+        upscaled_image = np.zeros((new_height, new_width, 3), dtype=np.uint8) # Create an empty upscaled image
 
-        upscaled_image = np.zeros((new_height, new_width, 3), dtype=np.uint8)
-
-        part_height = new_height // processes_limit
-        coordinates = [(x, y) for x in range(new_width) for y in range(new_height)]
-        parts = [coordinates[i:i + part_height] for i in range(0, len(coordinates), part_height)]
+        part_height = new_height // processes_limit # Calculate the height of each processing part
+        coordinates = [(x, y) for x in range(new_width) for y in range(new_height)] # Generate pixel coordinates
+        parts = [coordinates[i:i + part_height] for i in
+                 range(0, len(coordinates), part_height)] # Split coordinates into parts
 
         processed_pixels = pool.starmap(self.process_pixel_resolution,
                                         [(x, y, width_scale_factor, heigth_scale_factor, input_width, input_height, img)
-                                         for part in parts for (x, y) in part])
+                                         for part in parts for (x, y) in part]) # Process pixels in parallel
 
-        for (x, y), pixel_value in zip(coordinates, processed_pixels):
+        for (x, y), pixel_value in zip(coordinates, processed_pixels): # Assign processed pixels to the upscaled image
             upscaled_image[y, x] = pixel_value
 
-        if self.calls_counter > 1:
-            self.cache = [upscaled_image]
+        if self.calls_counter > 1: # Check if the method has been called more than once
+            self.cache = [upscaled_image] # Cache the upscaled image
 
-        return [upscaled_image]
+        return [upscaled_image] # Return the edited image as a list
 
     @staticmethod
     def process_pixel_resolution(x: int, y: int, scale_x: float, scale_y: float,
@@ -73,8 +75,8 @@ class ScaleToResolution(Filter):
         :param img: np.ndarray of image pixels (2D)
         :return: (R, G, B) np.ndarray that is our processed pixel
         """
-        original_x = int(x / scale_x)
-        original_y = int(y / scale_y)
+        original_x = int(x / scale_x) # Calculate the original x coordinate
+        original_y = int(y / scale_y) # Calculate the original y coordinate
 
         dx = original_x - math.floor(original_x)
         dy = original_y - math.floor(original_y)
@@ -83,7 +85,7 @@ class ScaleToResolution(Filter):
         x_2 = min(max(math.floor(original_x), 0), input_width - 1)
         x_3 = min(max(math.floor(original_x) + 1, 0), input_width - 1)
         x_4 = min(max(math.floor(original_x) + 2, 0), input_width - 1)
-
+        # Ensure that the coordinates are within the image boundaries
         y_1 = min(max(math.floor(original_y) - 1, 0), input_height - 1)
         y_2 = min(max(math.floor(original_y), 0), input_height - 1)
         y_3 = min(max(math.floor(original_y) + 1, 0), input_height - 1)
@@ -98,7 +100,7 @@ class ScaleToResolution(Filter):
         pix22 = img[y_2, x_2]
         pix32 = img[y_2, x_3]
         pix42 = img[y_2, x_4]
-
+        # Get the pixels value
         pix13 = img[y_3, x_1]
         pix23 = img[y_3, x_2]
         pix33 = img[y_3, x_3]
@@ -113,6 +115,7 @@ class ScaleToResolution(Filter):
         arr2 = bicubic_hermit(pix12, pix22, pix32, pix42, dy)
         arr3 = bicubic_hermit(pix13, pix23, pix33, pix43, dy)
         arr4 = bicubic_hermit(pix14, pix24, pix34, pix44, dy)
+        # Call bicubic_hermit for interpolation
 
         val = bicubic_hermit(arr1, arr2, arr3, arr4, dx)
 
