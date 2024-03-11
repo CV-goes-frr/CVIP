@@ -1,7 +1,8 @@
 import cv2
+import numpy as np
 
-image1 = cv2.imread('pic1.png')
-image2 = cv2.imread('pic2.png')
+image1 = cv2.imread('one.jpg')
+image2 = cv2.imread('two.jpg')
 
 # Convert images to grayscale
 gray1 = cv2.cvtColor(image1, cv2.COLOR_BGR2GRAY)
@@ -26,9 +27,23 @@ matches = sorted(matches, key=lambda x: x.distance)
 distance_threshold = 40
 good_matches = [match for match in matches if match.distance < distance_threshold]
 
+minMatches = 10
+if len(good_matches) > minMatches:
+    src_pts = np.float32([keypoints1[m.queryIdx].pt for m in good_matches]).reshape(-1,1,2)
+    dst_pts = np.float32([keypoints2[m.trainIdx].pt for m in good_matches]).reshape(-1,1,2)
+
+    M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 5.0)
+    matchesMask = mask.ravel().tolist()
+
+    h, w, _ = image1.shape
+    pts = np.float32([[0, 0], [0, h - 1], [w - 1, h - 1], [w - 1, 0]]).reshape(-1, 1, 2)
+    dst = np.int32(cv2.perspectiveTransform(pts, M))
+
+    image2 = cv2.polylines(image2, [dst], True, 255, 3, cv2.LINE_AA)
+else:
+    print("Not enough features")
 # Draw only the good matches
 matching_result_filtered = cv2.drawMatches(image1, keypoints1, image2, keypoints2, good_matches, None, flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
 
-cv2.imshow('Filtered Feature Matching', matching_result_filtered)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+cv2.imwrite("result.jpg", matching_result_filtered)
+
