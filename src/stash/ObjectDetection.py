@@ -1,8 +1,8 @@
 import cv2
 import numpy as np
 
-image1 = cv2.imread('one.jpg')
-image2 = cv2.imread('two.jpg')
+image1 = cv2.imread("pic1.png")
+image2 = cv2.imread("pic2.png")
 
 # Convert images to grayscale
 gray1 = cv2.cvtColor(image1, cv2.COLOR_BGR2GRAY)
@@ -24,7 +24,7 @@ matches = bf.match(descriptors1, descriptors2)
 matches = sorted(matches, key=lambda x: x.distance)
 
 # Set a distance threshold
-distance_threshold = 40
+distance_threshold = 100
 good_matches = [match for match in matches if match.distance < distance_threshold]
 
 minMatches = 10
@@ -36,9 +36,14 @@ if len(good_matches) > minMatches:
     matchesMask = mask.ravel().tolist()
 
     h, w, _ = image1.shape
-    pts = np.float32([[0, 0], [0, h - 1], [w - 1, h - 1], [w - 1, 0]]).reshape(-1, 1, 2)
-    dst = np.int32(cv2.perspectiveTransform(pts, M))
+    object_bbox = cv2.boundingRect(np.intp(src_pts))
 
+    pts = np.float32([[[object_bbox[0], object_bbox[1]],
+                      [object_bbox[0], object_bbox[1] + object_bbox[3]],
+                      [object_bbox[0] + object_bbox[2],
+                       object_bbox[1] + object_bbox[3]],
+                      [object_bbox[0] + object_bbox[2], object_bbox[1]]]]).reshape(-1, 1, 2)
+    dst = np.int32(cv2.perspectiveTransform(pts, M))
     image2 = cv2.polylines(image2, [dst], True, 255, 3, cv2.LINE_AA)
 else:
     print("Not enough features")
