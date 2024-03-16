@@ -1,8 +1,8 @@
 import cv2
 import numpy as np
 
-image1 = cv2.imread("pic1.png")
-image2 = cv2.imread("pic2.png")
+image1 = cv2.imread("one.jpg")
+image2 = cv2.imread("two.jpg")
 
 # Convert images to grayscale
 gray1 = cv2.cvtColor(image1, cv2.COLOR_BGR2GRAY)
