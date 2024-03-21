@@ -30,7 +30,7 @@ def main():
 
 
 def apply(frames: np.ndarray, processes_limit: int, pool: Pool) -> np.ndarray:
-    print(frames.shape)
+    # print(frames.shape)
     step = 30
     result = frames[0]
 

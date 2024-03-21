@@ -11,10 +11,25 @@ class PanoramicMerge:
             print('Cannot calculate homography')
             return
 
-        result = cv2.warpPerspective(imageR, homography,
-                                     (imageR.shape[1] + imageL.shape[1], imageR.shape[0]))
-        # print(result.shape)
-        result[0:imageL.shape[0], 0:imageL.shape[1]] = imageL
+        warped = cv2.warpPerspective(imageR, homography,
+                                     (imageR.shape[1] + imageL.shape[1], imageL.shape[0]))
+        mask_warped = np.sum(warped, axis=2) != 0
+        mask_warped = cv2.erode(mask_warped.astype(np.uint8), np.ones((3, 3)))  # delete edge points and artifacts
+
+        result = np.ndarray((imageL.shape[0], imageL.shape[1] + imageR.shape[1], 3))
+
+        result[0:imageL.shape[0], 0:imageL.shape[1]] = imageL  # left part
+        result[mask_warped != 0] = warped[mask_warped != 0]  # right part where are no left part pixels
+
+        result = result.astype(np.uint8)
+
+        # remove black space at the right
+        gray = cv2.cvtColor(result, cv2.COLOR_BGR2GRAY)
+        threshold, binary = cv2.threshold(gray, 1, 255, cv2.THRESH_BINARY)
+        contours, hierarchy = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        if len(contours) > 0:
+            x, y, w, h = cv2.boundingRect(contours[0])
+            result = result[y:y + h, x:x + w]
 
         return result
 
