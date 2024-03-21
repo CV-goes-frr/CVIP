@@ -6,8 +6,9 @@ from .Filter import Filter
 
 class VideoEditor(Filter):
 
-    def __init__(self, filter_name: str):
+    def __init__(self):
         super().__init__()
+
     @staticmethod
     def apply(frames: np.ndarray, processes_limit: int, pool: Pool, filter: type, num_frames: int, width: int, height: int):
         """
@@ -16,7 +17,7 @@ class VideoEditor(Filter):
         :param processes_limit: we'll try to parallel it later
         :param pool: processes pool
         :param filter: filter that we use to our video
-        :param num_frames: video's number of frames
+        :param num_frames: videos number of frames
         :param width: video's width
         :param height: video's height
         :return:
