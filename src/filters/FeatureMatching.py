@@ -2,6 +2,7 @@ import os
 import sys
 from multiprocessing import Pool
 from typing import List
+from settings import prefix
 
 import numpy as np
 import cv2
@@ -10,12 +11,13 @@ from .Filter import Filter
 
 class FeatureMatching(Filter):
 
-    def __init__(self, type_match: str):
+    def __init__(self, type_match: str, img2: str):
         super().__init__()  # Call the constructor of the parent class (Filter)
         self.type_match = type_match
+        self.img2 = cv2.imread(f'{prefix}/{img2}')
 
 
-    def apply(self, img1: np.ndarray, img2: np.ndarray, processes_limit: int, pool: Pool) -> List[np.ndarray]:
+    def apply(self, img1: np.ndarray, processes_limit: int, pool: Pool) -> List[np.ndarray]:
 
         print("FEATURE MATCHING IN PROGRESS...")
         if self.cache:  # Check if a cached result exists
@@ -23,7 +25,7 @@ class FeatureMatching(Filter):
             return self.cache  # Return the cached result
 
         img_copy1 = np.copy(img1)
-        img_copy2 = np.copy(img2)
+        img_copy2 = np.copy(self.img2)
         gray1 = cv2.GaussianBlur(img_copy1, (5, 5), 0)
         gray2 = cv2.GaussianBlur(img_copy2, (5, 5), 0)
 
