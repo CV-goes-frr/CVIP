@@ -28,12 +28,14 @@ flann = cv2.FlannBasedMatcher(index_params, search_params)
 # Perform matching
 matches = flann.knnMatch(descriptors1, descriptors2, k=2)
 
+# Apply ratio test
+# Apply ratio test
 good_matches = []
 for match in matches:
     if len(match) == 2:
         m, n = match
         good_matches.append(m)
-
+print(len(good_matches))
 minMatches = 10
 if len(good_matches) > minMatches:
     src_pts = np.float32([keypoints1[m.queryIdx].pt for m in good_matches]).reshape(-1,1,2)

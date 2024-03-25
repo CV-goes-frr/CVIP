@@ -61,6 +61,10 @@ class VerifyArgs:
                 if len(self.args) != 2:
                     raise WrongParametersException(self.name, str(self.args[1:]))
 
+            case 'feature_matching':
+                if len(self.args) != 3:
+                    raise WrongParametersException(self.name, str(self.args[1:]))
+
             case _:
                 # If the filter name is not recognized, raise an exception
                 raise WrongFilterNameException(self.name)

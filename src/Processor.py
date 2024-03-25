@@ -14,6 +14,7 @@ from .filters.NnScale import NnScale
 from .filters.OverlayingMask import OverlayingMask
 from settings import prefix
 from .filters.VideoEditor import VideoEditor
+from .filters.FeatureMatching import FeatureMatching
 
 
 class Processor:
@@ -41,7 +42,8 @@ class Processor:
                                            "scale_to_resolution": ScaleToResolution,
                                            "face_blur": FaceBlurrer,
                                            "face_detection": FaceDetection,
-                                           "mask": OverlayingMask}
+                                           "mask": OverlayingMask,
+                                           "feature_matching": FeatureMatching}
 
         # what in-labels should be already done for applying the filter with this out-label
         self.label_dependencies: Dict[str, List[str]] = {}
