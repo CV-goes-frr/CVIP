@@ -15,6 +15,7 @@ from .filters.OverlayingMask import OverlayingMask
 from settings import prefix
 from .filters.VideoEditor import VideoEditor
 from .filters.FeatureMatching import FeatureMatching
+from .filters.MotionTracking import MotionTracking
 
 
 class Processor:
@@ -43,7 +44,8 @@ class Processor:
                                            "face_blur": FaceBlurrer,
                                            "face_detection": FaceDetection,
                                            "mask": OverlayingMask,
-                                           "feature_matching": FeatureMatching}
+                                           "feature_matching": FeatureMatching,
+                                           "motion_tracking": MotionTracking}
 
         # what in-labels should be already done for applying the filter with this out-label
         self.label_dependencies: Dict[str, List[str]] = {}
@@ -106,6 +108,7 @@ class Processor:
                                         self.num_frames, self.width, self.height)
             else:  # apply operation for the image
                 res = self.label_in_map[label].apply(prev_res, self.processes_limit, self.pool)
+
             for r in res:
                 result.append(r)
 

@@ -5,6 +5,7 @@ from multiprocessing import Pool
 
 from .Filter import Filter
 
+
 class MotionTracking(Filter):
     def __init__(self):
         super().__init__()  # Call the constructor of the parent class (Filter)
