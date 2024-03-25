@@ -3,7 +3,7 @@ from multiprocessing import Pool
 import cv2
 import numpy as np
 
-from src.stash.PanoramicMerge import PanoramicMerge
+from src.stash.panorama.PanoramicMerge import PanoramicMerge
 
 
 def main():

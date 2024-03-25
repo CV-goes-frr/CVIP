@@ -1,16 +1,16 @@
 import cv2
 import numpy as np
 
-image1 = cv2.imread("one.jpg")
-image2 = cv2.imread("two.jpg")
-
-# Convert images to grayscale
-gray1 = cv2.cvtColor(image1, cv2.COLOR_BGR2GRAY)
-gray2 = cv2.cvtColor(image2, cv2.COLOR_BGR2GRAY)
+image1 = cv2.imread("./media/one.jpg")
+image2 = cv2.imread("./media/two.jpg")
 
 # Apply GaussianBlur to reduce noise
-gray1 = cv2.GaussianBlur(gray1, (5, 5), 0)
-gray2 = cv2.GaussianBlur(gray2, (5, 5), 0)
+gray1 = cv2.GaussianBlur(image1, (5, 5), 0)
+gray2 = cv2.GaussianBlur(image2, (5, 5), 0)
+
+# Convert images to grayscale
+gray1 = cv2.cvtColor(gray1, cv2.COLOR_BGR2GRAY)
+gray2 = cv2.cvtColor(gray2, cv2.COLOR_BGR2GRAY)
 
 orb = cv2.ORB_create()
 keypoints1, descriptors1 = orb.detectAndCompute(gray1, None)
@@ -51,4 +51,3 @@ else:
 matching_result_filtered = cv2.drawMatches(image1, keypoints1, image2, keypoints2, good_matches, None, flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
 
 cv2.imwrite("result.jpg", matching_result_filtered)
-
