@@ -1,5 +1,6 @@
-from typing import List
 from multiprocessing import Pool
+from typing import List
+
 import numpy as np
 
 from .Filter import Filter
@@ -9,18 +10,29 @@ from .decorators.bilinear_weight_decorator import bilinear_weight_cache
 class BilinearScale(Filter):
 
     def __init__(self, scale_factor: str):
+        """
+        Initializes the BilinearScale filter.
+
+        Args:
+            scale_factor (str): Scaling factor as a string.
+
+        Returns:
+            None
+        """
         super().__init__()  # Call the constructor of the parent class (Filter)
         self.scale_factor: float = float(scale_factor)  # Initialize the scale_factor attribute with the given value
 
     def apply(self, img: np.ndarray, processes_limit: int, pool: Pool) -> List[np.ndarray]:
         """
-        Apply signature for every Filter object. Method call edit input image and return new one.
-        Shape of new img np.ndarray can be not the same as input shape.
+        Applies bilinear scaling to the input image.
 
-        :param img: np.ndarray of pixels
-        :param processes_limit: split the image into this number of pieces to process in parallel
-        :param pool: processes pool
-        :return: edited image
+        Args:
+            img (np.ndarray): Input image as a NumPy array.
+            processes_limit (int): Number of processes to use.
+            pool (Pool): Pool of processes.
+
+        Returns:
+            List[np.ndarray]: List containing the scaled image as a NumPy array.
         """
         print("BILINEAR SCALE IN PROGRESS...")
         if self.cache:  # Check if a cached result exists
@@ -56,15 +68,17 @@ class BilinearScale(Filter):
         """
         Process a single pixel for bilinear scaling.
 
-        :param x: x-coordinate of the pixel
-        :param y: y-coordinate of the pixel
-        :param scale_factor: how many times should we upscale the given image
-        :param input_width: width of the input image
-        :param input_height: height of the input image
-        :param img: input image as a NumPy array
-        :return: processed pixel as a NumPy array
-        """
+        Args:
+            x (int): x-coordinate of the pixel
+            y (int): y-coordinate of the pixel
+            scale_factor (float): Scaling factor
+            input_width (int): Width of the input image
+            input_height (int): Height of the input image
+            img (np.ndarray): Input image as a NumPy array
 
+        Returns:
+            np.ndarray: Processed pixel as a NumPy array
+        """
         original_x = int(x / scale_factor)  # Calculate the original x coordinate
         original_y = int(y / scale_factor)  # Calculate the original y coordinate
 
@@ -93,25 +107,28 @@ class BilinearScale(Filter):
 def weight_function(alpha, beta, top_left: np.ndarray, top_right: np.ndarray,
                     bottom_left: np.ndarray, bottom_right: np.ndarray):
     """
-    Calculate the weighted sum of pixel values for bilinear scaling.
+        Calculate the weighted sum of pixel values for bilinear scaling.
 
-    :param alpha: Alpha value (interpolation factor for x-direction, ranging from 0 to 1)
-    :param beta: Beta value (interpolation factor for y-direction, ranging from 0 to 1)
-    :param top_left: Top-left pixel value as a NumPy array
-    :param top_right: Top-right pixel value as a NumPy array
-    :param bottom_left: Bottom-left pixel value as a NumPy array
-    :param bottom_right: Bottom-right pixel value as a NumPy array
-    :return: Weighted pixel value as a NumPy array
+        Args:
+            alpha: Alpha value (interpolation factor for x-direction, ranging from 0 to 1)
+            beta: Beta value (interpolation factor for y-direction, ranging from 0 to 1)
+            top_left (np.ndarray): Top-left pixel value as a NumPy array
+            top_right (np.ndarray): Top-right pixel value as a NumPy array
+            bottom_left (np.ndarray): Bottom-left pixel value as a NumPy array
+            bottom_right (np.ndarray): Bottom-right pixel value as a NumPy array
 
-    This function computes the weighted sum of the four corner pixels using the given interpolation factors.
+        Returns:
+            np.ndarray: Weighted pixel value as a NumPy array
 
-    - 'alpha' and 'beta' represent the fractional part of the x and y coordinates.
-    - 'top_left', 'top_right', 'bottom_left', and 'bottom_right' are the pixel values at the four corners.
+        This function computes the weighted sum of the four corner pixels using the given interpolation factors.
 
-    The interpolation formula combines these corner values based on 'alpha' and 'beta':
-    - (1 - alpha) * (1 - beta) * top_left: Contribution from the top-left pixel
-    - alpha * (1 - beta) * top_right: Contribution from the top-right pixel
-    - (1 - alpha) * beta * bottom_left: Contribution from the bottom-left pixel
+        - 'alpha' and 'beta' represent the fractional part of the x and y coordinates.
+        - 'top_left', 'top_right', 'bottom_left', and 'bottom_right' are the pixel values at the four corners.
+
+        The interpolation formula combines these corner values based on 'alpha' and 'beta':
+        - (1 - alpha) * (1 - beta) * top_left: Contribution from the top-left pixel
+        - alpha * (1 - beta) * top_right: Contribution from the top-right pixel
+        - (1 - alpha) * beta * bottom_left: Contribution from the bottom-left pixel
     - alpha * beta * bottom_right: Contribution from the bottom-right pixel
 
     The final result is the weighted sum of these contributions, representing the pixel value at the given (alpha, beta).

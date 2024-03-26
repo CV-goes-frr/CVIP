@@ -5,16 +5,33 @@ import numpy as np
 
 def bicubic_hermit_cache(function):
     """
-    Overriding wrapper function to make input data hashable and
-    cached_wrapper function to call the original function with hashable input data.
+    Decorator for caching the results of a function that accepts numpy arrays as input parameters.
 
-    :param function: - original function
-    :return: - wrapper function
+    Args:
+        function: Original function to be decorated.
+
+    Returns:
+        function: Wrapper function with caching functionality.
     """
+
     @lru_cache(maxsize=128)
     def cached_wrapper(hashable_array1: tuple, hashable_array2: tuple,
                        hashable_array3: tuple, hashable_array4: tuple, t: int):
-        # cast tuples to np.array(s)
+        """
+        Wrapper function that caches the results of the original function based on hashable input data.
+
+        Args:
+            hashable_array1 (tuple): Hashable tuple representing the first numpy array.
+            hashable_array2 (tuple): Hashable tuple representing the second numpy array.
+            hashable_array3 (tuple): Hashable tuple representing the third numpy array.
+            hashable_array4 (tuple): Hashable tuple representing the fourth numpy array.
+            t (int): Integer parameter.
+
+        Returns:
+            result: Result of calling the original function with the corresponding numpy arrays.
+
+        """
+        # Cast tuples to np.arrays
         array1 = np.array(hashable_array1)
         array2 = np.array(hashable_array2)
         array3 = np.array(hashable_array3)
@@ -24,10 +41,23 @@ def bicubic_hermit_cache(function):
     @wraps(function)
     def wrapper(array1: np.ndarray, array2: np.ndarray,
                 array3: np.ndarray, array4: np.ndarray, t: int):
-        # cast np.ndarray(s) to tuples
+        """
+        Wrapper function that casts numpy arrays to tuples before calling the cached wrapper.
+
+        Args:
+            array1 (np.ndarray): First numpy array.
+            array2 (np.ndarray): Second numpy array.
+            array3 (np.ndarray): Third numpy array.
+            array4 (np.ndarray): Fourth numpy array.
+            t (int): Integer parameter.
+
+        Returns:
+            result: Result of calling the cached wrapper function with the corresponding numpy arrays.
+        """
+        # Cast np.ndarray(s) to tuples
         return cached_wrapper(tuple(array1), tuple(array2), tuple(array3), tuple(array4), t)
 
-    # copy lru_cache attributes over too
+    # Copy lru_cache attributes over too
     wrapper.cache_info = cached_wrapper.cache_info
     wrapper.cache_clear = cached_wrapper.cache_clear
 
