@@ -1,23 +1,37 @@
+from multiprocessing import Pool
+from typing import List
+
 import cv2
 import dlib
 import numpy as np
-from typing import List
-from multiprocessing import Pool
 
 from .Filter import Filter
 
 
 class FaceDetection(Filter):
     def __init__(self):
+        """
+        Initializes the FaceDetection filter.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
         super().__init__()  # Call the constructor of the parent class (Filter)
 
     def apply(self, img: np.ndarray, processes_limit: int, pool: Pool) -> List[np.ndarray]:
         """
-        Face detection with dlib frontal face detector.
-        :param img: np.ndarray of pixels - Input image as a NumPy array
-        :param processes_limit: we'll try to parallel it later
-        :param pool: processes pool
-        :return: List containing the edited image as a NumPy array
+        Applies face detection using the dlib frontal face detector.
+
+        Args:
+            img (np.ndarray): Input image as a NumPy array.
+            processes_limit (int): Number of processes to use.
+            pool (Pool): Pool of processes.
+
+        Returns:
+            List[np.ndarray]: List containing the edited image as a NumPy array.
         """
 
         print("FACE DETECTION IN PROGRESS...")
@@ -25,13 +39,20 @@ class FaceDetection(Filter):
             print("USING CACHE...")
             return self.cache  # Return the cached result
 
+        # Create a copy of the input image
         img_copy = np.copy(img)
-        gray = cv2.cvtColor(img_copy, cv2.COLOR_BGR2GRAY)  # Convert the image to grayscale
 
-        detector = dlib.get_frontal_face_detector()  # Initialize the face detector
+        # Convert the image to grayscale
+        gray = cv2.cvtColor(img_copy, cv2.COLOR_BGR2GRAY)
+
+        # Initialize the face detector
+        detector = dlib.get_frontal_face_detector()
+
+        # Detect faces in the grayscale image
         rects = detector(gray, 0)
 
-        for (_, rect) in enumerate(rects):  # Iterate over the detected faces
+        # Draw rectangles around the detected faces
+        for (_, rect) in enumerate(rects):
             cv2.rectangle(img_copy, (rect.left(), rect.top()), (rect.right(), rect.bottom()), (0, 255, 0), 2)
 
         return [img_copy]  # Return the edited image as a list

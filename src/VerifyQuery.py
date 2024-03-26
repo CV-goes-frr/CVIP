@@ -1,5 +1,5 @@
-import re
 import platform
+import re
 
 from .exceptions.InvalidBrackets import InvalidBracketsException
 from .exceptions.InvalidFlags import InvalidFlagsException
