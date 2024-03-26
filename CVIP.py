@@ -1,22 +1,25 @@
-import time
 import argparse
-from multiprocessing import freeze_support
 import cv2
+import time
+from multiprocessing import freeze_support
 
 from settings import prefix
+from src.Parser import Parser
 from src.VerifyQuery import VerifyQuery
 from src.exceptions.InvalidBrackets import InvalidBracketsException
 from src.exceptions.InvalidFlags import InvalidFlagsException
+from src.exceptions.NoFace import NoFaceException
+from src.exceptions.WrongDependency import WrongDependencyException
 from src.exceptions.WrongFileFormat import WrongFileFormatException
 from src.exceptions.WrongFilename import WrongFilenameException
 from src.exceptions.WrongFiltername import WrongFilterNameException
-from src.exceptions.WrongDependency import WrongDependencyException
 from src.exceptions.WrongParameters import WrongParametersException
-from src.Parser import Parser
-from src.exceptions.NoFace import NoFaceException
 
 
 def main():
+    """
+    Main function to execute the program.
+    """
     freeze_support()
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument(
@@ -109,6 +112,5 @@ def main():
         except FileNotFoundError as e:
             print("\n\n!!! Error occurred !!!\n" + str(e) + "\n")
 
-        
 if __name__ == "__main__":
     main()

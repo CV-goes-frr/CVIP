@@ -1,23 +1,30 @@
-import os
-import sys
+from imutils import face_utils
 from multiprocessing import Pool
 from typing import List
 
 import cv2
 import dlib
 import numpy as np
-from imutils import face_utils
-
-os.chdir(sys._MEIPASS)
+import os
+import sys
 
 from .Filter import Filter
 
+os.chdir(sys._MEIPASS)
 PREDICTOR_PATH = "shape_predictor_81_face_landmarks.dat"
 
 
 class FaceBlurrer(Filter):
-
     def __init__(self, coef: str):
+        """
+        Initializes the FaceBlurrer filter.
+
+        Args:
+            coef (str): Coefficient for Gaussian blur.
+
+        Returns:
+            None
+        """
         super().__init__()  # Call the constructor of the parent class (Filter)
         self.detector = dlib.get_frontal_face_detector()  # Initialize the face detector
         self.predictor = dlib.shape_predictor(PREDICTOR_PATH)  # Initialize the face landmarks predictor
@@ -25,13 +32,16 @@ class FaceBlurrer(Filter):
 
     def apply(self, img: np.ndarray, processes_limit: int, pool: Pool) -> List[np.ndarray]:
         """
-        Face detection with dlib.get_frontal_face_detector().
-        Creating a mask to outline the face silhouette based on specific facial landmarks.
+        Applies face detection with dlib.get_frontal_face_detector() and creates a mask to outline the face silhouette
+        based on specific facial landmarks.
 
-        :param img: np.ndarray of pixels - Input image as a NumPy array
-        :param processes_limit: we'll try to parallel it later
-        :param pool: processes pool
-        :return: edited image - List containing the edited image as a NumPy array
+        Args:
+            img (np.ndarray): Input image as a NumPy array.
+            processes_limit (int): Number of processes to use.
+            pool (Pool): Pool of processes.
+
+        Returns:
+            List[np.ndarray]: List containing the edited image as a NumPy array.
         """
 
         print("OUTLINING FACE SILHOUETTE AND APPLYING BLUR...")
@@ -82,13 +92,15 @@ class FaceBlurrer(Filter):
         """
         Point reflection relative to the line that is set by (x0, y0) and (x1, y1).
 
-        :param self: self
-        :param p: point to reflect (np.array(x, y)) - Point to be reflected
-        :param x0: x of the first point of the line - X-coordinate of the first point of the line
-        :param y0: y of the first point of the line - Y-coordinate of the first point of the line
-        :param x1: x of the second point of the line - X-coordinate of the second point of the line
-        :param y1: y of the second point of the line - Y-coordinate of the second point of the line
-        :return: edited image - The reflected point as a NumPy array
+        Args:
+            p (np.array): Point to be reflected.
+            x0 (int): X-coordinate of the first point of the line.
+            y0 (int): Y-coordinate of the first point of the line.
+            x1 (int): X-coordinate of the second point of the line.
+            y1 (int): Y-coordinate of the second point of the line.
+
+        Returns:
+            np.array: The reflected point as a NumPy array.
         """
 
         dx = x1 - x0

@@ -1,55 +1,70 @@
-import cv2
-import numpy as np
-from multiprocessing import Pool
-import dlib
 from imutils import face_utils
+from multiprocessing import Pool
 
-from .Filter import Filter
+import cv2
+import dlib
+import numpy as np
+
 from settings import prefix
+from .Filter import Filter
 from .linal.RtcUmeyama import RtcUmeyama
 from ..exceptions.NoFace import NoFaceException
+
 
 PREDICTOR_PATH = "shape_predictor_81_face_landmarks.dat"
 
 
 class OverlayingMask(Filter):
-    def __init__(self, mask_name: str):
-        super().__init__()  # Call the constructor of the parent class (Filter)
+    def init(self, mask_name: str):
+        """
+        Initializes the OverlayingMask filter.
+
+        Args:
+            mask_name (str): Name of the mask image file.
+
+        Returns:
+            None
+        """
+        super().init()  # Call the constructor of the parent class (Filter)
         self.log = "OVERLAYING MASKING IN PROGRESS..."
 
-        self.detector = dlib.get_frontal_face_detector()  # Initialize the face detector
-        self.predictor = dlib.shape_predictor(PREDICTOR_PATH)  # Initialize the face landmarks predictor
+        # Initialize the face detector and shape predictor
+        self.detector = dlib.get_frontal_face_detector()
+        self.predictor = dlib.shape_predictor(PREDICTOR_PATH)
+
+        # Coefficient for scaling the mask
         self.coef = 1.25
 
-        # ## Find points on the mask
+        # Load the mask image
         self.mask_image = cv2.imread(f'{prefix}/{mask_name}')
-        # Find landmarks on the mask
         mask_gray = cv2.cvtColor(self.mask_image, cv2.COLOR_BGR2GRAY)  # Convert the image to grayscale
-        rects = self.detector(mask_gray, 0)  # Detect faces in the grayscale image
 
+        # Detect faces in the mask image
+        rects = self.detector(mask_gray, 0)
+
+        # If no faces are detected, raise an exception
         if len(rects) == 0:
-            raise NoFaceException(mask_name)  # if there is no face on mask_image
+            raise NoFaceException(mask_name)
 
+        # Extract facial landmarks from the mask image
         for (i, rect) in enumerate(rects):
-            mask_shape = self.predictor(mask_gray, rect)  # Get the facial landmarks for the current face
-        self.mask_landmarks = face_utils.shape_to_np(mask_shape)  # Convert the landmarks to NumPy array
+            mask_shape = self.predictor(mask_gray, rect)
+        self.mask_landmarks = face_utils.shape_to_np(mask_shape)
 
-        self.jaw_mark_l = 1
-        self.jaw_mark_r = 15
-
-        self.mask_detection_confidence = 0.5
-        self.mask_tracking_confidence = 0.5
-        self.mask_max_faces = 1
+        # Define indices for marking the jawline on the face
 
     def apply(self, img: np.ndarray, processes_limit: int, pool: Pool):
         """
-        :param self: self
-        :param img: np.ndarray of pixels - Input image as a NumPy array
-        :param processes_limit:we'll try to parallel it later
-        :param pool: processes pool
-        :return: edited image - List containing the edited image as a NumPy array
-        """
+        Applies the overlaying mask filter to the input image.
 
+        Args:
+            img (np.ndarray): Input image as a NumPy array.
+            processes_limit (int): Number of processes to use.
+            pool (Pool): Pool of processes.
+
+        Returns:
+            List[np.ndarray]: List containing the edited image as a NumPy array.
+        """
         if self.cache:
             print("USING CACHE...")
             return self.cache
@@ -57,7 +72,7 @@ class OverlayingMask(Filter):
         # Shape of the mask we need to calculate transformation
         h_mask, w_mask, c_mask = img.shape
 
-        # ## Find points on target faces
+        # Detect faces in the input image
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # Convert the image to grayscale
         rects = self.detector(gray, 0)  # Detect faces in the grayscale image
 
@@ -66,36 +81,40 @@ class OverlayingMask(Filter):
             shape = self.predictor(gray, rect)  # Get the facial landmarks for the current face
             shape = face_utils.shape_to_np(shape)  # Convert the landmarks to NumPy array
 
-            R, t, c = RtcUmeyama(shape, self.mask_landmarks)  # Calculating rotation, translation and scale
+            # Calculate rotation, translation, and scale for overlaying the mask
+            R, t, c = RtcUmeyama(shape, self.mask_landmarks)
 
             mask_copy = self.mask_image.copy()
 
-            # Form am Affine transformation matrix
+            # Form an affine transformation matrix
             A = np.concatenate((c * R, np.expand_dims(t, axis=1)), axis=1)
             mask_copy = cv2.warpAffine(mask_copy, A, (w_mask, h_mask))  # Edit mask image
 
+            # Create a silhouette of the face for masking
             face_silhouette = np.concatenate((
-                shape[0:17],   # Points 0 to 16
-                shape[78:79],  # Point 78
-                shape[74:75],  # Point 74
-                shape[79:80],  # Point 79
-                shape[73:74],  # Point 73
-                shape[72:73],  # Point 72
-                shape[80:81],  # Point 80
-                shape[71:72],  # Point 71
-                shape[70:71],  # Point 70
-                shape[69:70],  # Point 69
-                shape[68:69],  # Point 68
-                shape[76:77],  # Point 76
-                shape[75:76],  # Point 75
-                shape[77:78],  # Point 77
-                shape[0:1]     # Point 0 (to close the loop)
+                shape[0:17],
+                shape[78:79],
+                shape[74:75],
+                shape[79:80],
+                shape[73:74],
+                shape[72:73],
+                shape[80:81],
+                shape[71:72],
+                shape[70:71],
+                shape[69:70],
+                shape[68:69],
+                shape[76:77],
+                shape[75:76],
+                shape[77:78],
+                shape[0:1]
             ), axis=0)
 
-            # Create a poly on the face, where we'll change pixels to mask's pixels
-            mask_poly = np.zeros_like(mask_copy)  # Create a mask with the same shape as the image
-            cv2.fillPoly(mask_poly, [face_silhouette], (255, 255, 255))  # Fill the mask to outline face silhouette
-            img = np.where(mask_poly != 0, mask_copy, img)  # Set non-silhouette areas to black
+            # Create a mask for the face silhouette
+            mask_poly = np.zeros_like(mask_copy)
+            cv2.fillPoly(mask_poly, [face_silhouette], (255, 255, 255))
+
+            # Overlay the mask on the face silhouette
+            img = np.where(mask_poly != 0, mask_copy, img)
 
         if self.calls_counter > 1:
             self.cache = [img]
@@ -104,25 +123,37 @@ class OverlayingMask(Filter):
 
     @staticmethod
     def scale(im: np.ndarray, nR: np.array, nC: np.array):
-        nR0 = len(im)  # source number of rows
-        nC0 = len(im[0])  # source number of columns
+        """
+        Scales the input image to the specified size.
+
+        Args:
+            im (np.ndarray): Input image as a NumPy array.
+            nR (np.array): New number of rows.
+            nC (np.array): New number of columns.
+
+        Returns:
+            np.ndarray: Scaled image as a NumPy array.
+        """
+        nR0 = len(im)  # Source number of rows
+        nC0 = len(im[0])  # Source number of columns
         return [[im[int(nR0 * r / nR)][int(nC0 * c / nC)]
                  for c in range(nC)] for r in range(nR)]
 
     @staticmethod
     def reflect(self, p: np.array, x0: int, y0: int, x1: int, y1: int):
         """
-        Point reflection relative to the line that is set by (x0, y0) and (x1, y1).
+        Reflects a point relative to a line defined by two points.
 
-        :param self: self
-        :param p: point to reflect (np.array(x, y)) - Point to be reflected
-        :param x0: x of the first point of the line - X-coordinate of the first point of the line
-        :param y0: y of the first point of the line - Y-coordinate of the first point of the line
-        :param x1: x of the second point of the line - X-coordinate of the second point of the line
-        :param y1: y of the second point of the line - Y-coordinate of the second point of the line
-        :return: edited image - The reflected point as a NumPy array
+        Args:
+            p (np.array): Point to be reflected.
+            x0 (int): X-coordinate of the first point of the line.
+            y0 (int): Y-coordinate of the first point of the line.
+            x1 (int): X-coordinate of the second point of the line.
+            y1 (int): Y-coordinate of the second point of the line.
+
+        Returns:
+            np.array: Reflected point as a NumPy array.
         """
-
         dx = x1 - x0
         dy = y1 - y0
 

@@ -1,27 +1,40 @@
+from multiprocessing import Pool
+from typing import List
+
 import cv2
 import numpy as np
-from typing import List
-from multiprocessing import Pool
 
 from .Filter import Filter
 
 
 class MotionTracking(Filter):
     def __init__(self):
+        """
+        Initializes the MotionTracking filter.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
         super().__init__()  # Call the constructor of the parent class (Filter)
 
-    def apply(self, first_frame : np.ndarray, second_frame : np.ndarray,
+    def apply(self, first_frame: np.ndarray, second_frame: np.ndarray,
               processes_limit: int, pool: Pool) -> List[np.ndarray]:
         """
-        Simple motion tracking with absolute difference
-        :param first_frame: np.ndarray of pixels - Input frame as a NumPy array
-        :param second_frame: np.ndarray of pixels - Next frame as a NumPy array
-        :param processes_limit: we'll try to parallel it later
-        :param pool: processes pool
-        :return:List containing the edited frame as a NumPy array
-        """
+        Applies simple motion tracking with absolute difference.
 
-        # compute the absolute difference between the current frame and
+        Args:
+            first_frame (np.ndarray): Input frame as a NumPy array.
+            second_frame (np.ndarray): Next frame as a NumPy array.
+            processes_limit (int): Number of processes to use.
+            pool (Pool): Pool of processes.
+
+        Returns:
+            List[np.ndarray]: List containing the edited frame as a NumPy array.
+        """
+        # Compute the absolute difference between the current frame and the next frame
         diff = cv2.absdiff(first_frame, second_frame)
 
         # Apply GaussianBlur to reduce noise
@@ -30,21 +43,20 @@ class MotionTracking(Filter):
         # Convert images to grayscale
         gray = cv2.cvtColor(blur, cv2.COLOR_BGR2GRAY)
 
-        # dilate the thresholded image to fill in holes, then find contours
-        # on thresholded image
+        # Dilate the thresholded image to fill in holes, then find contours
         _, thresh = cv2.threshold(gray, 30, 255, cv2.THRESH_BINARY)
         dilated = cv2.dilate(thresh.copy(), None, iterations=3)
         contours, _ = cv2.findContours(dilated, cv2.RETR_EXTERNAL,
                                        cv2.CHAIN_APPROX_SIMPLE)
 
         bboxes = []
-        # loop over the contours
+        # Loop over the contours
         for contour in contours:
-            # if the contour is too small, ignore it
+            # If the contour is too small, ignore it
             if cv2.contourArea(contour) < 8000:
                 continue
 
-            # compute the bounding box for the contour
+            # Compute the bounding box for the contour
             (x, y, w, h) = cv2.boundingRect(contour)
             bboxes.append((x, y, w, h))
 
@@ -54,6 +66,7 @@ class MotionTracking(Filter):
             x1, y1, w1, h1 = bboxes[i]
             for j in range(i + 1, len(bboxes)):
                 x2, y2, w2, h2 = bboxes[j]
+
                 # Calculate the area of the first bounding box
                 area1 = w1 * h1
 
@@ -85,4 +98,5 @@ class MotionTracking(Filter):
         for i in sorted(set(range(len(bboxes))) - suppress):
             x, y, w, h = bboxes[i]
             cv2.rectangle(first_frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
         return [first_frame]

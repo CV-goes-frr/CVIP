@@ -1,11 +1,16 @@
-import numpy as np
 from multiprocessing import Pool
+
+import numpy as np
 
 from .Filter import Filter
 from .MotionTracking import MotionTracking
 
 
+
 class VideoEditor(Filter):
+    """
+    Class for editing videos.
+    """
 
     def __init__(self):
         super().__init__()
@@ -13,15 +18,19 @@ class VideoEditor(Filter):
     @staticmethod
     def apply(frames: np.ndarray, processes_limit: int, pool: Pool, filter: type, num_frames: int, width: int, height: int):
         """
-        Class for video
-        :param frames: Array of frames
-        :param processes_limit: we'll try to parallel it later
-        :param pool: processes pool
-        :param filter: filter that we use to our video
-        :param num_frames: videos number of frames
-        :param width: video's width
-        :param height: video's height
-        :return:
+        Applies a filter to a sequence of video frames.
+
+        Args:
+            frames (np.ndarray): Array of frames.
+            processes_limit (int): Number of processes for parallelization.
+            pool (Pool): Process pool.
+            filter (type): Filter to apply to the frames.
+            num_frames (int): Number of frames in the video.
+            width (int): Width of the video.
+            height (int): Height of the video.
+
+        Returns:
+            List: Edited frames.
         """
         print("Start VideoEditor")
         output = np.empty((num_frames, height, width, 3), np.uint8)  # Create array of frames

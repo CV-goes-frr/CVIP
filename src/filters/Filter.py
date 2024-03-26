@@ -1,10 +1,15 @@
 class Filter:
-
     def __init__(self):
         """
-        Handmade caching parameters for optimizing Filters that are called many times.
-        cache - for manually storing some of the results.
-        log - a message that is called before calling an operation.
+        Initializes the Filter object.
+
+        Attributes:
+            calls_counter (int): Counter to track the number of calls to the filter.
+            cache (list): List to manually store some of the results.
+            log (str): Message that is printed before calling an operation.
+
+        Returns:
+            None
         """
         self.calls_counter: int = 0
         self.cache: list = []
@@ -12,8 +17,9 @@ class Filter:
 
     def start_log(self):
         """
-        A method that is inherited and can be called for every operation.
+        Prints the log message.
 
-        :return: the log we redefined for the operation (or the default)
+        Returns:
+            str: The log message defined for the operation (or the default).
         """
         print(self.log)

@@ -1,16 +1,26 @@
 import re
 
-from .exceptions.WrongParameters import WrongParametersException
 from .exceptions.WrongFiltername import WrongFilterNameException
+from .exceptions.WrongParameters import WrongParametersException
 
 
 class VerifyArgs:
 
     def __init__(self, args: str):
+        """
+        Initializes VerifyArgs object with args and its name.
+
+        Args:
+            args (str): Arguments string.
+        """
         self.args: str = args
         self.name: str = args[0]
 
     def check(self):
+        """
+        Checks the filter name and its parameters based on the name.
+        Raises exceptions for wrong parameters or filter name.
+        """
         # Check the filter name and its parameters based on the name
         match self.name:
             case 'crop':
