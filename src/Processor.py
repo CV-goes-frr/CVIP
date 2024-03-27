@@ -18,7 +18,7 @@ from .filters.VideoEditor import VideoEditor
 
 class Processor:
 
-    def init(self, processes_limit: int, video_editing: bool):
+    def __init__(self, processes_limit: int, video_editing: bool):
         """
         Initializes Processor object with processes_limit and video_editing flag.
 
