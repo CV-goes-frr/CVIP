@@ -1,5 +1,4 @@
 import cv2
-import numpy as np
 
 def overlay_videos(video_path_1, video_path_2, output_path, resize_factor=4, x_offset=10, y_offset=10):
     cap1 = cv2.VideoCapture(video_path_1)
@@ -13,14 +12,12 @@ def overlay_videos(video_path_1, video_path_2, output_path, resize_factor=4, x_o
     height2 = int(cap2.get(cv2.CAP_PROP_FRAME_HEIGHT))
     fps2 = cap2.get(cv2.CAP_PROP_FPS)
 
-    total_frames = min(int(cap1.get(cv2.CAP_PROP_FRAME_COUNT)), int(cap2.get(cv2.CAP_PROP_FRAME_COUNT)))
-
     fps = min(fps1, fps2)
 
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     out = cv2.VideoWriter(output_path, fourcc, fps, (width1, height1))
 
-    for _ in range(total_frames):
+    while True:
         ret1, frame1 = cap1.read()
         ret2, frame2 = cap2.read()
 
@@ -34,16 +31,6 @@ def overlay_videos(video_path_1, video_path_2, output_path, resize_factor=4, x_o
 
         out.write(frame1)
 
-    # If one video is longer, continue processing frames until both videos are exhausted
-    while ret1 or ret2:
-        if ret1:
-            ret1, frame1 = cap1.read()
-            out.write(frame1)
-        if ret2:
-            ret2, frame2 = cap2.read()
-            frame2 = np.zeros((height2, width2, 3), dtype=np.uint8)  # Black screen
-            out.write(frame1)
-
     cap1.release()
     cap2.release()
     out.release()
@@ -54,8 +41,4 @@ video_path_1 = "./media/jerry1.mp4"
 video_path_2 = "./media/minion.mp4"
 output_path = "output_video.mp4"
 
-resize_factor = int(input("Enter the resize factor for the second video: "))
-x_offset = int(input("Enter the x coordinate for the left upper corner of the second video: "))
-y_offset = int(input("Enter the y coordinate for the left upper corner of the second video: "))
-
-overlay_videos(video_path_1, video_path_2, output_path, resize_factor, x_offset, y_offset)
+overlay_videos(video_path_1, video_path_2, output_path, 4, 10, 10)
