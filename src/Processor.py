@@ -111,7 +111,7 @@ class Processor:
                 self.label_in_map[label].start_log()
                 if self.video_editing:  # applying filter frame by frame with VideoEditor class
                     res = VideoEditor.apply(prev_res, self.processes_limit, self.pool, self.label_in_map[label],
-                                            self.num_frames, self.width, self.height)
+                                            self.num_frames)
                 else:  # apply operation for the image
                     res = self.label_in_map[label].apply(prev_res, self.processes_limit, self.pool)
                 for r in res:
