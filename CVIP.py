@@ -14,6 +14,7 @@ from src.exceptions.WrongFileFormat import WrongFileFormatException
 from src.exceptions.WrongFilename import WrongFilenameException
 from src.exceptions.WrongFiltername import WrongFilterNameException
 from src.exceptions.WrongParameters import WrongParametersException
+from src.filters.VideoToPanorama import VideoToPanorama
 
 
 def main():
@@ -96,6 +97,8 @@ def main():
 
             pars = Parser(args.actions, process_lim)
             proc = pars.parse(video_editing=False)
+            if sum(isinstance(x, VideoToPanorama) for x in proc.label_in_map.values()):
+                proc.video_editing = True
 
             start: float = time.time()
             print("\nPROCESSING...\n")
