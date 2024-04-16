@@ -1,8 +1,8 @@
 import cv2
 import numpy as np
 
-image1 = cv2.imread("./media/one.jpg")
-image2 = cv2.imread("./media/two.jpg")
+image1 = cv2.imread("../../resources/book1.jpg")
+image2 = cv2.imread("../../resources/book2.jpg")
 
 # Apply GaussianBlur to reduce noise
 gray1 = cv2.GaussianBlur(image1, (5, 5), 0)
