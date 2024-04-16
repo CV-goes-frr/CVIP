@@ -9,6 +9,7 @@ from .Filter import Filter
 class VideoToPanorama(Filter):
     def __init__(self):
         super().__init__()
+        self.log = "CREATING PANORAMA FROM VIDEO IN PROCESS..."
 
     def apply(self, frames: np.ndarray, processes_limit: int, pool: Pool) -> np.ndarray:
         # print(frames.shape)

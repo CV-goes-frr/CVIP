@@ -26,6 +26,7 @@ class FaceBlurrer(Filter):
             None
         """
         super().__init__()  # Call the constructor of the parent class (Filter)
+        self.log = "OUTLINING FACE SILHOUETTE AND APPLYING BLUR..."
         self.detector = dlib.get_frontal_face_detector()  # Initialize the face detector
         self.predictor = dlib.shape_predictor(PREDICTOR_PATH)  # Initialize the face landmarks predictor
         self.coef = int(coef)  # Convert the coefficient to an integer
@@ -44,7 +45,6 @@ class FaceBlurrer(Filter):
             List[np.ndarray]: List containing the edited image as a NumPy array.
         """
 
-        print("OUTLINING FACE SILHOUETTE AND APPLYING BLUR...")
         if self.cache:  # Check if a cached result exists
             print("USING CACHE...")
             return self.cache  # Return the cached result
