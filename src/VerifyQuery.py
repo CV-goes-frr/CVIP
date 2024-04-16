@@ -168,7 +168,7 @@ class VerifyQuery:
         """
 
         filenames = VerifyQuery.get_filenames_and_labels(string)
-        formats = ["png", "jpeg", "jpg"]
+        formats = ["png", "jpeg", "jpg", "mp4"]
         for filename in filenames:
             if "." in filename:
                 format = filename.split(".")[-1]

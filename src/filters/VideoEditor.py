@@ -4,7 +4,7 @@ import numpy as np
 
 from .Filter import Filter
 from .MotionTracking import MotionTracking
-
+from .VideoToPanorama import VideoToPanorama
 
 
 class VideoEditor(Filter):
@@ -41,6 +41,8 @@ class VideoEditor(Filter):
                 output[index, :, :, :] = n_frame[0]  # Add edited frame to array
 
             output[len(frames) - 1, :, :, :] = frames[-1]  # last frame but without detection
+        elif type(filter) is VideoToPanorama:
+            output = filter.apply(frames, processes_limit, pool)
         else:
             index = 0  # index of frame
             for frame in frames:

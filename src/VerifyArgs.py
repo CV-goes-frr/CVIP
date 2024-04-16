@@ -79,6 +79,10 @@ class VerifyArgs:
                 if len(self.args) != 1:
                     raise WrongParametersException(self.name, str(self.args[1:]))
 
+            case 'panorama':
+                if len(self.args) != 1:
+                    raise WrongParametersException(self.name, str(self.args[1:]))
+
             case _:
                 # If the filter name is not recognized, raise an exception
                 raise WrongFilterNameException(self.name)
