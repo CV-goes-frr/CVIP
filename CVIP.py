@@ -54,7 +54,7 @@ def main():
                 process_lim = args.parallel_processes
 
             # Checking prompt correctness
-            # VerifyQuery.check(args.actions)  # if something is wrong exceptions will occur
+            VerifyQuery.check(args.actions)  # if something is wrong exceptions will occur
 
             pars = Parser(args.actions, process_lim)
             proc = pars.parse(video_editing=True)
