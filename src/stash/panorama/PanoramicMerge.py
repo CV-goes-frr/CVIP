@@ -74,9 +74,9 @@ class PanoramicMerge:
 
 
 def main():
-    imageR = cv2.imread("../../stash/media/test2.png")
-    imageL = cv2.imread("../../stash/media/test1.png")
-    cv2.imwrite("../../stash/media/panorama.png", PanoramicMerge.process(imageL, imageR))
+    imageR = cv2.imread("../media/test2.png")
+    imageL = cv2.imread("../media/test1.png")
+    cv2.imwrite("../media/panorama.png", PanoramicMerge.process(imageL, imageR))
 
 
 if __name__ == "__main__":

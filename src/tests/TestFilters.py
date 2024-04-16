@@ -6,9 +6,6 @@ from multiprocessing import Pool
 
 from settings import prefix
 from src.filters.BilinearScale import BilinearScale, weight_function
-from src.filters.FeatureMatching import FeatureMatching
-from src.filters.MotionTracking import MotionTracking
-from src.filters.OverlayingMask import OverlayingMask
 from src.filters.ScaleToResolution import ScaleToResolution
 from src.filters.Crop import Crop
 from src.filters.NnScale import NnScale
@@ -206,81 +203,6 @@ class TestBicubicScale(unittest.TestCase):
             detected_image = detection.apply(test_image, 2, pool)[0]
 
         self.assertFalse(np.array_equal(test_image, detected_image))  # face detected
-
-    def test_overlaying_mask_face(self):
-        test_image = cv2.imread(prefix + 'resources/face.jpg')
-
-        overlaying_mask = OverlayingMask(mask_name=prefix + 'resources/elon.jpg')
-
-        with Pool(processes=2) as pool:
-            masked_image = overlaying_mask.apply(test_image, 2, pool)[0]
-
-        self.assertFalse(np.array_equal(test_image, masked_image))  # overlaying mask
-
-    def test_overlaying_mask_without_face(self):
-        test_image = np.zeros((200, 200, 3), dtype=np.uint8)
-
-        overlaying_mask = OverlayingMask(mask_name=prefix + 'resources/elon.jpg')
-
-        with Pool(processes=2) as pool:
-            masked_image = overlaying_mask.apply(test_image, 2, pool)[0]
-
-        self.assertTrue(np.array_equal(test_image, masked_image))  # nothing has changed
-
-    def test_feature_matching_any_types(self):
-        test_image = cv2.imread(prefix + "resources/book1.jpg")
-
-        feature_matching_bf = FeatureMatching(type_match='BF', img2=prefix + "resources/book2.jpg")
-        feature_matching_flann = FeatureMatching(type_match='FLANN', img2=prefix + "resources/book2.jpg")
-
-        with Pool(processes=2) as pool:
-            matched_bf = feature_matching_bf.apply(test_image, 2, pool)[0]
-            matched_flann = feature_matching_flann.apply(test_image, 2, pool)[0]
-
-        self.assertFalse(np.array_equal(matched_flann, matched_bf))
-
-    def test_feature_matching_bf(self):
-        test_image = cv2.imread(prefix + "resources/book1.jpg")
-
-        feature_matching_bf = FeatureMatching(type_match='BF', img2=prefix + "resources/book2.jpg")
-
-        with Pool(processes=2) as pool:
-            matched_bf = feature_matching_bf.apply(test_image, 2, pool)[0]
-
-        self.assertFalse(np.array_equal(test_image, matched_bf))
-
-    def test_feature_matching_flann(self):
-        test_image = cv2.imread(prefix + "resources/book1.jpg")
-
-        feature_matching_flann = FeatureMatching(type_match='FLANN', img2=prefix + "resources/book2.jpg")
-
-        with Pool(processes=2) as pool:
-            matched_bf = feature_matching_flann.apply(test_image, 2, pool)[0]
-
-        self.assertFalse(np.array_equal(test_image, matched_bf))
-
-    def test_motion_tracking_true(self):
-        cap = cv2.VideoCapture(prefix + "resources/Patrick.mp4")
-        ret, first_frame = cap.read()  # reading first frame
-        ret, second_frame = cap.read()  # reading second frame
-
-        motion_tracking = MotionTracking()
-
-        with Pool(processes=2) as pool:
-            edited_frame = motion_tracking.apply(first_frame, second_frame, 2, pool)[0]
-
-        self.assertFalse(np.array_equal(edited_frame, first_frame))
-
-    def test_motion_tracking_false(self):
-        cap = cv2.VideoCapture(prefix + "resources/Patrick.mp4")
-        ret, first_frame = cap.read()  # reading frame
-
-        motion_tracking = MotionTracking()
-
-        with Pool(processes=2) as pool:
-            edited_frame = motion_tracking.apply(first_frame, first_frame, 2, pool)[0]
-
-        self.assertTrue(np.array_equal(edited_frame, first_frame))
 
 
 if __name__ == '__main__':

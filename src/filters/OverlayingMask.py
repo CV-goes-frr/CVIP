@@ -25,7 +25,7 @@ class OverlayingMask(Filter):
         Returns:
             None
         """
-        super().__init__()  # Call the constructor of the parent class (Filter)
+        super().init()  # Call the constructor of the parent class (Filter)
         self.log = "OVERLAYING MASKING IN PROGRESS..."
 
         # Initialize the face detector and shape predictor
