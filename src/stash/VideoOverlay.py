@@ -4,23 +4,17 @@ import math
 
 
 def overlay_videos(video_path_1, video_path_2, output_path, resize_factor=4, x_offset=10, y_offset=10, longest=True):
-    cap1 = cv2.VideoCapture(video_path_1)
-    cap2 = cv2.VideoCapture(video_path_2)
-
-    width1 = int(cap1.get(cv2.CAP_PROP_FRAME_WIDTH))
-    height1 = int(cap1.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    cap1, cap2 = cv2.VideoCapture(video_path_1), cv2.VideoCapture(video_path_2)
+    width1, height1 = int(cap1.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap1.get(cv2.CAP_PROP_FRAME_HEIGHT))
     fps1 = cap1.get(cv2.CAP_PROP_FPS)
     total_frames1 = cap1.get(cv2.CAP_PROP_FRAME_COUNT)
 
-    width2 = int(cap2.get(cv2.CAP_PROP_FRAME_WIDTH))
-    height2 = int(cap2.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    width2, height2 = int(cap2.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap2.get(cv2.CAP_PROP_FRAME_HEIGHT))
     fps2 = cap2.get(cv2.CAP_PROP_FPS)
     total_frames2 = cap2.get(cv2.CAP_PROP_FRAME_COUNT)
 
-    duration1 = total_frames1 / fps1
-    duration2 = total_frames2 / fps2
-    longest_Video = cap1 if duration1 >= duration2 else cap2
-    shortest_Video = cap2 if duration2 < duration1 else cap1
+    duration1, duration2 = total_frames1 / fps1, total_frames2 / fps2
+    longest_Video, shortest_Video = cap1 if duration1 >= duration2 else cap2, cap2 if duration2 < duration1 else cap1
     longest_Video_cap1 = duration1 >= duration2
     fps_ratio = math.ceil(shortest_Video.get(cv2.CAP_PROP_FPS) / longest_Video.get(cv2.CAP_PROP_FPS))
 
@@ -29,8 +23,7 @@ def overlay_videos(video_path_1, video_path_2, output_path, resize_factor=4, x_o
     else:
         out = np.empty((int(shortest_Video.get(cv2.CAP_PROP_FRAME_COUNT)), height1, width1, 3), np.uint8)
     frames_count = 0
-    prev_frame = None
-    prev_ret = None
+    prev_ret, prev_frame = None, None
     while True:
         if longest_Video_cap1:
             if frames_count % fps_ratio == 0:
@@ -78,8 +71,8 @@ def overlay_videos(video_path_1, video_path_2, output_path, resize_factor=4, x_o
     print("Overlay completed successfully!")
 
 
-video_path_2 = "./media/jerry1.mp4"
-video_path_1 = "./media/minion.mp4"
+video_path_1 = "./media/jerry1.mp4"
+video_path_2 = "./media/minion.mp4"
 output_path = "output_video.mp4"
 
-overlay_videos(video_path_1, video_path_2, output_path, 4, 10, 10, True)
+overlay_videos(video_path_1, video_path_2, output_path, 4, 10, 10, False)
