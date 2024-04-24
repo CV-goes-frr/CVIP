@@ -5,6 +5,7 @@ import numpy as np
 from .Filter import Filter
 from .MotionTracking import MotionTracking
 from .VideoToPanorama import VideoToPanorama
+from .VideoOverlay import VideoOverlay
 
 
 class VideoEditor(Filter):
@@ -15,8 +16,10 @@ class VideoEditor(Filter):
     def __init__(self):
         super().__init__()
 
+
     @staticmethod
-    def apply(frames: np.ndarray, processes_limit: int, pool: Pool, filter: type, num_frames: int):
+    def apply(frames: np.ndarray, processes_limit: int, pool: Pool, filter: type,
+              num_frames: int, width, height, fps):
         """
         Applies a filter to a sequence of video frames.
 
@@ -46,6 +49,9 @@ class VideoEditor(Filter):
             output[len(frames) - 1, :, :, :] = frames[-1]  # last frame but without detection
         elif type(filter) is VideoToPanorama:
             output = filter.apply(frames, processes_limit, pool)
+        elif type(filter) is VideoOverlay:
+            output = filter.apply(frames, width, height, fps,
+                                  num_frames, processes_limit, pool)
         else:
             index = 0  # index of frame
             for frame in frames:
