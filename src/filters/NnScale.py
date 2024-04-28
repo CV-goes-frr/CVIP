@@ -17,6 +17,7 @@ class NnScale(Filter):
             None
         """
         super().__init__()  # Call the constructor of the parent class (Filter)
+        self.log = "NN SCALE IN PROGRESS..."
         self.scale_factor: float = float(scale_factor)
 
     def apply(self, img: np.ndarray, processes_limit: int, pool: Pool) -> List[np.ndarray]:
@@ -31,7 +32,7 @@ class NnScale(Filter):
         Returns:
             List[np.ndarray]: List containing the edited image as a NumPy array.
         """
-        print("NN SCALE IN PROGRESS...")
+
         if self.cache:  # Check if a cached result exists
             print("USING CACHE...")
             return self.cache  # Return the cached result

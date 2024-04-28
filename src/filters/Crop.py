@@ -21,6 +21,7 @@ class Crop(Filter):
             None
         """
         super().__init__()  # Call the constructor of the parent class (Filter)
+        self.log = "CROP IN PROGRESS..."
         self.x_1: int = int(x_1)  # Convert x_1 to an integer
         self.y_1: int = int(y_1)  # Convert y_1 to an integer
         self.x_2: int = int(x_2)  # Convert x_2 to an integer
@@ -38,7 +39,7 @@ class Crop(Filter):
         Returns:
             List[np.ndarray]: List containing the cropped image as a NumPy array.
         """
-        print("CROP IN PROGRESS...")
+
         if self.cache:  # Check if a cached result exists
             print("USING CACHE...")
             return self.cache  # Return the cached result

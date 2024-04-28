@@ -20,6 +20,7 @@ class BilinearScale(Filter):
             None
         """
         super().__init__()  # Call the constructor of the parent class (Filter)
+        self.log = "BILINEAR SCALE IN PROGRESS..."
         self.scale_factor: float = float(scale_factor)  # Initialize the scale_factor attribute with the given value
 
     def apply(self, img: np.ndarray, processes_limit: int, pool: Pool) -> List[np.ndarray]:
@@ -34,7 +35,7 @@ class BilinearScale(Filter):
         Returns:
             List[np.ndarray]: List containing the scaled image as a NumPy array.
         """
-        print("BILINEAR SCALE IN PROGRESS...")
+
         if self.cache:  # Check if a cached result exists
             print("USING CACHE...")
             return self.cache  # Return the cached result

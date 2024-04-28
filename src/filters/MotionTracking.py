@@ -19,6 +19,7 @@ class MotionTracking(Filter):
             None
         """
         super().__init__()  # Call the constructor of the parent class (Filter)
+        self.log = "MOTION TRACKING IN PROGRESS..."
 
     def apply(self, first_frame: np.ndarray, second_frame: np.ndarray,
               processes_limit: int, pool: Pool) -> List[np.ndarray]:
