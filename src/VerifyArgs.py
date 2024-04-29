@@ -84,7 +84,13 @@ class VerifyArgs:
                     raise WrongParametersException(self.name, str(self.args[1:]))
 
             case 'video_overlay':
-                pass
+                if len(self.args) != 6:
+                    raise WrongParametersException(self.name, str(self.args[1:]))
+                for param in self.args[2:]:
+                    if not re.match(r'^[0-9]+$', param):
+                        raise WrongParametersException(self.name, param)
+                if self.args[5] != "0" and self.args[5] != "1":
+                    raise WrongParametersException(self.name, self.args[5])
 
             case _:
                 # If the filter name is not recognized, raise an exception
