@@ -2,6 +2,7 @@ import argparse
 import cv2
 import time
 from multiprocessing import freeze_support
+from moviepy.editor import VideoFileClip
 
 from settings import prefix
 from src.Parser import Parser
@@ -74,6 +75,12 @@ def main():
 
                 out.release()  # It's necessary
 
+                # merge the audio
+                video = VideoFileClip(f'{prefix}/{fin}.mp4')
+                video.without_audio()
+                video_merged = video.set_audio(proc.audio)
+                video_merged.write_videofile(f'{prefix}/{fin}.mp4')
+
             end: float = time.time()
             print(f"\nALL TASKS WERE COMPLETED\nTIME ELAPSED: {end - start}\n")
 
@@ -114,6 +121,7 @@ def main():
             print("\n\n!!! Error occurred !!!\n" + str(e) + "\n")
         except FileNotFoundError as e:
             print("\n\n!!! Error occurred !!!\n" + str(e) + "\n")
+
 
 if __name__ == "__main__":
     main()
