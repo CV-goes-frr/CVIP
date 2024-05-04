@@ -90,7 +90,7 @@ class Processor:
                 self.fps = int(cap.get(cv2.CAP_PROP_FPS))
                 self.num_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
                 self.audio = VideoFileClip(f'{prefix}/{prev_label[3::]}').audio
-                print(self.audio)
+                # print(self.audio)
 
                 # create prev_result
                 prev_result = [np.empty((self.num_frames, self.height, self.width, 3), np.uint8)]

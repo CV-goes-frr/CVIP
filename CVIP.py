@@ -1,4 +1,6 @@
 import argparse
+import os
+
 import cv2
 import time
 from multiprocessing import freeze_support
@@ -68,7 +70,7 @@ def main():
             print("\nPROCESSING...\n")
             for fin in proc.fin_labels:
                 res_images_list = proc.process(fin)
-                out = cv2.VideoWriter(f'{prefix}/{fin}.mp4', fourcc, proc.fps, (proc.width, proc.height))
+                out = cv2.VideoWriter(f'{prefix}/{fin}_.mp4', fourcc, proc.fps, (proc.width, proc.height))
                 # write result frame by frame
                 for value in res_images_list[0]:
                     out.write(value)
@@ -76,10 +78,11 @@ def main():
                 out.release()  # It's necessary
 
                 # merge the audio
-                video = VideoFileClip(f'{prefix}/{fin}.mp4')
+                video = VideoFileClip(f'{prefix}/{fin}_.mp4')
                 video.without_audio()
                 video_merged = video.set_audio(proc.audio)
                 video_merged.write_videofile(f'{prefix}/{fin}.mp4')
+                os.remove(f'{prefix}/{fin}_.mp4')
 
             end: float = time.time()
             print(f"\nALL TASKS WERE COMPLETED\nTIME ELAPSED: {end - start}\n")
