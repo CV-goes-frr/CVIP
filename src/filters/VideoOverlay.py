@@ -38,22 +38,22 @@ class VideoOverlay(Filter):
         twice = denominator - rest
 
         if twice == rest:
-            period = 0
+            period = 1
         # When output fps = input fps * 2
         elif twice == 0:
             return list(input_frames)
         # So output fps is equal input fps
         else:
-            period = int(rest / twice)
+            period = int(round(rest / twice))
         # Once in period of frames we will multiply this frames
 
         output_frames = []
         # List of frames
-        temp = period + 1
+        temp = period
         for i in range(num_frames):
             temp = temp - 1
             if temp == 0:
-                temp = period + 1
+                temp = period
                 for j in range(math.ceil(out_fps / in_fps)):
                     output_frames.append(input_frames[i])
                     # This frame needs to multiply one more than the others
@@ -79,7 +79,7 @@ class VideoOverlay(Filter):
             rest = out_fps // gcd
             delete = denominator - rest
 
-            period = int(rest / delete)
+            period = int(round(rest / delete))
             # Once in period of frames we will delete a frame
             output_frames = []
             # List of frames
@@ -101,7 +101,7 @@ class VideoOverlay(Filter):
 
             print(denominator, rest, delete)
 
-            period = int(delete / rest)
+            period = int(round(delete / rest))
             # Once in period of frames we will multiply this frames
             output_frames = []
 
@@ -121,6 +121,7 @@ class VideoOverlay(Filter):
         # Information about video2
         width2, height2 = int(cap2.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap2.get(cv2.CAP_PROP_FRAME_HEIGHT))
         fps2 = int(round(cap2.get(cv2.CAP_PROP_FPS)))
+        fps1 = int(round(fps1))
         total_frames2 = cap2.get(cv2.CAP_PROP_FRAME_COUNT)
         biggest_fps1 = fps1 >= fps2
         # If biggest_fps1 == True, then increaseFps, else decreaseFps
@@ -138,13 +139,8 @@ class VideoOverlay(Filter):
 
         duration1, duration2 = num_frames1 / fps1, total_frames2 / fps2
 
-        longest_video, shortest_video = ((video1, fps1, width1, height1, num_frames1) if duration1 >= duration2 else (
-            video2, fps2, width2, height2, total_frames2),
-                                         (video2, fps2, width2, height2, total_frames2) if duration2 < duration1 else (
-                                             video1, fps1, width1, height1, num_frames1))
-
         longest_video_cap1 = duration1 >= duration2
-        fps_ratio = math.ceil(fps1 / fps2)
+        fps_ratio = fps1/fps2
 
         if biggest_fps1:
             video2 = self.increaseFps(video2, fps2, fps1, int(total_frames2))
@@ -155,14 +151,14 @@ class VideoOverlay(Filter):
 
         if self.longest:
             if longest_video_cap1:
-                out = np.empty((int(longest_video[4]), height1, width1, 3), np.uint8)
+                out = np.empty((int(num_frames1), height1, width1, 3), np.uint8)
             else:
-                out = np.empty((int(longest_video[4] * fps_ratio), height1, width1, 3), np.uint8)
+                out = np.empty((int(math.ceil(total_frames2 * fps_ratio)), height1, width1, 3), np.uint8)
         else:
             if longest_video_cap1:
-                out = np.empty((int(shortest_video[4]), height1, width1, 3), np.uint8)
+                out = np.empty((int(math.ceil(total_frames2 * fps_ratio)), height1, width1, 3), np.uint8)
             else:
-                out = np.empty((int(shortest_video[4]), height1, width1, 3), np.uint8)
+                out = np.empty((int(num_frames1), height1, width1, 3), np.uint8)
         # Create output np.array
 
         frames_count = 0
