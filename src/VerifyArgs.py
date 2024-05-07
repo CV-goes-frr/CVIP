@@ -89,7 +89,9 @@ class VerifyArgs:
                 for param in self.args[2:]:
                     if not re.match(r'^[0-9]+$', param):
                         raise WrongParametersException(self.name, param)
-                if self.args[5] != "0" and self.args[5] != "1":
+                if int(self.args[2]) < 1:
+                    raise WrongParametersException(self.name, self.args[2])
+                if int(self.args[5]) != 0 and int(self.args[5]) != 1:
                     raise WrongParametersException(self.name, self.args[5])
 
             case _:
