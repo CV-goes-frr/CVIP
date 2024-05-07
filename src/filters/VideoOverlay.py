@@ -117,6 +117,7 @@ class VideoOverlay(Filter):
 
     def apply(self, video1: np.ndarray, width1, height1, fps1, num_frames1, processes_limit: int,
               pool: Pool) -> np.ndarray:
+
         cap2 = cv2.VideoCapture(f'{prefix}/{self.video_path2}')
         # Information about video2
         width2, height2 = int(cap2.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap2.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -124,8 +125,11 @@ class VideoOverlay(Filter):
         fps1 = int(round(fps1))
         total_frames2 = cap2.get(cv2.CAP_PROP_FRAME_COUNT)
         biggest_fps1 = fps1 >= fps2
-        # If biggest_fps1 == True, then increaseFps, else decreaseFps
 
+        if width1 < width2 // self.resize_factor or height1 < height1 // self.resize_factor:
+            raise ValueError
+
+        # If biggest_fps1 == True, then increaseFps, else decreaseFps
         video2 = []
         # List of frames
         while True:
