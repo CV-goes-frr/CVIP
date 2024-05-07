@@ -10,7 +10,25 @@ from .Filter import Filter
 
 
 class VideoOverlay(Filter):
-    def __init__(self, path_to_vid2, resize_factor, x_offset, y_offset, longest):
+    def __init__(self,
+                 path_to_vid2: str,
+                 resize_factor: int,
+                 x_offset: int,
+                 y_offset: int,
+                 longest: int):
+        """
+            Initializes the VideoOverlay filter.
+
+            Args:
+                path_to_vid2 (str): Path to overlay's video.
+                resize_factor (int): How many times decrease the overlay's video.
+                x_offset (int): Offset overlay's video by x.
+                y_offset (int): Offset overlay's video by y.
+                longest (int): If longest == 1 then overlay by longest video else the other way around.
+
+            Returns:
+                None
+        """
         super().__init__()
         self.log = "OVERLAYING VIDEOS IN PROCESS..."
         self.video_path2 = path_to_vid2
@@ -20,9 +38,23 @@ class VideoOverlay(Filter):
         self.longest = bool(int(longest))
 
     @staticmethod
-    def increaseFps(input_frames: np.ndarray, in_fps: int, out_fps: int, num_frames: int) -> list[Any]:
-        # This method increases amount of frames to new fps
-        # We need to increase the number of frames in the ratio of the output frames to the input frames
+    def increaseFps(input_frames: np.ndarray,
+                    in_fps: int,
+                    out_fps: int,
+                    num_frames: int) -> list[Any]:
+        """
+            This method increases amount of frames to new fps.
+            We need to increase the number of frames in the ratio of the output frames to the input frames.
+
+            Args:
+                input_frames (np.ndarray): Frames of the video where we change the FPS.
+                in_fps (int): Initial fps.
+                out_fps (int): Final fps.
+                num_frames (int): Amount of frames of initial video
+
+            Returns:
+                List[np.ndarray]: List containing the edited amount of frames as a NumPy array.
+        """
 
         fps = out_fps
         # If out_fps * 2 < in_fps then the ratio doesn't change just will be an extra integer
@@ -64,9 +96,23 @@ class VideoOverlay(Filter):
         return output_frames
 
     @staticmethod
-    def decreaseFps(input_frames: np.ndarray, in_fps: int, out_fps: int, num_frames: int) -> list[Any]:
-        # This method decreases amount of frames to new fps
-        # We need to decrease the number of frames in the ratio of the output frames to the input frames
+    def decreaseFps(input_frames: np.ndarray,
+                    in_fps: int,
+                    out_fps: int,
+                    num_frames: int) -> list[Any]:
+        """
+            This method decreases amount of frames to new fps.
+            We need to decrease the number of frames in the ratio of the output frames to the input frames.
+
+            Args:
+                input_frames (np.ndarray): Frames of the video where we change the FPS.
+                in_fps (int): Initial fps.
+                out_fps (int): Final fps.
+                num_frames (int): Amount of frames of initial video
+
+            Returns:
+                List[np.ndarray]: List containing the edited amount of frames as a NumPy array.
+        """
 
         gcd = math.gcd(out_fps, in_fps)
 
@@ -115,8 +161,25 @@ class VideoOverlay(Filter):
 
         return output_frames
 
-    def apply(self, video1: np.ndarray, width1, height1, fps1, num_frames1, processes_limit: int,
+    def apply(self, video1: np.ndarray,
+              width1: int, height1: int, fps1: float, num_frames1: int, processes_limit: int,
               pool: Pool) -> np.ndarray:
+        """
+            Applies VideoOverlay filter to the input video.
+
+            Args:
+                video1 (np.ndarray): Frames of the video where we use VideoOverlay.
+                width1 (int): Width of video1.
+                height1 (int): Height of video1.
+                fps1 (float): FPS of video1.
+                num_frames1 (int): Amount of frames of video1.
+                processes_limit (int): Number of processes to use.
+                pool (Pool): Pool of processes.
+
+            Returns:
+                List[np.ndarray]: List containing the edited frames as a NumPy array.
+        """
+
         cap2 = cv2.VideoCapture(f'{prefix}/{self.video_path2}')
         # Information about video2
         width2, height2 = int(cap2.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap2.get(cv2.CAP_PROP_FRAME_HEIGHT))
