@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import time
 from multiprocessing import Pool
+from moviepy.editor import VideoFileClip
 from typing import Dict, List
 
 from settings import prefix
@@ -33,6 +34,7 @@ class Processor:
         self.width = 0
         self.height = 0
         self.fps = 0
+        self.audio = None
 
         self.fin_labels: List[str] = []  # labels to create output files from
         if processes_limit > 4:  # if we create more than 4 processes, we can blow up machines without enough RAM
@@ -87,6 +89,8 @@ class Processor:
                 self.height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
                 self.fps = int(cap.get(cv2.CAP_PROP_FPS))
                 self.num_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+                self.audio = VideoFileClip(f'{prefix}/{prev_label[3::]}').audio
+                # print(self.audio)
 
                 # create prev_result
                 prev_result = [np.empty((self.num_frames, self.height, self.width, 3), np.uint8)]
