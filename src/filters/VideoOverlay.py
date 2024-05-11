@@ -1,21 +1,22 @@
+import cv2
+import numpy as np
+import math
 from multiprocessing import Pool
+from settings import prefix
 from typing import Any
 
-import numpy as np
-import cv2
-import math
-
-from settings import prefix
 from .Filter import Filter
 
 
 class VideoOverlay(Filter):
-    def __init__(self,
-                 path_to_vid2: str,
-                 resize_factor: int,
-                 x_offset: int,
-                 y_offset: int,
-                 longest: int):
+    def __init__(
+            self,
+            path_to_vid2: str,
+            resize_factor: int,
+            x_offset: int,
+            y_offset: int,
+            longest: int
+    ):
         """
             Initializes the VideoOverlay filter.
 
@@ -38,10 +39,12 @@ class VideoOverlay(Filter):
         self.longest = bool(int(longest))
 
     @staticmethod
-    def increaseFps(input_frames: np.ndarray,
-                    in_fps: int,
-                    out_fps: int,
-                    num_frames: int) -> list[Any]:
+    def increaseFps(
+            input_frames: np.ndarray,
+            in_fps: int,
+            out_fps: int,
+            num_frames: int
+    ) -> list[Any]:
         """
             This method increases amount of frames to new fps.
             We need to increase the number of frames in the ratio of the output frames to the input frames.
@@ -96,10 +99,12 @@ class VideoOverlay(Filter):
         return output_frames
 
     @staticmethod
-    def decreaseFps(input_frames: np.ndarray,
-                    in_fps: int,
-                    out_fps: int,
-                    num_frames: int) -> list[Any]:
+    def decreaseFps(
+            input_frames: np.ndarray,
+            in_fps: int,
+            out_fps: int,
+            num_frames: int
+    ) -> list[Any]:
         """
             This method decreases amount of frames to new fps.
             We need to decrease the number of frames in the ratio of the output frames to the input frames.
@@ -161,9 +166,16 @@ class VideoOverlay(Filter):
 
         return output_frames
 
-    def apply(self, video1: np.ndarray,
-              width1: int, height1: int, fps1: float, num_frames1: int, processes_limit: int,
-              pool: Pool) -> np.ndarray:
+    def apply(
+            self,
+            video1: np.ndarray,
+            width1: int,
+            height1: int,
+            fps1: float,
+            num_frames1: int,
+            processes_limit: int,
+            pool: Pool
+    ) -> np.ndarray:
         """
             Applies VideoOverlay filter to the input video.
 
@@ -182,7 +194,8 @@ class VideoOverlay(Filter):
 
         cap2 = cv2.VideoCapture(f'{prefix}/{self.video_path2}')
         # Information about video2
-        width2, height2 = int(cap2.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap2.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        width2, height2 = (int(cap2.get(cv2.CAP_PROP_FRAME_WIDTH)),
+                           int(cap2.get(cv2.CAP_PROP_FRAME_HEIGHT)))
         fps2 = int(round(cap2.get(cv2.CAP_PROP_FPS)))
         fps1 = int(round(fps1))
         total_frames2 = cap2.get(cv2.CAP_PROP_FRAME_COUNT)
@@ -214,14 +227,26 @@ class VideoOverlay(Filter):
 
         if self.longest:
             if longest_video_cap1:
-                out = np.empty((int(num_frames1), height1, width1, 3), np.uint8)
+                out = np.empty(
+                    (int(num_frames1), height1, width1, 3),
+                    np.uint8
+                )
             else:
-                out = np.empty((int(math.ceil(total_frames2 * fps_ratio)), height1, width1, 3), np.uint8)
+                out = np.empty(
+                    (int(math.ceil(total_frames2 * fps_ratio)), height1, width1, 3),
+                    np.uint8
+                )
         else:
             if longest_video_cap1:
-                out = np.empty((int(math.ceil(total_frames2 * fps_ratio)), height1, width1, 3), np.uint8)
+                out = np.empty(
+                    (int(math.ceil(total_frames2 * fps_ratio)), height1, width1, 3),
+                    np.uint8
+                )
             else:
-                out = np.empty((int(num_frames1), height1, width1, 3), np.uint8)
+                out = np.empty(
+                    (int(num_frames1), height1, width1, 3),
+                    np.uint8
+                )
         # Create output np.array
 
         frames_count = 0
@@ -239,17 +264,28 @@ class VideoOverlay(Filter):
                 # When video1 is over, but not video2
                 frame1 = np.zeros((height1, width1, 3), dtype=np.uint8)
                 frame2 = video2[frames_count]
-                frame2_resized = cv2.resize(frame2, (width2 // self.resize_factor, height2 // self.resize_factor))
+                frame2_resized = cv2.resize(
+                    frame2,
+                    (width2 // self.resize_factor,
+                     height2 // self.resize_factor)
+                )
             elif video2.shape[0] <= frames_count < video1.shape[0]:
                 # When video2 is over, but not video1
                 frame1 = video1[frames_count]
-                frame2_resized = np.zeros((height1 // self.resize_factor,
-                                           width1 // self.resize_factor, 3), dtype=np.uint8)
+                frame2_resized = np.zeros(
+                    (height1 // self.resize_factor,
+                     width1 // self.resize_factor, 3),
+                    dtype=np.uint8
+                )
             else:
                 # When video1 and video2 aren't over
                 frame1 = video1[frames_count]
                 frame2 = video2[frames_count]
-                frame2_resized = cv2.resize(frame2, (width2 // self.resize_factor, height2 // self.resize_factor))
+                frame2_resized = cv2.resize(
+                    frame2,
+                    (width2 // self.resize_factor,
+                     height2 // self.resize_factor)
+                )
 
             # Create output frame
             frame1[self.y_offset:self.y_offset + frame2_resized.shape[0],
