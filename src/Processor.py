@@ -119,12 +119,12 @@ class Processor:
                 if self.video_editing:  # applying filter frame by frame with VideoEditor class
                     try:
                         res = VideoEditor.apply(prev_res, self.processes_limit, self.pool, self.label_in_map[label],
-                                            self.num_frames, self.width, self.height, self.fps)
-                    except ValueError:
-                        raise WrongParametersException("video_overlay",
-                                                       "Couldn't match width or height. Check the shape of the second video")
+                                                self.num_frames, self.width, self.height, self.fps)
+                    except ValueError as e:
+                        raise WrongParametersException(type(self.label_in_map[label]), str(e))
                 else:  # apply operation for the image
                     res = self.label_in_map[label].apply(prev_res, self.processes_limit, self.pool)
+
                 for r in res:
                     result.append(r)
 

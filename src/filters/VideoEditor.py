@@ -36,14 +36,14 @@ class VideoEditor(Filter):
             List: Edited frames.
         """
         print("Start VideoEditor")
-        #output = np.empty((num_frames, height, width, 3), np.uint8)  # Create array of frames
+        # output = np.empty((num_frames, height, width, 3), np.uint8)  # Create array of frames
         output = None
         if type(filter) is MotionTracking:
             for index in range(len(frames) - 1):
                 n_frame = filter.apply(frames[index], frames[index + 1], processes_limit, pool)  # Use filter to frame
                 if output is None:
                     width, height, _ = n_frame[0].shape
-                    output = np.empty((num_frames, height, width, 3), np.uint8)
+                    output = np.empty((num_frames, width, height, 3), np.uint8)
                 output[index, :, :, :] = n_frame[0]  # Add edited frame to array
 
             output[len(frames) - 1, :, :, :] = frames[-1]  # last frame but without detection
@@ -58,7 +58,7 @@ class VideoEditor(Filter):
                 frame = filter.apply(frame, processes_limit, pool)  # Use filter to frame
                 if output is None:
                     width, height, _ = frame[0].shape
-                    output = np.empty((num_frames, height, width, 3), np.uint8)
+                    output = np.empty((num_frames, width, height, 3), np.uint8)
                 output[index, :, :, :] = frame[0]  # Add edited frame to array
                 index += 1  # Next frame
 
