@@ -4,6 +4,7 @@ import numpy as np
 
 from .Filter import Filter
 from .MotionTracking import MotionTracking
+from .VideoFlip import VideoFlip
 from .VideoReverse import VideoReverse
 from .VideoToPanorama import VideoToPanorama
 from .VideoOverlay import VideoOverlay
@@ -54,6 +55,8 @@ class VideoEditor(Filter):
             output = filter.apply(frames, width, height, fps,
                                   num_frames, processes_limit, pool)
         elif type(filter) is VideoReverse:
+            output = filter.apply(frames, processes_limit, pool)
+        elif type(filter) is VideoFlip:
             output = filter.apply(frames, processes_limit, pool)
 
         else:

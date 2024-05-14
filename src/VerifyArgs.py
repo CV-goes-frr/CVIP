@@ -98,6 +98,12 @@ class VerifyArgs:
                 if len(self.args) != 1:
                     raise WrongParametersException(self.name, str(self.args[1:]))
 
+            case 'flip':
+                if len(self.args) != 2:
+                    raise WrongParametersException(self.name, str(self.args[1:]))
+                if self.args[1] != 'horizontal' and self.args[1] != 'vertical':
+                    raise WrongParametersException(self.name, str(self.args[1:]))
+
             case _:
                 # If the filter name is not recognized, raise an exception
                 raise WrongFilterNameException(self.name)

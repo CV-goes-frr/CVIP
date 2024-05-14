@@ -1,4 +1,3 @@
-import cv2
 import numpy as np
 from multiprocessing import Pool
 
@@ -11,4 +10,4 @@ class VideoReverse(Filter):
         self.log = "REVERSING A VIDEO IN PROCESS..."
 
     def apply(self, frames: np.ndarray, processes_limit: int, pool: Pool) -> np.ndarray:
-        return np.flipud(frames)
+        return np.flipud(frames)  # axis=0
