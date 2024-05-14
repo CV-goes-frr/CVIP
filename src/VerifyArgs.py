@@ -104,6 +104,12 @@ class VerifyArgs:
                 if self.args[1] != 'horizontal' and self.args[1] != 'vertical':
                     raise WrongParametersException(self.name, str(self.args[1:]))
 
+            case 'saturation':
+                if len(self.args) != 2:
+                    raise WrongParametersException(self.name, str(self.args[1:]))
+                if not re.match(r'^[.0-9]+$', self.args[1]):
+                    raise WrongParametersException(self.name, self.args[1])
+
             case _:
                 # If the filter name is not recognized, raise an exception
                 raise WrongFilterNameException(self.name)

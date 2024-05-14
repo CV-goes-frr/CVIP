@@ -14,6 +14,7 @@ from .filters.FeatureMatching import FeatureMatching
 from .filters.MotionTracking import MotionTracking
 from .filters.NnScale import NnScale
 from .filters.OverlayingMask import OverlayingMask
+from .filters.Saturation import Saturation
 from .filters.ScaleToResolution import ScaleToResolution
 from .filters.VideoEditor import VideoEditor
 from .filters.VideoFlip import VideoFlip
@@ -59,7 +60,8 @@ class Processor:
                                            "panorama": VideoToPanorama,
                                            "video_overlay": VideoOverlay,
                                            "reverse": VideoReverse,
-                                           "flip": VideoFlip}
+                                           "flip": VideoFlip,
+                                           "saturation": Saturation}
 
         # what in-labels should be already done for applying the filter with this out-label
         self.label_dependencies: Dict[str, List[str]] = {}

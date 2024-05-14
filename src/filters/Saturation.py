@@ -1,8 +1,7 @@
 import cv2
+import numpy as np
 from multiprocessing import Pool
 from typing import List
-
-import numpy as np
 
 from .Filter import Filter
 
