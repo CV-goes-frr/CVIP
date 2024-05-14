@@ -16,6 +16,8 @@ from .filters.NnScale import NnScale
 from .filters.OverlayingMask import OverlayingMask
 from .filters.ScaleToResolution import ScaleToResolution
 from .filters.VideoEditor import VideoEditor
+from .filters.VideoOverlay import VideoOverlay
+from src.exceptions.WrongParameters import WrongParametersException
 from src.filters.VideoToPanorama import VideoToPanorama
 
 
@@ -52,7 +54,8 @@ class Processor:
                                            "mask": OverlayingMask,
                                            "motion_tracking": MotionTracking,
                                            "feature_matching": FeatureMatching,
-                                           "panorama": VideoToPanorama}
+                                           "panorama": VideoToPanorama,
+                                           "video_overlay": VideoOverlay}
 
         # what in-labels should be already done for applying the filter with this out-label
         self.label_dependencies: Dict[str, List[str]] = {}
@@ -114,8 +117,12 @@ class Processor:
             for prev_res in prev_result:
                 self.label_in_map[label].start_log()
                 if self.video_editing:  # applying filter frame by frame with VideoEditor class
-                    res = VideoEditor.apply(prev_res, self.processes_limit, self.pool, self.label_in_map[label],
-                                            self.num_frames)
+                    try:
+                        res = VideoEditor.apply(prev_res, self.processes_limit, self.pool, self.label_in_map[label],
+                                            self.num_frames, self.width, self.height, self.fps)
+                    except ValueError:
+                        raise WrongParametersException("video_overlay",
+                                                       "Couldn't match width or height. Check the shape of the second video")
                 else:  # apply operation for the image
                     res = self.label_in_map[label].apply(prev_res, self.processes_limit, self.pool)
                 for r in res:
