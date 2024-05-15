@@ -15,7 +15,8 @@ PREDICTOR_PATH = "shape_predictor_81_face_landmarks.dat"
 
 
 class OverlayingMask(Filter):
-    def init(self, mask_name: str):
+
+    def __init__(self, mask_name: str):
         """
         Initializes the OverlayingMask filter.
 
