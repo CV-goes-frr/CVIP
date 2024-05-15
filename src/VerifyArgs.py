@@ -83,6 +83,37 @@ class VerifyArgs:
                 if len(self.args) != 1:
                     raise WrongParametersException(self.name, str(self.args[1:]))
 
+            case 'video_overlay':
+                if len(self.args) != 6:
+                    raise WrongParametersException(self.name, str(self.args[1:]))
+                for param in self.args[2:]:
+                    if not re.match(r'^[0-9]+$', param):
+                        raise WrongParametersException(self.name, param)
+                if int(self.args[2]) < 1:
+                    raise WrongParametersException(self.name, self.args[2])
+                if int(self.args[5]) != 0 and int(self.args[5]) != 1:
+                    raise WrongParametersException(self.name, self.args[5])
+
+            case 'reverse':
+                if len(self.args) != 1:
+                    raise WrongParametersException(self.name, str(self.args[1:]))
+
+            case 'flip':
+                if len(self.args) != 2:
+                    raise WrongParametersException(self.name, str(self.args[1:]))
+                if self.args[1] != 'horizontal' and self.args[1] != 'vertical':
+                    raise WrongParametersException(self.name, str(self.args[1:]))
+
+            case "fade":
+                if len(self.args) != 3:
+                    raise WrongParametersException(self.name, str(self.args[1:]))
+          
+            case 'saturation':
+                if len(self.args) != 2:
+                    raise WrongParametersException(self.name, str(self.args[1:]))
+                if not re.match(r'^[.0-9]+$', self.args[1]):
+                    raise WrongParametersException(self.name, self.args[1])
+
             case _:
                 # If the filter name is not recognized, raise an exception
                 raise WrongFilterNameException(self.name)

@@ -23,6 +23,7 @@ class ScaleToResolution(Filter):
             size_y (str): Target height.
         """
         super().__init__()
+        self.log = "BICUBIC SCALE TO RESOLUTION IN PROCESS..."
         self.size_x: int = int(size_x)
         self.size_y: int = int(size_y)
 
@@ -38,7 +39,7 @@ class ScaleToResolution(Filter):
         Returns:
             List[np.ndarray]: List containing the scaled image.
         """
-        print("BICUBIC SCALE TO RESOLUTION IN PROCESS...")  # Print a message indicating the start of the process
+
         if self.cache:  # Check if there is a cached result
             print("USING CACHE...")  # Print a message indicating the use of cached result
             return self.cache  # Return the cached result

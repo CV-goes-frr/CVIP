@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import time
 from multiprocessing import Pool
+from moviepy.editor import VideoFileClip
 from typing import Dict, List
 
 from settings import prefix
@@ -13,9 +14,15 @@ from .filters.FeatureMatching import FeatureMatching
 from .filters.MotionTracking import MotionTracking
 from .filters.NnScale import NnScale
 from .filters.OverlayingMask import OverlayingMask
+from .filters.Saturation import Saturation
 from .filters.ScaleToResolution import ScaleToResolution
 from .filters.VideoEditor import VideoEditor
+from .filters.VideoFlip import VideoFlip
+from .filters.VideoOverlay import VideoOverlay
+from src.exceptions.WrongParameters import WrongParametersException
 from src.filters.VideoToPanorama import VideoToPanorama
+from .filters.VideoReverse import VideoReverse
+from .filters.FadeEffect import FadeEffect
 
 
 class Processor:
@@ -33,6 +40,7 @@ class Processor:
         self.width = 0
         self.height = 0
         self.fps = 0
+        self.audio = None
 
         self.fin_labels: List[str] = []  # labels to create output files from
         if processes_limit > 4:  # if we create more than 4 processes, we can blow up machines without enough RAM
@@ -50,7 +58,12 @@ class Processor:
                                            "mask": OverlayingMask,
                                            "motion_tracking": MotionTracking,
                                            "feature_matching": FeatureMatching,
-                                           "panorama": VideoToPanorama}
+                                           "panorama": VideoToPanorama,
+                                           "video_overlay": VideoOverlay,
+                                           "reverse": VideoReverse,
+                                           "flip": VideoFlip,
+                                           "fade": FadeEffec,
+                                           "saturation": Saturation}
 
         # what in-labels should be already done for applying the filter with this out-label
         self.label_dependencies: Dict[str, List[str]] = {}
@@ -87,6 +100,8 @@ class Processor:
                 self.height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
                 self.fps = int(cap.get(cv2.CAP_PROP_FPS))
                 self.num_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+                self.audio = VideoFileClip(f'{prefix}/{prev_label[3::]}').audio
+                # print(self.audio)
 
                 # create prev_result
                 prev_result = [np.empty((self.num_frames, self.height, self.width, 3), np.uint8)]
@@ -110,10 +125,14 @@ class Processor:
             for prev_res in prev_result:
                 self.label_in_map[label].start_log()
                 if self.video_editing:  # applying filter frame by frame with VideoEditor class
-                    res = VideoEditor.apply(prev_res, self.processes_limit, self.pool, self.label_in_map[label],
-                                            self.num_frames, self.width, self.height)
+                    try:
+                        res = VideoEditor.apply(prev_res, self.processes_limit, self.pool, self.label_in_map[label],
+                                                self.num_frames, self.width, self.height, self.fps)
+                    except ValueError as e:
+                        raise WrongParametersException(str(type(self.label_in_map[label])), str(e))
                 else:  # apply operation for the image
                     res = self.label_in_map[label].apply(prev_res, self.processes_limit, self.pool)
+
                 for r in res:
                     result.append(r)
 
