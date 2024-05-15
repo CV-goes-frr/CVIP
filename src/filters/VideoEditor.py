@@ -2,6 +2,7 @@ from multiprocessing import Pool
 
 import numpy as np
 
+from .FadeEffect import FadeEffect
 from .Filter import Filter
 from .MotionTracking import MotionTracking
 from .VideoFlip import VideoFlip
@@ -57,6 +58,8 @@ class VideoEditor(Filter):
         elif type(filter) is VideoReverse:
             output = filter.apply(frames, processes_limit, pool)
         elif type(filter) is VideoFlip:
+            output = filter.apply(frames, processes_limit, pool)
+        elif type(filter) is FadeEffect:
             output = filter.apply(frames, processes_limit, pool)
 
         else:

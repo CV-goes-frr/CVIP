@@ -23,6 +23,7 @@ from src.filters.VideoToPanorama import VideoToPanorama
 from .filters.VideoReverse import VideoReverse
 from .filters.FadeEffect import FadeEffect
 
+
 class Processor:
 
     def __init__(self, processes_limit: int, video_editing: bool):
@@ -126,7 +127,7 @@ class Processor:
                         res = VideoEditor.apply(prev_res, self.processes_limit, self.pool, self.label_in_map[label],
                                                 self.num_frames, self.width, self.height, self.fps)
                     except ValueError as e:
-                        raise WrongParametersException(type(self.label_in_map[label]), str(e))
+                        raise WrongParametersException(str(type(self.label_in_map[label])), str(e))
                 else:  # apply operation for the image
                     res = self.label_in_map[label].apply(prev_res, self.processes_limit, self.pool)
 
