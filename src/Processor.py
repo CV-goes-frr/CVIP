@@ -22,6 +22,7 @@ from .filters.VideoOverlay import VideoOverlay
 from src.exceptions.WrongParameters import WrongParametersException
 from src.filters.VideoToPanorama import VideoToPanorama
 from .filters.VideoReverse import VideoReverse
+from .filters.FadeEffect import FadeEffect
 
 
 class Processor:
@@ -61,6 +62,7 @@ class Processor:
                                            "video_overlay": VideoOverlay,
                                            "reverse": VideoReverse,
                                            "flip": VideoFlip,
+                                           "fade": FadeEffec,
                                            "saturation": Saturation}
 
         # what in-labels should be already done for applying the filter with this out-label
@@ -127,7 +129,7 @@ class Processor:
                         res = VideoEditor.apply(prev_res, self.processes_limit, self.pool, self.label_in_map[label],
                                                 self.num_frames, self.width, self.height, self.fps)
                     except ValueError as e:
-                        raise WrongParametersException(type(self.label_in_map[label]), str(e))
+                        raise WrongParametersException(str(type(self.label_in_map[label])), str(e))
                 else:  # apply operation for the image
                     res = self.label_in_map[label].apply(prev_res, self.processes_limit, self.pool)
 
