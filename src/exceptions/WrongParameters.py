@@ -16,5 +16,5 @@ class WrongParametersException(Exception):
         Returns:
             None
         """
-        self.message = "Wrong parameters for " + fltr + ": " + str(arguments)
+        self.message = "Wrong parameters for " + str(fltr) + ": " + str(arguments)
         super(WrongParametersException, self).__init__(self.message)
