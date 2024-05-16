@@ -71,6 +71,4 @@ class VideoEditor(Filter):
                 output[index, :, :, :] = frame[0]  # Add edited frame to array
                 index += 1  # Next frame
 
-        print("IN VIDEO EDITOR: ", output.shape)
-        print(type(output))
         return [output]  # array of frames
