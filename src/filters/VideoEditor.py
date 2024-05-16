@@ -19,7 +19,6 @@ class VideoEditor(Filter):
     def __init__(self):
         super().__init__()
 
-
     @staticmethod
     def apply(frames: np.ndarray, processes_limit: int, pool: Pool, filter: type,
               num_frames: int, width, height, fps):
@@ -72,4 +71,6 @@ class VideoEditor(Filter):
                 output[index, :, :, :] = frame[0]  # Add edited frame to array
                 index += 1  # Next frame
 
+        print("IN VIDEO EDITOR: ", output.shape)
+        print(type(output))
         return [output]  # array of frames
