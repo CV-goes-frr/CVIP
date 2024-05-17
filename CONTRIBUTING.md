@@ -103,7 +103,7 @@ By following these coding standards, we can maintain a clean and efficient codeb
 
 If you have any questions about the project or contributing, feel free to reach out to maintainers:
 [Valeria Yakovleva](melarozz18@gmail.com)
-[Maksim Kotenkov](example@gmail.com)
+[Maksim Kotenkov](makaninkirmh@gmail.com)
 [Kirill Makanin](example@gmail.com)
 
 We appreciate your contributions to CVIP!
