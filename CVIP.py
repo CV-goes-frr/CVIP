@@ -70,19 +70,25 @@ def main():
             print("\nPROCESSING...\n")
             for fin in proc.fin_labels:
                 res_images_list = proc.process(fin)
-                out = cv2.VideoWriter(f'{prefix}/{fin}_.mp4', fourcc, proc.fps, (proc.width, proc.height))
-                # write result frame by frame
-                for value in res_images_list[0]:
-                    out.write(value)
 
-                out.release()  # It's necessary
+                if len(res_images_list[0].shape) == 4:  # this is a video (n_frames, size, size, 3)
+                    height, width, _ = res_images_list[0][0].shape
+                    out = cv2.VideoWriter(f'{prefix}/{fin}_.mp4', fourcc, proc.fps, (width, height))
+                    # write result frame by frame
+                    for value in res_images_list[0]:
+                        # print("value written")
+                        out.write(value)
 
-                # merge the audio
-                video = VideoFileClip(f'{prefix}/{fin}_.mp4')
-                video.without_audio()
-                video_merged = video.set_audio(proc.audio)
-                video_merged.write_videofile(f'{prefix}/{fin}.mp4')
-                os.remove(f'{prefix}/{fin}_.mp4')
+                    out.release()  # It's necessary
+
+                    # merge the audio
+                    video = VideoFileClip(f'{prefix}/{fin}_.mp4')
+                    video.without_audio()
+                    video_merged = video.set_audio(proc.audio)
+                    video_merged.write_videofile(f'{prefix}/{fin}.mp4')
+                    os.remove(f'{prefix}/{fin}_.mp4')
+                else:
+                    cv2.imwrite(f'{prefix}/{fin}.jpg', res_images_list[0])
 
             end: float = time.time()
             print(f"\nALL TASKS WERE COMPLETED\nTIME ELAPSED: {end - start}\n")

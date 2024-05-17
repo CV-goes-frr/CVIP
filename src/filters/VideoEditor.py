@@ -19,7 +19,6 @@ class VideoEditor(Filter):
     def __init__(self):
         super().__init__()
 
-
     @staticmethod
     def apply(frames: np.ndarray, processes_limit: int, pool: Pool, filter: type,
               num_frames: int, width, height, fps):

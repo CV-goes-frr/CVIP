@@ -62,7 +62,7 @@ class Processor:
                                            "video_overlay": VideoOverlay,
                                            "reverse": VideoReverse,
                                            "flip": VideoFlip,
-                                           "fade": FadeEffec,
+                                           "fade": FadeEffect,
                                            "saturation": Saturation}
 
         # what in-labels should be already done for applying the filter with this out-label
