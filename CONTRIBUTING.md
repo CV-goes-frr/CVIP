@@ -58,10 +58,6 @@ To integrate a new filter into the project, follow these steps:
    - If necessary, navigate to `src/VerifyQuery.py`.
    - Add support for your filter in query verification.
 
-6. **Import Filter in CVIP Module:**
-   - Navigate to `CVIP.py`.
-   - Add an import statement for your filter at the top of the file.
-
 By following these steps, your new filter will be integrated into the project and ready for use. Don't forget to test your changes locally before opening a pull request.
 
 ### Python Style Guide
