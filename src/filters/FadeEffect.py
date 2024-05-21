@@ -51,7 +51,7 @@ class FadeEffect(Filter):
 
         def apply_fade_out(array, duration = 30):
             for i in range(duration):
-                alpha = (duration - i) / duration
+                alpha = 1 - (duration - i) / duration
                 array[num_frames - i - 1] = cv2.addWeighted(array[num_frames - i - 1], alpha,
                                                              np.zeros_like(array[num_frames - i - 1]), 1 - alpha, 0)
             return array

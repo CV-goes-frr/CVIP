@@ -115,6 +115,7 @@ class Processor:
                         prev_result[0][index, :, :, :] = frame
                         index += 1
                 cap.release()
+                # self.num_frames = len(prev_result[0])
             else:
                 prev_result = [cv2.imread(f'{prefix}/{prev_label[3::]}')]  # or read the image
 
