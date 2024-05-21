@@ -80,8 +80,12 @@ class VerifyArgs:
                     raise WrongParametersException(self.name, str(self.args[1:]))
 
             case 'panorama':
-                if len(self.args) != 1:
+                if len(self.args) != 2:
                     raise WrongParametersException(self.name, str(self.args[1:]))
+                if not re.match(r'^[0-9]+$', self.args[1]):
+                    raise WrongParametersException(self.name, self.args[1])
+                if int(self.args[1]) < 1:
+                    raise WrongParametersException(self.name, self.args[1])
 
             case 'video_overlay':
                 if len(self.args) != 6:
