@@ -19,6 +19,7 @@ class VideoToPanorama(Filter):
         """
         super().__init__()
         self.log = "CREATING PANORAMA FROM VIDEO IN PROCESS..."
+        self.step = int(step)
 
     def apply(self, frames: np.ndarray, processes_limit: int, pool: Pool) -> np.ndarray:
         """
@@ -31,10 +32,9 @@ class VideoToPanorama(Filter):
         Returns:
             np.ndarray: Array containing the panorama frame.
         """
-        step = 30
         result = frames[0]
 
-        for frame_index in range(step, len(frames), step):
+        for frame_index in range(self.step, len(frames), self.step):
             result = PanoramicMerge.process(result, frames[frame_index])
 
         return result
