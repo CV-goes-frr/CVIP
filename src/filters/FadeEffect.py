@@ -36,23 +36,27 @@ class FadeEffect(Filter):
             List[np.ndarray]: List containing the edited video frames as a NumPy array.
         """
         num_frames = frames.shape[0]
+        print(num_frames)
 
         # Ensure fade lengths do not exceed the number of frames
         fade_in_length = min(self.fade_in_length, num_frames)
         fade_out_length = min(self.fade_out_length, num_frames)
 
-        def fade_frame(i):
-            if i < fade_in_length:  # Fade-in
-                alpha = i / fade_in_length
-                frames[i] = cv2.addWeighted(frames[i], alpha, np.zeros_like(frames[i]), 1 - alpha, 0)
+        def apply_fade_in(array, duration = 30):
+            for i in range(duration):
+                alpha = i / duration
+                array[i] = cv2.addWeighted(array[i], alpha, np.zeros_like(array[i]), 1 - alpha, 0)
+            return array
 
-            elif i >= num_frames - fade_out_length:  # Fade-out
-                alpha = (fade_out_length - i) / fade_out_length
-                frames[num_frames - i - 1] = cv2.addWeighted(frames[num_frames - i - 1], alpha,
-                                                             np.zeros_like(frames[num_frames - i - 1]), 1 - alpha, 0)
 
-            return frames[i]
+        def apply_fade_out(array, duration = 30):
+            for i in range(duration):
+                alpha = (duration - i) / duration
+                array[num_frames - i - 1] = cv2.addWeighted(array[num_frames - i - 1], alpha,
+                                                             np.zeros_like(array[num_frames - i - 1]), 1 - alpha, 0)
+            return array
 
-        faded_frames = np.array([fade_frame(i) for i in range(num_frames)])
+        frames = apply_fade_in(frames, fade_in_length)
+        frames = apply_fade_out(frames, fade_out_length)
 
-        return faded_frames
+        return frames
