@@ -83,7 +83,7 @@ def main():
 
                     # merge the audio
                     video = VideoFileClip(f'{prefix}/{fin}_.mp4')
-                    video.without_audio()
+                    # video.without_audio()
                     video_merged = video.set_audio(proc.audio)
                     video_merged.write_videofile(f'{prefix}/{fin}.mp4')
                     os.remove(f'{prefix}/{fin}_.mp4')
