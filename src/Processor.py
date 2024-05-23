@@ -37,8 +37,8 @@ class Processor:
         """
         self.video_editing = video_editing  # editing a video will change process
         self.num_frames = 0  # we need to store them when we open the video
-        self.width = 0
-        self.height = 0
+        # self.width = 0
+        # self.height = 0
         self.fps = 0
         self.audio = None
 
@@ -96,15 +96,15 @@ class Processor:
             if self.video_editing:
                 # read the video
                 cap = cv2.VideoCapture(f'{prefix}/{prev_label[3::]}')
-                self.width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))  # reading all the parameters
-                self.height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+                width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))  # reading all the parameters
+                height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
                 self.fps = int(cap.get(cv2.CAP_PROP_FPS))
                 self.num_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
                 self.audio = VideoFileClip(f'{prefix}/{prev_label[3::]}').audio
                 # print(self.audio)
 
                 # create prev_result
-                prev_result = [np.empty((self.num_frames, self.height, self.width, 3), np.uint8)]
+                prev_result = [np.empty((self.num_frames, height, width, 3), np.uint8)]
                 index = 0
 
                 while True:
@@ -127,8 +127,9 @@ class Processor:
             self.label_in_map[label].start_log()
             if self.video_editing:  # applying filter frame by frame with VideoEditor class
                 try:
+                    height, width, _ = prev_res[0].shape  # get the shape of the first frame
                     res = VideoEditor.apply(prev_res, self.processes_limit, self.pool, self.label_in_map[label],
-                                            self.num_frames, self.width, self.height, self.fps)
+                                            self.num_frames, width, height, self.fps)
                 except ValueError as e:
                     raise WrongParametersException(str(type(self.label_in_map[label])), str(e))
             else:  # apply operation for the image

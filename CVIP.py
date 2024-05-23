@@ -76,7 +76,7 @@ def main():
                     out = cv2.VideoWriter(f'{prefix}/{fin}_.mp4', fourcc, proc.fps, (width, height))
                     # write result frame by frame
                     for value in res_images_list[0]:
-                        # print("value written")
+                        # print("value written")ч
                         out.write(value)
 
                     out.release()  # It's necessary
