@@ -4,11 +4,19 @@ CVIP stands for Computer Vision Image Processing tool, that is a convenient, fas
 
 Main features:
 --------------
-  - Blurring faces
-  - Overlaying masking
-  - Face detection
-  - Upscaling/Downscaling with some scale factor
-  - Upscaling/Downscaling to some resolution
+  - `Blurring faces` (photo/video)
+  - `Crop` (photo/video)
+  - `Overlaying masking` (photo/video)
+  - `Face detection` (photo/video)
+  - `Upscaling/Downscaling with some scale factor` (photo/video)
+  - `Upscaling/Downscaling to some resolution` (photo/video)
+  - `Motion Tracking` (video)
+  - `Saturation` (photo/video)
+  - `Flip horizontally/vertically` (photo/video)
+  - `Overlay one video with another` (video)
+  - `Reverse` (video)
+  - `Panorama` (video)
+  - `Feature Matching` (photo/video)
 
 ## Building:
 Open the root directory of the CVIP project you've downloaded. There should be CVIP.spec file.

@@ -25,7 +25,7 @@ def apply_fade_out(frames, duration=30):
     num_frames = len(frames)
     fade_frames = min(duration, num_frames)
     for i in range(fade_frames):
-        alpha = (fade_frames - i) / fade_frames
+        alpha = 1 - (fade_frames - i) / fade_frames
         frames[num_frames - i - 1] = cv2.addWeighted(frames[num_frames - i - 1], alpha, np.zeros_like(frames[num_frames - i - 1]), 1 - alpha, 0)
     return frames
 
@@ -44,7 +44,7 @@ def main(input_video_path, output_video_path, fade_in_duration=30, fade_out_dura
     write_numpy_to_video(frames, output_video_path)
 
 if __name__ == "__main__":
-    input_video_path = './media/jerry1.mp4'
+    input_video_path = './media/patrick.mp4'
     output_video_path = 'output_video.mp4'
     fade_in_duration = 30  # duration in frames
     fade_out_duration = 30  # duration in frames

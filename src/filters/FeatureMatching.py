@@ -70,7 +70,7 @@ class FeatureMatching(Filter):
             matches = sorted(matches, key=lambda x: x.distance)
 
             # Set a distance threshold
-            distance_threshold = 100
+            distance_threshold = 65
             good_matches = [match for match in matches if match.distance < distance_threshold]
         elif self.type_match == 'FLANN':
             # FLANN-based matching
@@ -98,15 +98,15 @@ class FeatureMatching(Filter):
             matchesMask = mask.ravel().tolist()
 
             # Get bounding box of the object in the source image
-            object_bbox = cv2.boundingRect(np.intp(src_pts))
+            # object_bbox = cv2.boundingRect(np.intp(src_pts))
 
             # Get the perspective transformation of the object in the destination image
-            pts = np.float32([[[object_bbox[0], object_bbox[1]],
-                               [object_bbox[0], object_bbox[1] + object_bbox[3]],
-                               [object_bbox[0] + object_bbox[2], object_bbox[1] + object_bbox[3]],
-                               [object_bbox[0] + object_bbox[2], object_bbox[1]]]]).reshape(-1, 1, 2)
-            dst = np.int32(cv2.perspectiveTransform(pts, M))
-            image2 = cv2.polylines(img_copy2, [dst], True, 255, 3, cv2.LINE_AA)
+            # pts = np.float32([[[object_bbox[0], object_bbox[1]],
+            #                    [object_bbox[0], object_bbox[1] + object_bbox[3]],
+            #                    [object_bbox[0] + object_bbox[2], object_bbox[1] + object_bbox[3]],
+            #                    [object_bbox[0] + object_bbox[2], object_bbox[1]]]]).reshape(-1, 1, 2)
+            # dst = np.int32(cv2.perspectiveTransform(pts, M))
+            # image2 = cv2.polylines(img_copy2, [dst], True, 255, 3, cv2.LINE_AA)
         else:
             print("Not enough features")
 
