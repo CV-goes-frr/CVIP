@@ -119,26 +119,26 @@ class Processor:
             else:
                 prev_result = [cv2.imread(f'{prefix}/{prev_label[3::]}')]  # or read the image
 
-            # now let our filter process all we've got from previous
-            result: List = []
-            start: float = time.time()
+        # now let our filter process all we've got from previous
+        result: List = []
+        start: float = time.time()
 
-            for prev_res in prev_result:
-                self.label_in_map[label].start_log()
-                if self.video_editing:  # applying filter frame by frame with VideoEditor class
-                    try:
-                        res = VideoEditor.apply(prev_res, self.processes_limit, self.pool, self.label_in_map[label],
-                                                self.num_frames, self.width, self.height, self.fps)
-                    except ValueError as e:
-                        raise WrongParametersException(str(type(self.label_in_map[label])), str(e))
-                else:  # apply operation for the image
-                    res = self.label_in_map[label].apply(prev_res, self.processes_limit, self.pool)
+        for prev_res in prev_result:
+            self.label_in_map[label].start_log()
+            if self.video_editing:  # applying filter frame by frame with VideoEditor class
+                try:
+                    res = VideoEditor.apply(prev_res, self.processes_limit, self.pool, self.label_in_map[label],
+                                            self.num_frames, self.width, self.height, self.fps)
+                except ValueError as e:
+                    raise WrongParametersException(str(type(self.label_in_map[label])), str(e))
+            else:  # apply operation for the image
+                res = self.label_in_map[label].apply(prev_res, self.processes_limit, self.pool)
 
-                for r in res:
-                    result.append(r)
+            for r in res:
+                result.append(r)
 
-            end: float = time.time()
-            print("Time elapsed:", end - start)
-            print()
+        end: float = time.time()
+        print("Time elapsed:", end - start)
+        print()
 
-            return result
+        return result
