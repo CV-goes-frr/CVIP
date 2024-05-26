@@ -7,7 +7,7 @@ from .Filter import Filter
 
 
 class VideoToPanorama(Filter):
-    def __init__(self):
+    def __init__(self, step: int):
         """
         Initializes the VideoToPanorama filter.
 
