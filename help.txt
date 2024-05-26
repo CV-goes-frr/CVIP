@@ -12,6 +12,13 @@ Actions list:
 * face_blur:blur_coefficient
 * face_detection
 * mask:mask_filename.format
+* feature_matching:type_match:path_to_img_2
+* fade:fade_in_length:fade_out_length
+* motion_tracking
+* saturation:saturation_factor
+* flip:axis
+* reverse
+* panorama
 
 Also, You can mark a label to be the input image or the output image:
 * [-i=input_image.format]action:parameters[-o=output_image]
@@ -23,3 +30,5 @@ Examples of a CVIP call:
 ./CVIP [-i=input_img.png]face_blur:2[-o=blurred][blurred]crop:100:100:400:400[cropped][cropped]scale_to_resolution:600:600[-o=cropped_center] --parallel_processes=2
 
 ./CVIP [-i=input_img.jpg]crop:0:0:1000:500[cropped][cropped]face_detection[-o=detected][cropped]mask:mask_filename.png[-o=masked][-i=input_image2.png]face_blur:5[-o=blurred_original_size][blurred_original_size]scale_to_resolution:1920:1080[-o=blurred_good_resolution]
+
+./CVIP -v [-i=input_video.mp4]fade:30:50[out][out]reverse[-o=reversed_faded]

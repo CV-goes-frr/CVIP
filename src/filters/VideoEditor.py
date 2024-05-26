@@ -19,7 +19,6 @@ class VideoEditor(Filter):
     def __init__(self):
         super().__init__()
 
-
     @staticmethod
     def apply(frames: np.ndarray, processes_limit: int, pool: Pool, filter: type,
               num_frames: int, width, height, fps):
@@ -38,10 +37,27 @@ class VideoEditor(Filter):
         Returns:
             List: Edited frames.
         """
+
+        process_whole_video: list[type] = [
+            VideoToPanorama,
+            VideoReverse,
+            VideoFlip,
+            FadeEffect
+        ]
+        
         print("Start VideoEditor")
         # output = np.empty((num_frames, height, width, 3), np.uint8)  # Create array of frames
         output = None
-        if type(filter) is MotionTracking:
+
+        # processing frame by frame with (frames, process_limit, pool) arguments
+        if type(filter) in process_whole_video:
+            output = filter.apply(frames, processes_limit, pool)
+        # processing frame by frame but with extended list of arguments
+        elif type(filter) is VideoOverlay:
+            output = filter.apply(frames, width, height, fps,
+                                  num_frames, processes_limit, pool)
+        # processing MotionTracking (because of problems with last frame)
+        elif type(filter) is MotionTracking:
             for index in range(len(frames) - 1):
                 n_frame = filter.apply(frames[index], frames[index + 1], processes_limit, pool)  # Use filter to frame
                 if output is None:
@@ -50,18 +66,7 @@ class VideoEditor(Filter):
                 output[index, :, :, :] = n_frame[0]  # Add edited frame to array
 
             output[len(frames) - 1, :, :, :] = frames[-1]  # last frame but without detection
-        elif type(filter) is VideoToPanorama:
-            output = filter.apply(frames, processes_limit, pool)
-        elif type(filter) is VideoOverlay:
-            output = filter.apply(frames, width, height, fps,
-                                  num_frames, processes_limit, pool)
-        elif type(filter) is VideoReverse:
-            output = filter.apply(frames, processes_limit, pool)
-        elif type(filter) is VideoFlip:
-            output = filter.apply(frames, processes_limit, pool)
-        elif type(filter) is FadeEffect:
-            output = filter.apply(frames, processes_limit, pool)
-
+        # processing frame by frame
         else:
             index = 0  # index of frame
             for frame in frames:

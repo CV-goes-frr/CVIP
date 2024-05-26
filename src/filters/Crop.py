@@ -5,6 +5,7 @@ import numpy as np
 
 from .Filter import Filter
 
+
 class Crop(Filter):
 
     def __init__(self, x_1: str, y_1: str, x_2: str, y_2: str):

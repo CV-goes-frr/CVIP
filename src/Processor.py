@@ -37,8 +37,8 @@ class Processor:
         """
         self.video_editing = video_editing  # editing a video will change process
         self.num_frames = 0  # we need to store them when we open the video
-        self.width = 0
-        self.height = 0
+        # self.width = 0
+        # self.height = 0
         self.fps = 0
         self.audio = None
 
@@ -62,7 +62,7 @@ class Processor:
                                            "video_overlay": VideoOverlay,
                                            "reverse": VideoReverse,
                                            "flip": VideoFlip,
-                                           "fade": FadeEffec,
+                                           "fade": FadeEffect,
                                            "saturation": Saturation}
 
         # what in-labels should be already done for applying the filter with this out-label
@@ -96,15 +96,15 @@ class Processor:
             if self.video_editing:
                 # read the video
                 cap = cv2.VideoCapture(f'{prefix}/{prev_label[3::]}')
-                self.width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))  # reading all the parameters
-                self.height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+                width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))  # reading all the parameters
+                height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
                 self.fps = int(cap.get(cv2.CAP_PROP_FPS))
                 self.num_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
                 self.audio = VideoFileClip(f'{prefix}/{prev_label[3::]}').audio
                 # print(self.audio)
 
                 # create prev_result
-                prev_result = [np.empty((self.num_frames, self.height, self.width, 3), np.uint8)]
+                prev_result = [np.empty((self.num_frames, height, width, 3), np.uint8)]
                 index = 0
 
                 while True:
@@ -115,29 +115,31 @@ class Processor:
                         prev_result[0][index, :, :, :] = frame
                         index += 1
                 cap.release()
+                # self.num_frames = len(prev_result[0])
             else:
                 prev_result = [cv2.imread(f'{prefix}/{prev_label[3::]}')]  # or read the image
 
-            # now let our filter process all we've got from previous
-            result: List = []
-            start: float = time.time()
+        # now let our filter process all we've got from previous
+        result: List = []
+        start: float = time.time()
 
-            for prev_res in prev_result:
-                self.label_in_map[label].start_log()
-                if self.video_editing:  # applying filter frame by frame with VideoEditor class
-                    try:
-                        res = VideoEditor.apply(prev_res, self.processes_limit, self.pool, self.label_in_map[label],
-                                                self.num_frames, self.width, self.height, self.fps)
-                    except ValueError as e:
-                        raise WrongParametersException(str(type(self.label_in_map[label])), str(e))
-                else:  # apply operation for the image
-                    res = self.label_in_map[label].apply(prev_res, self.processes_limit, self.pool)
+        for prev_res in prev_result:
+            self.label_in_map[label].start_log()
+            if self.video_editing:  # applying filter frame by frame with VideoEditor class
+                try:
+                    height, width, _ = prev_res[0].shape  # get the shape of the first frame
+                    res = VideoEditor.apply(prev_res, self.processes_limit, self.pool, self.label_in_map[label],
+                                            self.num_frames, width, height, self.fps)
+                except ValueError as e:
+                    raise WrongParametersException(str(type(self.label_in_map[label])), str(e))
+            else:  # apply operation for the image
+                res = self.label_in_map[label].apply(prev_res, self.processes_limit, self.pool)
 
-                for r in res:
-                    result.append(r)
+            for r in res:
+                result.append(r)
 
-            end: float = time.time()
-            print("Time elapsed:", end - start)
-            print()
+        end: float = time.time()
+        print("Time elapsed:", end - start)
+        print()
 
-            return result
+        return result

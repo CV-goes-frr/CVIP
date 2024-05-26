@@ -198,7 +198,7 @@ class VideoOverlay(Filter):
                            int(cap2.get(cv2.CAP_PROP_FRAME_HEIGHT)))
         fps2 = int(round(cap2.get(cv2.CAP_PROP_FPS)))
         fps1 = int(round(fps1))
-        total_frames2 = cap2.get(cv2.CAP_PROP_FRAME_COUNT)
+        total_frames2 = 0
         biggest_fps1 = fps1 >= fps2
         # If biggest_fps1 == True, then increaseFps, else decreaseFps
 
@@ -208,15 +208,16 @@ class VideoOverlay(Filter):
             ret, frame = cap2.read()
             if not ret:
                 break
+            total_frames2 += 1
             video2.append(np.array(frame))
             # Read frames
         cap2.release()
+
         video2 = np.array(video2)
 
         duration1, duration2 = num_frames1 / fps1, total_frames2 / fps2
 
         longest_video_cap1 = duration1 >= duration2
-        fps_ratio = fps1/fps2
 
         if biggest_fps1:
             video2 = self.increaseFps(video2, fps2, fps1, int(total_frames2))
@@ -233,13 +234,13 @@ class VideoOverlay(Filter):
                 )
             else:
                 out = np.empty(
-                    (int(math.ceil(total_frames2 * fps_ratio)), height1, width1, 3),
+                    (video2.shape[0], height1, width1, 3),
                     np.uint8
                 )
         else:
             if longest_video_cap1:
                 out = np.empty(
-                    (int(math.ceil(total_frames2 * fps_ratio)), height1, width1, 3),
+                    (video2.shape[0], height1, width1, 3),
                     np.uint8
                 )
             else:
@@ -289,7 +290,7 @@ class VideoOverlay(Filter):
 
             # Create output frame
             frame1[self.y_offset:self.y_offset + frame2_resized.shape[0],
-                self.x_offset:self.x_offset + frame2_resized.shape[1]] = frame2_resized
+            self.x_offset:self.x_offset + frame2_resized.shape[1]] = frame2_resized
             out[frames_count] = frame1
             frames_count += 1
 
