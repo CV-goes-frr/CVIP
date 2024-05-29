@@ -18,7 +18,7 @@ Actions list:
 * saturation:saturation_factor
 * flip:axis
 * reverse
-* panorama
+* panorama:frame_step
 
 Also, You can mark a label to be the input image or the output image:
 * [-i=input_image.format]action:parameters[-o=output_image]
