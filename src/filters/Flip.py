@@ -4,7 +4,7 @@ from multiprocessing import Pool
 from .Filter import Filter
 
 
-class VideoFlip(Filter):
+class Flip(Filter):
     def __init__(self, axis: str):
         """
         Initializes the VideoFilter filter.
@@ -17,20 +17,20 @@ class VideoFlip(Filter):
         """
         super().__init__()
         self.axis = axis
-        self.log = "FLIPPING A VIDEO IN PROCESS..."
+        self.log = "FLIPPING IN PROCESS..."
 
-    def apply(self, frames: np.ndarray, processes_limit: int, pool: Pool) -> np.ndarray:
+    def apply(self, frame: np.ndarray, processes_limit: int, pool: Pool) -> np.ndarray:
         """
         Flips input media.
 
         Args:
-            frames (np.ndarray): NumPy array of frames.
+            frame (np.ndarray): NumPy array.
             processes_limit (int): Number of processes to use.
             pool (Pool): Pool of processes.
         Returns:
-            np.ndarray: Array containing the flipped media frames.
+            np.ndarray: Array containing the flipped image.
         """
         if self.axis == 'horizontal':
-            return np.flip(frames, axis=2)
+            return [np.flip(frame, axis=1)]
         else:
-            return np.fliplr(frames)  # axis=1
+            return [np.flip(frame, axis=0)]

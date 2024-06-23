@@ -5,7 +5,6 @@ import numpy as np
 from .FadeEffect import FadeEffect
 from .Filter import Filter
 from .MotionTracking import MotionTracking
-from .VideoFlip import VideoFlip
 from .VideoReverse import VideoReverse
 from .VideoToPanorama import VideoToPanorama
 from .VideoOverlay import VideoOverlay
@@ -41,7 +40,6 @@ class VideoEditor(Filter):
         process_whole_video: list[type] = [
             VideoToPanorama,
             VideoReverse,
-            VideoFlip,
             FadeEffect
         ]
         
