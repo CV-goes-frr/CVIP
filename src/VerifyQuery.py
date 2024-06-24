@@ -1,3 +1,4 @@
+import os
 import platform
 import re
 
@@ -151,7 +152,7 @@ class VerifyQuery:
                     # return False
                     raise WrongFilenameException(filename)
             elif system == "Darwin":
-                if filename[0] == "." or ":" in filename:
+                if filename[0] == ":" in filename:
                     # return False
                     raise WrongFilenameException(filename)
         return True
@@ -168,16 +169,23 @@ class VerifyQuery:
         """
 
         filenames = VerifyQuery.get_filenames_and_labels(string)
-        formats = ["png", "jpeg", "jpg", "MOV", "mp4"]
+        formats = ["png", "jpeg", "jpg", "MOV", "mp4", "mov"]
 
         for filename in filenames:
-            if "." in filename:
-                format = filename.split(".")[-1]
+            # Ensure directories exist
+            directory = os.path.dirname(filename)
+            if directory and not os.path.exists(directory):
+                os.makedirs(directory)
+
+            # Validate file format
+            basename = os.path.basename(filename)
+            if "." in basename:
+                file_format = basename.split(".")[-1]
             else:
                 return True
-            if format not in formats:
-                # return False
-                raise WrongFileFormatException(filename)
+
+            if file_format not in formats:
+                raise WrongFileFormatException(filename)  # Use the original path in the exception
         return True
 
     def check(string):
