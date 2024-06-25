@@ -1,6 +1,6 @@
 # [![security: bandit](https://img.shields.io/badge/security-bandit-yellow.svg)](https://github.com/PyCQA/bandit) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) ![OpenCV](https://img.shields.io/badge/opencv-%23white.svg?style=for-the-badge&logo=opencv&logoColor=white) ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54) ![NumPy](https://img.shields.io/badge/numpy-%23013243.svg?style=for-the-badge&logo=numpy&logoColor=white) 
 # CVIP
-CVIP stands for Computer Vision Image Processing tool, that is a convenient, fast and flexible command line tool for editing pictures with the use of Computer Vision methods.
+CVIP stands for Computer Vision Image Processing tool, that is an open-source, convenient, fast and flexible command line tool for editing pictures with the use of Computer Vision methods.
 
 Main features:
 --------------
