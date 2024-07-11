@@ -5,37 +5,18 @@ CVIP stands for Computer Vision Image Processing tool, that is a convenient, fas
 Main features:
 --------------
   - `Blurring faces` (photo/video)
-![blur](resources/gentlemen.jpg)
-./CVIP [-i=Gentlemen.png]face_blur:10[-o=blurred]
   - `Crop` (photo/video)
-![crop](resources/bad.png)
-./CVIP [-i=walter.png]crop:700:650:850:730[-o=eye]
   - `Overlaying masking` (photo/video)
-![mask](resources/masking.png)
-./CVIP [-i=photo.jpg]mask:man.jpg[-o=masked]
   - `Face detection` (photo/video)
-![face](resources/faces.jpg)
-./CVIP [-i=photo.jpg]face_detection[-o=detected]
   - `Upscaling/Downscaling with some scale factor` (photo/video)
-![scale](resources/scale.jpg)
-./CVIP [-i=animals.png]nn_scale_with_factor:2[-o=scaled1]
-./CVIP [-i=animals.png]bilinear_scale_with_factor:2[-o=scaled2]
   - `Upscaling/Downscaling to some resolution` (photo/video)
-![resolution](resources/patrick.jpg)
-./CVIP [-i=bateman.png]scale_to_resolution:1280:300[-o=blooper]
   - `Motion Tracking` (video)
-![motion](resources/motion_tracking_example.gif)
-./CVIP -v [-i=runner.mp4]motion_tracking[-o=tracked]
   - `Saturation` (photo/video)
-![saturation](resources/sunset.png)
-./CVIP [-i=sunset.png]saturation:1.2[-o=saturated]
   - `Flip horizontally/vertically` (photo/video)
   - `Overlay one video with another` (video)
   - `Reverse` (video)
   - `Panorama` (video)
   - `Feature Matching` (photo/video)
-![matching](resources/object_detect.jpg)
-./CVIP [-i=match1.png]feature_matching:BF:match2.png[-o=matched_showcase]
 
 ## Building:
 Open the root directory of the CVIP project you've downloaded. There should be CVIP.spec file.
