@@ -54,6 +54,8 @@ Main features:
 `./CVIP [-i=../examples/man.jpg]nn_scale_with_factor:2[-o=../examples/man_x2_nn]` with photos
 `./CVIP [-i=../examples/man.jpg]bilinear_scale_with_factor:2[-o=../examples/man_x2_bilinear]` with photos
 
+![Result](examples/scale.jpg "Result")
+
 `./CVIP -v [-i=../examples/woman.mov]nn_scale_with_factor:2[-o=../examples/woman_x2_nn]` with videos
 `./CVIP -v [-i=../examples/woman.mov]bilinear_scale_with_factor:2[-o=../examples/woman_x2_bilinear]` with videos
 
@@ -63,15 +65,19 @@ Main features:
 `./CVIP [-i=../examples/man.jpg]scale_to_resolution:1000:1000[-o=../examples/man_1000_1000]` with photos
 `./CVIP -v [-i=../examples/woman.mov]scale_to_resolution:1000:1000[-o=../examples/woman_1000_1000]` with videos
 
+![Result](examples/patrick.jpg "Result")
+
 # `Motion Tracking` (video)
 ## How to use?
 `./CVIP -v [-i=../examples/run.mov]motion_tracking[-o=../examples/run_motion]` with videos
 
+![Result](examples/motion_tracking_example.gif "Result")
+
 # `Saturation` (photo)
 ## How to use?
-`./CVIP [-i=../examples/man.jpg]saturation:2[-o=../examples/man_saturation]` with photos
+`./CVIP [-i=../examples/sunset.jpg]saturation:2[-o=../examples/saturation]` with photos
 
-![Result](examples/man_saturation.jpg "Result")
+![Result](examples/sunset.png "Result")
 
 # `Flip horizontally/vertically` (photo/video)
 ## How to use?
@@ -102,7 +108,9 @@ Main features:
 
 # `Feature Matching` (photo/video)
 ## How to use?
+`./CVIP [-i=match1.png]feature_matching:BF:match2.png[-o=matched]`
 
+![Result](examples/object_detect.jpg "Result")
 
 
 # Building:
