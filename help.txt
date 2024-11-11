@@ -19,6 +19,7 @@ Actions list:
 * flip:axis
 * reverse
 * panorama:frame_step
+* video_overlay:path_to_other_video:resize_factor:offset_x:offset_y:shortest_or_longest_video_length
 
 Also, You can mark a label to be the input image or the output image:
 * [-i=input_image.format]action:parameters[-o=output_image]

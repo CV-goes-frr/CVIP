@@ -17,7 +17,7 @@ from .filters.OverlayingMask import OverlayingMask
 from .filters.Saturation import Saturation
 from .filters.ScaleToResolution import ScaleToResolution
 from .filters.VideoEditor import VideoEditor
-from .filters.VideoFlip import VideoFlip
+from .filters.Flip import Flip
 from .filters.VideoOverlay import VideoOverlay
 from src.exceptions.WrongParameters import WrongParametersException
 from src.filters.VideoToPanorama import VideoToPanorama
@@ -61,7 +61,7 @@ class Processor:
                                            "panorama": VideoToPanorama,
                                            "video_overlay": VideoOverlay,
                                            "reverse": VideoReverse,
-                                           "flip": VideoFlip,
+                                           "flip": Flip,
                                            "fade": FadeEffect,
                                            "saturation": Saturation}
 
